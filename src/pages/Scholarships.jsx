@@ -18,7 +18,7 @@ const AI_TIPS = {
     'Use Claude to write a base essay, then tweak the opening paragraph for each scholarship\'s specific prompt.',
     'Apply to every scholarship your intended major/department offers — program-specific ones have fewer applicants.',
     'Check professional associations in your field (engineering, nursing, IT, etc). They all have scholarships.',
-    'DECA, FFA, FFA, 4-H, Boy Scouts, Girl Scouts — if you were in any of these, you have eligible scholarships.',
+    'DECA, FFA, 4-H, Boy Scouts, Girl Scouts — if you were in any of these, you have eligible scholarships.',
   ],
   long: [
     'National scholarships ($5k+) are worth 2–3 hours of effort each. Use your winning essays as a template.',
