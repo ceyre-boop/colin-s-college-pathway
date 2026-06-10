@@ -1,0 +1,13 @@
+# Render Blueprint. Push this repo, then "New > Blueprint" in Render and point it here.
+# Set ANTHROPIC_API_KEY as a secret in the dashboard (sync: false keeps it out of git).
+services:
+  - type: web
+    name: colin-college-pathway
+    runtime: node
+    plan: free
+    buildCommand: bun install && bun run build
+    startCommand: bun run server.ts
+    autoDeploy: true
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false

@@ -1,3 +1,14 @@
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { PLAN_YEARS } from '../data/defaults';
 
 const fmt = (n) =>
@@ -23,6 +34,17 @@ export default function Dashboard({ costs, scholarships, aid }) {
   const scholarshipsApplied = scholarships.filter((s) => s.status === 'applied').length;
   const scholarshipsWon = scholarships.filter((s) => s.status === 'won').length;
   const scholarshipsFound = scholarships.filter((s) => s.status === 'found').length;
+
+  // Funding coverage: one stacked bar of secured funding (green) vs remaining gap (red).
+  const coverageData = [
+    { name: '5-Year Plan', Funded: Math.min(totalFunding, totalCost), Gap: Math.max(0, gap) },
+  ];
+
+  // 5-year cost broken down by category.
+  const costByCategory = costs.map((c) => ({
+    name: c.label,
+    total: Number(c.annualAmount || 0) * PLAN_YEARS,
+  }));
 
   return (
     <div className="page">
@@ -69,6 +91,54 @@ export default function Dashboard({ costs, scholarships, aid }) {
         </div>
       )}
 
+      <h2>Funding Coverage</h2>
+      <div className="chart-card">
+        <ResponsiveContainer width="100%" height={120}>
+          <BarChart data={coverageData} layout="vertical" margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+            <XAxis
+              type="number"
+              tick={{ fill: '#8890b0', fontSize: 12 }}
+              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+            />
+            <YAxis type="category" dataKey="name" tick={{ fill: '#8890b0', fontSize: 12 }} width={80} />
+            <Tooltip
+              formatter={(v) => fmt(v)}
+              contentStyle={{ background: '#1a1d27', border: '1px solid #2d3252', borderRadius: 8 }}
+              labelStyle={{ color: '#e8eaf0' }}
+              cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+            />
+            <Legend wrapperStyle={{ fontSize: 13 }} />
+            <Bar dataKey="Funded" stackId="a" fill="#22c55e" radius={[4, 0, 0, 4]} />
+            <Bar dataKey="Gap" stackId="a" fill="#ef4444" radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <h2>5-Year Cost by Category</h2>
+      <div className="chart-card">
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={costByCategory} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2d3252" vertical={false} />
+            <XAxis dataKey="name" tick={{ fill: '#8890b0', fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={50} />
+            <YAxis
+              tick={{ fill: '#8890b0', fontSize: 12 }}
+              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+            />
+            <Tooltip
+              formatter={(v) => fmt(v)}
+              contentStyle={{ background: '#1a1d27', border: '1px solid #2d3252', borderRadius: 8 }}
+              labelStyle={{ color: '#e8eaf0' }}
+              cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+            />
+            <Bar dataKey="total" radius={[4, 4, 0, 0]}>
+              {costByCategory.map((_, i) => (
+                <Cell key={i} fill="#6366f1" />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
       <h2>Scholarship Pipeline</h2>
       <div className="card-grid">
         <div className="card">
@@ -92,8 +162,8 @@ export default function Dashboard({ costs, scholarships, aid }) {
           and subsidized loans. No FAFSA = leaving thousands on the table.
         </li>
         <li>
-          <strong>Apply for all state grants.</strong> Oregon Opportunity Grant and OregonPromise
-          are need-based and often overlooked.
+          <strong>Lock in Michigan residency + Go Blue Guarantee.</strong> In-state status plus the
+          Go Blue Guarantee can cover tuition outright — the single biggest lever, worth ~$15–20k.
         </li>
         <li>
           <strong>Easy wins first.</strong> Local scholarships ($250–$2k) have almost no competition.

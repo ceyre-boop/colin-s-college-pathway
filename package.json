@@ -1,17 +1,19 @@
 {
   "name": "colin-s-college-pathway",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "bun run server.ts",
+    "lint": "eslint ."
   },
   "dependencies": {
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "recharts": "^2.15.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

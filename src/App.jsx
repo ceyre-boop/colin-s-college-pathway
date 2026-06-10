@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { DEFAULT_COSTS, AID_TYPES, PLAN_YEARS } from './data/defaults';
+import { DEFAULT_COSTS, AID_TYPES, PLAN_YEARS, DEFAULT_SCHOLARSHIPS } from './data/defaults';
 import Dashboard from './pages/Dashboard';
 import Costs from './pages/Costs';
 import Scholarships from './pages/Scholarships';
 import Aid from './pages/Aid';
 import Budget from './pages/Budget';
+import Essays from './pages/Essays';
 import './index.css';
 
 const TABS = [
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'costs',        label: '💸 Costs'        },
   { id: 'aid',          label: '🏛️ Gov Aid'      },
   { id: 'scholarships', label: '🎓 Scholarships' },
+  { id: 'essays',       label: '✍️ AI Essays'    },
   { id: 'budget',       label: '📋 Budget'       },
 ];
 
@@ -21,13 +23,13 @@ const DEFAULT_AID = AID_TYPES.map((t) => ({ id: t.id, annualAmount: 0, notes: ''
 export default function App() {
   const [tab, setTab] = useState('dashboard');
   const [costs, setCosts] = useLocalStorage('ccp_costs', DEFAULT_COSTS);
-  const [scholarships, setScholarships] = useLocalStorage('ccp_scholarships', []);
+  const [scholarships, setScholarships] = useLocalStorage('ccp_scholarships', DEFAULT_SCHOLARSHIPS);
   const [aid, setAid] = useLocalStorage('ccp_aid', DEFAULT_AID);
 
   function resetAll() {
     if (!window.confirm('Reset ALL data to defaults? This cannot be undone.')) return;
     setCosts(DEFAULT_COSTS);
-    setScholarships([]);
+    setScholarships(DEFAULT_SCHOLARSHIPS);
     setAid(DEFAULT_AID);
   }
 
@@ -74,6 +76,7 @@ export default function App() {
         {tab === 'costs'        && <Costs        costs={costs} setCosts={setCosts} />}
         {tab === 'aid'          && <Aid          aid={aid} setAid={setAid} />}
         {tab === 'scholarships' && <Scholarships scholarships={scholarships} setScholarships={setScholarships} />}
+        {tab === 'essays'       && <Essays       scholarships={scholarships} />}
         {tab === 'budget'       && <Budget       costs={costs} scholarships={scholarships} aid={aid} />}
       </main>
 
