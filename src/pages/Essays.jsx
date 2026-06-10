@@ -1,64 +1,58 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { PROFILE } from '../data/profile';
 
 const CUSTOM = '__custom__';
 
+// Assembles a ready-to-paste essay prompt. You paste this into a Claude Code session
+// and Claude drafts the essay on your Max subscription — no API key, no backend, no cost.
+function buildPrompt({ name, focus, amount, profile, context }) {
+  return [
+    `Write a scholarship application essay of 400–500 words for the "${name}" scholarship` +
+      (amount ? ` (${amount}).` : '.'),
+    '',
+    focus ? `WHAT THIS SCHOLARSHIP REWARDS:\n${focus}` : '',
+    '',
+    'APPLICANT PROFILE (ground every claim in these real facts — do not invent):',
+    profile,
+    context ? `\nADDITIONAL CONTEXT FOR THIS ESSAY:\n${context}` : '',
+    '',
+    'Requirements:',
+    '- First person, specific, concrete. Use my real moments and projects.',
+    "- Tie my story directly to what this specific scholarship rewards.",
+    '- No generic filler, no clichés, no fabricated achievements.',
+    '- 400–500 words. Return only the essay text, no preamble or title.',
+  ]
+    .filter((line) => line !== '')
+    .join('\n');
+}
+
 export default function Essays({ scholarships }) {
   const [selectedId, setSelectedId] = useState(scholarships[0]?.id ?? CUSTOM);
   const [customName, setCustomName] = useState('');
-  const [prompt, setPrompt] = useState('');
+  const [context, setContext] = useState('');
   const [profile, setProfile] = useState(PROFILE);
-  const [essay, setEssay] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const selected = scholarships.find((s) => s.id === selectedId) ?? null;
-  const scholarshipName = selectedId === CUSTOM ? customName.trim() : selected?.name ?? '';
-  const scholarshipFocus = selected?.notes || 'General merit + financial need scholarship.';
+  const name = selectedId === CUSTOM ? customName.trim() : selected?.name ?? '';
 
-  async function generate() {
-    if (!scholarshipName) {
-      setError('Pick a scholarship or enter a name first.');
-      return;
-    }
-    setLoading(true);
-    setError('');
-    setEssay('');
-    setCopied(false);
-    try {
-      const res = await fetch('/api/essay', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          scholarshipName,
-          scholarshipFocus,
-          amount: selected?.amount ? `$${Number(selected.amount).toLocaleString()}` : undefined,
-          profile,
-          extraContext: prompt.trim() || undefined,
-        }),
-      });
-      // On a static host (GitHub Pages) there is no /api/essay — the request returns the SPA's
-      // HTML, not JSON. Detect that and explain instead of throwing a cryptic parse error.
-      const contentType = res.headers.get('content-type') ?? '';
-      if (!contentType.includes('application/json')) {
-        throw new Error(
-          "Essay generation needs the backend, which isn't on this static preview yet — it goes " +
-            'live once the app is deployed to Render. Everything else on this site works here.',
-        );
-      }
-      const data = await res.json();
-      if (!res.ok || !data.essay) throw new Error(data.error || `Request failed (${res.status})`);
-      setEssay(data.essay);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Generation failed.');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const prompt = useMemo(
+    () =>
+      name
+        ? buildPrompt({
+            name,
+            focus: selected?.notes ?? '',
+            amount: selected?.amount ? `$${Number(selected.amount).toLocaleString()}` : '',
+            profile,
+            context: context.trim(),
+          })
+        : '',
+    [name, selected, profile, context],
+  );
 
   async function copy() {
-    await navigator.clipboard.writeText(essay);
+    if (!prompt) return;
+    await navigator.clipboard.writeText(prompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
@@ -67,14 +61,20 @@ export default function Essays({ scholarships }) {
     <div className="page">
       <h1>AI Essays</h1>
       <p className="subtitle">
-        Draft a 400–500 word essay grounded in your real profile — not generic filler. Pick a
-        tracked scholarship or enter any name, then generate.
+        Build a tailored essay prompt grounded in your real profile, then have Claude draft it.
       </p>
 
       <div className="info-box">
-        <strong>⚙️ Backend required:</strong> essay generation runs on the Render deployment
-        (it keeps the Claude API key server-side). On the static GitHub Pages preview the rest of
-        the app works fully; this button activates once we deploy to Render.
+        <strong>🤖 How this works (free, on your Max plan):</strong>
+        <ol>
+          <li>Pick a scholarship (or type a name) and add any prompt-specific context.</li>
+          <li>Hit <strong>Copy Prompt</strong>.</li>
+          <li>Paste it into a Claude Code session and Claude drafts a 400–500 word essay from your profile.</li>
+        </ol>
+        <p className="tip-note">
+          For a batch, paste several prompts at once — or just ask Claude to “write essays for every
+          scholarship marked Applied.” Edit your real details in <code>src/data/profile.js</code> for sharper essays.
+        </p>
       </div>
 
       <div className="card" style={{ marginTop: '1rem' }}>
@@ -92,7 +92,7 @@ export default function Essays({ scholarships }) {
 
           {selectedId === CUSTOM && (
             <>
-              <label>Scholarship name *</label>
+              <label>Scholarship name</label>
               <input
                 className="input"
                 value={customName}
@@ -102,12 +102,12 @@ export default function Essays({ scholarships }) {
             </>
           )}
 
-          <label>Essay prompt / extra context</label>
+          <label>Essay prompt / context</label>
           <textarea
             className="input"
             rows={3}
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            value={context}
+            onChange={(e) => setContext(e.target.value)}
             placeholder="Paste the scholarship's essay question, or note what to emphasize (e.g. leadership, the MRI project)…"
           />
 
@@ -119,25 +119,17 @@ export default function Essays({ scholarships }) {
             onChange={(e) => setProfile(e.target.value)}
           />
         </div>
-
-        <div className="modal-actions" style={{ marginTop: '1rem' }}>
-          <button className="btn btn-primary" onClick={generate} disabled={loading}>
-            {loading ? 'Generating…' : 'Generate Essay'}
-          </button>
-        </div>
-
-        {error && <div className="alert alert-yellow" style={{ marginTop: '1rem' }}>⚠ {error}</div>}
       </div>
 
-      {essay && (
+      {prompt && (
         <div className="card" style={{ marginTop: '1rem' }}>
           <div className="toolbar" style={{ marginBottom: '0.75rem' }}>
-            <span className="note-text">{essay.trim().split(/\s+/).length} words</span>
-            <button className="btn btn-sm" onClick={copy} style={{ marginLeft: 'auto' }}>
-              {copied ? 'Copied ✓' : 'Copy'}
+            <span className="note-text">Ready-to-paste prompt</span>
+            <button className="btn btn-primary" onClick={copy} style={{ marginLeft: 'auto' }}>
+              {copied ? 'Copied ✓' : 'Copy Prompt'}
             </button>
           </div>
-          <div className="essay-output">{essay}</div>
+          <div className="essay-output">{prompt}</div>
         </div>
       )}
     </div>

@@ -1,13 +1,12 @@
-# Render Blueprint. In Render: New > Blueprint, point at this repo.
-# Set ANTHROPIC_API_KEY as a secret in the dashboard (sync: false keeps it out of git).
-# Uses Docker (oven/bun image) so Bun is guaranteed on the host.
+# Render Blueprint — static site (no backend, no secrets).
+# In Render: New > Blueprint, point at this repo, click Apply. Free, global CDN, no cold starts.
 services:
   - type: web
     name: colin-college-pathway
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    plan: free
-    autoDeploy: true
-    envVars:
-      - key: ANTHROPIC_API_KEY
-        sync: false
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
