@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { semesterFinancials } from "./data/semesters";
@@ -6,6 +6,7 @@ import { INIT_TIMELINE, CAT_META } from "./data/timeline";
 import { PATHWAY_DATA, COURSE_STATUS, ALREADY_HAVE, DEGREE_TOTAL, UPPER_DIVISION_NEEDED, UPPER_DIVISION_HAVE, GRAD_TARGET } from "./data/pathway";
 import { REQUIREMENTS, ACTION_ITEMS, KEY_CONTACTS } from "./data/requirements";
 import { DEFAULT_SCHOLARSHIPS, STATUS_OPTIONS, PRIORITY_OPTIONS } from "./data/defaults";
+import { SCOUT_SCHOLARSHIPS, SCOUT_GENERATED_AT } from "./data/scoutFound";
 import { fullProfile, fieldsBlock } from "./data/profile";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
 import "./index.css";
@@ -38,6 +39,17 @@ export default function CollegePathway() {
   const [newEvent, setNewEvent] = useState({ year: 2026, month: "", title: "", desc: "", cat: "academic", icon: "⭐", essay: "" });
   const [batchLoading, setBatchLoading] = useState(false);
   const [batchMsg, setBatchMsg] = useState("");
+
+  // Merge scout finds (src/data/scoutFound.js) into the localStorage-backed list.
+  // Scout ids are stable slugs, so re-runs only add genuinely new scholarships and
+  // the user's status/amount edits on existing ones persist.
+  useEffect(() => {
+    setScholarships((prev) => {
+      const fresh = SCOUT_SCHOLARSHIPS.filter((s) => !prev.some((p) => p.id === s.id));
+      return fresh.length ? [...prev, ...fresh] : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── computed financials ──
   const wonAmt = scholarships.filter((s) => s.status === "won").reduce((a, s) => a + Number(s.amount || 0), 0);
@@ -392,6 +404,12 @@ export default function CollegePathway() {
         {/* SCHOLARSHIPS */}
         {tab === "scholarships" && (
           <div>
+            {SCOUT_SCHOLARSHIPS.length > 0 && (
+              <div style={{ fontSize: 9, color: T.muted, letterSpacing: 2, marginBottom: 10 }}>
+                SCOUT LAST RUN: {new Date(SCOUT_GENERATED_AT).toLocaleDateString()} · {SCOUT_SCHOLARSHIPS.length} IMPORTED ·{" "}
+                <span style={{ color: T.blue }}>bun scout/scout.ts --emit-app</span> to refresh
+              </div>
+            )}
             <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
               {[["all", "ALL"], ...STATUS_OPTIONS.map((s) => [s.value, s.label])].map(([k, l]) => {
                 const c = STATUS_META[k]?.color || T.muted;
@@ -410,6 +428,11 @@ export default function CollegePathway() {
                       <div style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
                         <span style={{ fontSize: 13, color: T.white, fontWeight: "bold" }}>{s.name}</span>
                         <span style={{ fontSize: 9, color: T.muted, letterSpacing: 2 }}>{s.org}</span>
+                        {s.source === "scout" && (
+                          <span style={{ fontSize: 8, color: T.blue, border: `1px solid ${T.blue}`, borderRadius: 3, padding: "1px 5px", letterSpacing: 1 }}>
+                            SCOUT{typeof s.match === "number" ? ` ${s.match}%` : ""}
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: 10, color: T.muted, marginTop: 4, lineHeight: 1.6 }}>{s.notes}</div>
                       <div style={{ fontSize: 9, color: T.muted, marginTop: 4 }}>DEADLINE: {s.deadline}{s.url ? <> · <a href={s.url} target="_blank" rel="noreferrer" style={{ color: T.blue }}>link ↗</a></> : null}</div>

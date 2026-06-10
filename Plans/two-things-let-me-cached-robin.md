@@ -1,45 +1,82 @@
-# Scholarship Scout — Layer 1 (SCOUT) + Layer 2 (FILTER)
+# Scout → App Integration + Chrome Shortcut
+
+> Previous plan (build the scout) is done: `scout/scout.ts` works, scoring runs via PAI Inference,
+> output at `~/scholarships_found.json`. A full 409-candidate scoring run is finishing in the
+> background; its output feeds this plan.
 
 ## Context
 
-The college-pathway app already covers Layer 3: the dashboard tracks the pipeline, `server.ts` drafts essays, and `ScholarshipAutomation.md` is the Claude-in-Chrome form-filling playbook. What's missing is the discovery engine: a script that finds new scholarships matching Colin's profile, scores them for eligibility/effort/legitimacy, and outputs a ranked list ready to feed the Chrome workflow.
+The scout produces scored JSON; the app shows a static 18-entry list seeded from
+`src/data/defaults.js` into localStorage. This plan connects them (brief item 1, "today"),
+builds the Claude-for-Chrome apply shortcut (brief item 2), and notes why item 3 (Alta G2 gate)
+is not planned here.
 
-This plan implements the pasted architecture with two deliberate deviations:
+**Corrections to the brief** (it was written against an imagined repo):
+- The file is `scout/scout.ts`, not `scouts.ts`; the list is `DEFAULT_SCHOLARSHIPS` in
+  `src/data/defaults.js` consumed by `src/App.jsx:28` via `useLocalStorage` — there is no
+  `CollegePathway.jsx` / `INIT_SCHOLARSHIPS`.
+- Claude for Chrome does **not** read local files — no `~/.claude/shortcuts/*.json` exists, and the
+  extension cannot call the Claude API with a key or read `scholarship_profile.json` from disk.
+  The real mechanism is a paste-once shortcut in the extension UI with the profile embedded in its
+  text. The deliverable is that paste-ready block, not a JSON file the extension would never load.
+- Slash commands live at `~/.claude/commands/<name>.md` → `/scout` (modern naming, not `/user:scout`).
 
-1. **TypeScript + Bun, not Python.** Global PAI rule: "TypeScript always. Never Python." Same architecture, same outputs — just the stack this machine standardizes on (and matches the existing repo, which is all Bun/TS).
-2. **Honest scraping tiers.** Fastweb, Scholarships.com, and Niche require login and run bot detection — a plain HTTP script will get empty pages, not scholarships. The scout uses sources that actually work unauthenticated (Bold.org, CareerOneStop, Scholarships360/Appily listing pages), and emits a "needs browser session" worklist for the login-walled sites so they're handled by Claude for Chrome per the existing playbook instead of silently failing.
+## Part A — Scout results into the app
 
-## Files to create
+### 1. `scout/scout.ts`: emit a data module instead of printing JSON
+- Repurpose `--emit-app` to **write `src/data/scoutFound.js`**:
+  `SCOUT_GENERATED_AT` (ISO string) + `SCOUT_SCHOLARSHIPS` array in the `defaults.js` shape,
+  plus `source: 'scout'`, `match`, `effort`, `expectedValue`.
+- Selection: top 30 by `expectedValue` with `match > 40`, deduped against `DEFAULT_SCHOLARSHIPS`
+  names (reuse the existing `emitAppEntries` dedupe in `scout/scout.ts`).
+- **Stable IDs** — `sc_scout_<slug-of-name>` (current `Date.now()` ids would duplicate on every
+  re-run once merged into localStorage).
+- Add `--from-cache`: skip scrape+score, build `scoutFound.js` from the existing
+  `~/scholarships_found.json`. (Fast path for the slash command and for iterating on the UI.)
+- Status mapping: reuse `deadlineBucket()` → `apply` / `future`.
 
-### 1. `~/.claude/memory/scholarship_profile.json`
-The exact profile JSON from the request, verbatim (personal, academic, financial, achievements, categories, essay_angles, contacts). One correction made against the repo's source of truth (`src/data/profile.js`): keep both GPAs labeled as given (`gpa_umflint: 3.92`, `gpa_mott: 3.70`). The `"first generation college student (verify)"` category stays flagged — the scout will not claim it on anything until verified.
+### 2. App merge + badge + timestamp (`src/App.jsx`)
+- On mount, merge `SCOUT_SCHOLARSHIPS` into the localStorage-backed list by id:
+  `setScholarships(prev => [...prev, ...SCOUT_SCHOLARSHIPS.filter(s => !prev.some(p => p.id === s.id))])`
+  — one `useEffect`, user edits (status, amounts) persist, re-runs add only new ids.
+- Card (`src/App.jsx:407-427`): for `s.source === 'scout'`, a small `SCOUT {match}%` badge next to
+  the org label.
+- Scholarships tab header: `SCOUT LAST RUN: {date} · {n} imported` from `SCOUT_GENERATED_AT`
+  (omit if no scout data).
+- `src/data/scoutFound.js` gets committed with real data (generated from the background run's
+  output) so the deployed site shows it; `.gitignore` untouched.
 
-### 2. `scout/scout.ts` (in this repo, git-tracked — not loose in `~`)
-Single-file Bun CLI, ~300 lines, zero new dependencies:
+### 3. `/scout` slash command — `~/.claude/commands/scout.md`
+Instructs the session to: run `bun scout/scout.ts --emit-app` in this repo (full scrape + score +
+emit), report the APPLY NOW summary and any blocked sources, then commit `src/data/scoutFound.js`
+and push (Render autodeploys). Mention `--from-cache` for emit-only.
 
-- **Load** profile from `~/.claude/memory/scholarship_profile.json`.
-- **Fetch** sources via modular adapters (each returns `{name, org, amount, deadline, url, description, source}`):
-  - `bold.org/scholarships` — public listing pages, filter to STEM/need-based/athlete/Eagle Scout categories.
-  - `careeronestop.org` scholarship finder — public, server-rendered, paginated; filter Michigan + STEM.
-  - `scholarships360.org` / `appily.com` no-essay lists — public listing pages.
-  - Fetches use Chrome-like headers; any source returning a block page is reported as `blocked`, not silently empty.
-  - `fastweb.com`, `scholarships.com`, `niche.com` — login-walled: emit as `needs_browser` entries with direct URLs for the Claude-in-Chrome pass.
-- **Score** each candidate with the Claude API (Haiku, batched ~15 per call) using the same raw-`fetch` pattern as `server.ts` (no SDK import). Returns per scholarship: `eligibility_match` (0–100 against profile), `effort` (low/med/high), `legit_flags` (application fees, paid-service redirects, missing org info). Reuse cost accounting from `src/lib/essayCost.js`.
-- **Rank & filter**: `expected_value = amount × match/100`; drop anything with scam flags (listed in a `removed_scams` section of the output for transparency, never silently).
-- **Output**:
-  - `~/scholarships_found.json` — ranked full list with direct application URLs.
-  - Console summary: top 20 by EV, split **apply now** vs **future** by deadline, plus the `needs_browser` worklist.
-  - `--emit-app` flag: prints top finds in the `DEFAULT_SCHOLARSHIPS` shape from `src/data/defaults.js` (id/name/org/amount/deadline/status/priority/url/notes) for pasting into the dashboard, deduped against the 18 already seeded.
+## Part B — Claude for Chrome apply shortcut
 
-### 3. `scout/README.md`
-One page: how to run (`bun scout/scout.ts`), required env (`ANTHROPIC_API_KEY` — already in `.env.example`), what each output means, and how the weekly cadence works (re-run manually or wire a `/schedule` routine later — left as follow-up, not built now).
+Rewrite section 3 of `ScholarshipAutomation.md` (single source of truth — no new file) into a
+complete paste-ready shortcut:
+1. Read page → extract scholarship name, org, amount, prompts, word limits, required fields.
+2. Profile block embedded inline (from `src/data/profile.js` `PROFILE_FIELDS` + facts — name,
+   email, phone, school, major, GPA, address from `~/.claude/memory/scholarship_profile.json`).
+3. Fill personal fields; pick the best-matching essay angle from the embedded angle list
+   (leadership → builder; adversity → constraint; why-your-field → MRI/AI×bio); draft the essay
+   to the form's word limit; fill it.
+4. HARD STOP before submit: list every filled field for review. Never claims unverified
+   categories (first-gen).
+Plus a one-paragraph install note (extension side panel → shortcuts → new → paste).
 
-## Not changing
-- `server.ts`, the React app, `defaults.js` seed data — untouched. The scout is additive.
-- No auto-submission anywhere; the scout ends at a ranked list. Forms remain human-reviewed per the playbook.
+## Out of scope
+- **Alta G2 gate (brief item 3)** — explicitly blocked on Colin confirming readiness + which data
+  to use, and it lives in `~/quant/`, not this repo. Not planned here; say so in the summary.
 
 ## Verification
-1. `bun scout/scout.ts` with `ANTHROPIC_API_KEY` set — confirm it completes, prints per-source fetch counts (including any `blocked` honestly reported), and writes `~/scholarships_found.json`.
-2. Inspect the JSON: every entry has a working application URL (spot-check 3 by fetching them), no scam-flagged entries in the ranked list, EV sort order correct.
-3. Run `--emit-app` and confirm output entries match the `defaults.js` shape and don't duplicate the 18 seeded IDs/URLs.
-4. Report actual results — if a source yields nothing, say so with the reason, not a padded list.
+1. `bun scout/scout.ts --from-cache --emit-app` → `src/data/scoutFound.js` exists, ≤30 entries,
+   all `match > 40`, ids stable across two consecutive runs (diff = timestamp only).
+2. `bun run build` passes; then **Interceptor** on the local server (`bun run start` after build):
+   Scholarships tab shows scout cards with badges + the LAST RUN header; existing seeded cards
+   unchanged; no console errors. Status edit on a scout card survives reload (localStorage merge
+   correct).
+3. Re-run emit → reload → no duplicate cards (stable-id check in the real UI).
+4. `/scout` command file exists; dry-read it for correct paths.
+5. Commit + push; verify Render deploy with Interceptor on the live URL (per the brief's
+   "commit and push when done").

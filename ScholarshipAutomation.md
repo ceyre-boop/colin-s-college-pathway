@@ -42,20 +42,59 @@ then STOP before submitting so I can review.
 
 ---
 
-## 3. Reusable shortcut — "Apply to Scholarship"
+## 3. Reusable shortcut — "Apply to Scholarship" (complete, paste-ready)
 
-Claude for Chrome supports saved shortcuts. Build this once (side panel → shortcuts → new):
+**Install (one time):** Claude for Chrome side panel → **Shortcuts** → **New** → name it
+`Apply to Scholarship`, trigger **Manual**, paste the entire block below as the instruction.
+The extension can't read local files or call the API with a key, so the profile is embedded
+in the shortcut text itself — it travels with the shortcut. When facts change (GPA, school),
+update them here and re-paste.
 
 ```
-SHORTCUT NAME: Apply to Scholarship
-TRIGGER: Manual
-STEPS:
-1. Read the current page — extract scholarship name, org, amount, requirements, word limits.
-2. Load my profile (paste from section 2, or save it to the extension's memory once).
-3. Fill all personal-info fields.
-4. Generate a custom essay matching the form's prompt and word limit.
-5. Fill the essay field.
-6. STOP — show me everything you filled. Do NOT submit. I review and submit myself.
+You are filling a scholarship application form on the current page for me. Follow these steps exactly.
+
+STEP 1 — READ THE PAGE
+Extract: scholarship name, organization, award amount, deadline, every required field,
+every essay prompt and its word/character limit. If this page charges an application fee
+or redirects to a paid service, STOP and tell me — do not fill anything.
+
+STEP 2 — MY PROFILE (ground every field and every essay claim in these facts; never invent)
+- Full name: Colin Eyre
+- Email: Colineyre222@gmail.com · Phone: +1 (470) 573-8908
+- Address: Swartz Creek, MI 48473 · DOB: December 19, 2006 (age 19) · US citizen
+- School: University of Michigan–Flint (BS Cellular & Molecular Biology, CS minor);
+  currently completing prereqs at Mott Community College, returning to UM-Flint Winter 2027
+- GPA: 3.92 at UM-Flint (Dean's List); 3.7 at Mott; SAT 1260
+- Honors: AP Scholar with Distinction x2 (9 AP exams, 32 transfer credits)
+- Financial: FAFSA SAI -1500 — maximum Pell eligibility, high need, Michigan resident
+- Work: Founding AI Engineer @ TABOOST (production AI inbox manager, 200+ emails/day);
+  Founder @ Alta Investments (live quant trading system built at 18, Sharpe 1.08)
+- Character: Eagle Scout at 13 (top 4%), black belt at 11, 4th place state wrestling (GA, junior yr)
+  while holding a 4.1 HS GPA; President of Lunch Bunch (reverse-inclusion program for special-needs
+  and socially isolated students)
+- Career goal: computational oncology / AI drug discovery
+- DO NOT claim: first-generation college student (unverified) or anything not listed above.
+
+STEP 3 — FILL PERSONAL FIELDS
+Fill every personal/academic/contact field from the profile. Leave anything the profile
+doesn't cover blank and flag it for me at the end.
+
+STEP 4 — ESSAYS
+For each essay prompt, pick the ONE angle that best matches it:
+- Leadership / community → Lunch Bunch: building belonging for kids who couldn't find it.
+- Adversity / financial need → builder under constraint: shipping TABOOST and Alta solo at
+  18-19 with maximum financial need; "the gap is just a variable — variables can be solved."
+- Why your field / career goals → the MRI moment: outlining real tumors on scans at my uncle's
+  radiation oncology clinic in North Dakota, used to plan radiation targeting — the direct line
+  from data to a human life is why I'm building computational oncology tools.
+- Perseverance / commitment → the pattern: black belt (6 years), Eagle Scout, state wrestling —
+  multi-year commitments seen through to the result.
+Write in first person, direct and concrete, a little wry. No clichés, no generic ambition
+statements, nothing not grounded in the profile. Match the word limit exactly. Fill the field.
+
+STEP 5 — HARD STOP
+Do NOT submit. Do NOT click anything past the final review screen. List every field you
+filled and its value, list anything you left blank, and wait for me to review and submit.
 ```
 
 Then every new form is: open it → run **Apply to Scholarship** → review → submit. Target ~20 in an afternoon.
