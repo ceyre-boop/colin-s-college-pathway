@@ -10,10 +10,10 @@ export const PRICING = {
 export const DEFAULT_MODEL = 'claude-haiku-4-5';
 
 // Token-minimal policy: Haiku for everything except high-value scholarships, where a better
-// essay is worth the extra cents — Tier-3 ("long" priority) or amount >= $7,500.
+// essay is worth the extra cents — "critical" priority or amount >= $7,500.
 export function pickModel(scholarship) {
   const amount = Number(scholarship?.amount || 0);
-  const highValue = scholarship?.priority === 'long' || amount >= 7500;
+  const highValue = scholarship?.priority === 'critical' || amount >= 7500;
   return highValue ? 'claude-sonnet-4-6' : DEFAULT_MODEL;
 }
 
