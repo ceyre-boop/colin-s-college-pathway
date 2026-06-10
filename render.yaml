@@ -1,12 +1,13 @@
-# Render Blueprint — static site (no backend, no secrets).
-# In Render: New > Blueprint, point at this repo, click Apply. Free, global CDN, no cold starts.
+# Render Blueprint — Bun web service (serves the SPA + /api essay drafting).
+# In Render: New > Blueprint, point at this repo, set ANTHROPIC_API_KEY as a secret, Apply.
+# Uses Docker (oven/bun image) so Bun is guaranteed on the host.
 services:
   - type: web
     name: colin-college-pathway
-    runtime: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false

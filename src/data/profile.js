@@ -28,3 +28,23 @@ Themes to draw on:
 Voice: direct, concrete, a little wry. "The gap is just a variable. Variables can be solved."
 Avoid: clichés, generic ambition statements, anything not grounded in the facts above.
 `.trim();
+
+// Structured fields for form-filling (copied into Claude for Chrome alongside the essay).
+export const PROFILE_FIELDS = {
+  'Full name': 'Colin Eyre',
+  Age: '19',
+  Location: 'Swartz Creek, Michigan',
+  School: 'University of Michigan–Flint',
+  Major: 'BS Cellular & Molecular Biology, CS minor',
+  GPA: '3.7',
+  Honors: 'AP Scholar with Distinction (x2)',
+  Work: 'Founding AI Engineer @ TABOOST; Founder @ Alta Investments',
+  'Career goal': 'Computational oncology / AI drug discovery',
+  'Financial need': 'FAFSA SAI -1500 (maximum Pell), high need, Michigan resident',
+};
+
+export function fieldsBlock() {
+  return Object.entries(PROFILE_FIELDS)
+    .map(([k, v]) => `- ${k}: ${v}`)
+    .join('\n');
+}

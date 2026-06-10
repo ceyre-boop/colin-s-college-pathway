@@ -1,0 +1,124 @@
+// Bun web service: serves the built SPA from dist/ and drafts scholarship essays via the
+// Anthropic Messages API. The API key lives here, server-side, never shipped to the browser.
+// Token-minimal: Haiku by default, Sonnet only for high-value scholarships (see pickModel).
+
+import { pickModel, costUsd, DEFAULT_MODEL } from "./src/lib/essayCost.js";
+
+const PORT = Number(process.env.PORT ?? 3000);
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const DIST = `${import.meta.dir}/dist`;
+
+interface Scholarship {
+  id: string;
+  name: string;
+  amount?: number | string;
+  priority?: string;
+  notes?: string;
+}
+
+function buildPrompt(s: Scholarship, profile: string, context?: string): string {
+  const amount = s.amount ? ` ($${Number(s.amount).toLocaleString()})` : "";
+  return [
+    `Write a scholarship application essay of 400-500 words for "${s.name}"${amount}.`,
+    s.notes ? `What it rewards: ${s.notes}` : "",
+    "",
+    "Applicant profile (ground every claim in these real facts — do not invent):",
+    profile,
+    context ? `\nExtra context for this essay:\n${context}` : "",
+    "",
+    "First person, specific, concrete; tie the story to what this scholarship rewards; no clichés",
+    "or fabrication. Return only the essay text — no preamble, no title.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+async function draftEssay(s: Scholarship, profile: string, context: string | undefined, modelOverride?: string) {
+  const model = modelOverride || pickModel(s);
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": ANTHROPIC_API_KEY as string,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 1200,
+      messages: [{ role: "user", content: buildPrompt(s, profile, context) }],
+    }),
+  });
+  if (!res.ok) throw new Error(`Anthropic ${res.status}: ${await res.text()}`);
+  const data = (await res.json()) as {
+    content: Array<{ type: string; text?: string }>;
+    usage?: { input_tokens: number; output_tokens: number };
+  };
+  const essay = data.content.filter((b) => b.type === "text").map((b) => b.text ?? "").join("").trim();
+  if (!essay) throw new Error("Anthropic returned no text");
+  return { essay, model, words: essay.split(/\s+/).length, costUsd: costUsd(data.usage, model) };
+}
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+}
+
+Bun.serve({
+  port: PORT,
+  // Bun's per-request timeout; batch of many essays can take a while.
+  idleTimeout: 255,
+  async fetch(request) {
+    const url = new URL(request.url);
+
+    if (url.pathname.startsWith("/api/") && request.method === "POST") {
+      if (!ANTHROPIC_API_KEY) return json({ error: "ANTHROPIC_API_KEY is not set on the server." }, 500);
+      let body: any;
+      try {
+        body = await request.json();
+      } catch {
+        return json({ error: "Invalid JSON body." }, 400);
+      }
+      const profile: string = body.profile;
+      if (!profile) return json({ error: "profile is required." }, 400);
+
+      try {
+        // One essay.
+        if (url.pathname === "/api/draft") {
+          if (!body.scholarship?.name) return json({ error: "scholarship.name required." }, 400);
+          const r = await draftEssay(body.scholarship, profile, body.context, body.model);
+          return json({ id: body.scholarship.id, ...r });
+        }
+        // Many essays — sequential to stay gentle on rate limits.
+        if (url.pathname === "/api/batch") {
+          const list: Scholarship[] = body.scholarships ?? [];
+          if (!list.length) return json({ error: "scholarships[] required." }, 400);
+          const results = [];
+          for (const s of list) {
+            try {
+              const r = await draftEssay(s, profile, undefined, body.model);
+              results.push({ id: s.id, ok: true, ...r });
+            } catch (err) {
+              results.push({ id: s.id, ok: false, error: err instanceof Error ? err.message : "failed" });
+            }
+          }
+          return json({ results, totalCostUsd: results.reduce((a, r: any) => a + (r.costUsd ?? 0), 0) });
+        }
+      } catch (err) {
+        return json({ error: err instanceof Error ? err.message : "draft failed." }, 500);
+      }
+      return json({ error: "Unknown endpoint." }, 404);
+    }
+
+    // Static files from dist/, with index.html fallback for client routing.
+    if (request.method === "GET") {
+      const filePath = url.pathname === "/" ? "/index.html" : url.pathname;
+      const file = Bun.file(`${DIST}${filePath}`);
+      if (await file.exists()) return new Response(file);
+      const index = Bun.file(`${DIST}/index.html`);
+      if (await index.exists()) return new Response(index);
+    }
+
+    return new Response("Not found", { status: 404 });
+  },
+});
+
+console.log(`Colin's College Pathway running on http://localhost:${PORT} (default model: ${DEFAULT_MODEL})`);

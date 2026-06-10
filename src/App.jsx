@@ -7,6 +7,7 @@ import Scholarships from './pages/Scholarships';
 import Aid from './pages/Aid';
 import Budget from './pages/Budget';
 import Essays from './pages/Essays';
+import ApplyQueue from './pages/ApplyQueue';
 import './index.css';
 
 const TABS = [
@@ -15,6 +16,7 @@ const TABS = [
   { id: 'aid',          label: '🏛️ Gov Aid'      },
   { id: 'scholarships', label: '🎓 Scholarships' },
   { id: 'essays',       label: '✍️ AI Essays'    },
+  { id: 'queue',        label: '🚀 Apply Queue'  },
   { id: 'budget',       label: '📋 Budget'       },
 ];
 
@@ -77,6 +79,7 @@ export default function App() {
         {tab === 'aid'          && <Aid          aid={aid} setAid={setAid} />}
         {tab === 'scholarships' && <Scholarships scholarships={scholarships} setScholarships={setScholarships} />}
         {tab === 'essays'       && <Essays       scholarships={scholarships} />}
+        {tab === 'queue'        && <ApplyQueue   scholarships={scholarships} setScholarships={setScholarships} />}
         {tab === 'budget'       && <Budget       costs={costs} scholarships={scholarships} aid={aid} />}
       </main>
 
