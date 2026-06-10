@@ -28,17 +28,17 @@ export const PATHWAY_DATA = [
     { code: 'PHL 168', name: 'Philosophy of Bioethics', cr: 3, req: 'A · Humanities (upper div)', status: 'completed' },
     { code: 'PSY 316', name: 'Biological Psychology', cr: 3, req: 'A · bio elective', status: 'completed' },
   ] },
-  { sem: 'Fall 2026', school: 'Mott — final Mott semester', status: 'current', courses: [
-    { code: 'CHEM 160', name: 'General Chemistry II', cr: 3, req: '→ CHM 262 · #1 priority', status: 'planned' },
-    { code: 'CHEM 161', name: 'Gen Chem II Lab', cr: 1, req: '→ CHM 263 · paired with 160', status: 'planned' },
+  { sem: 'Fall 2026', school: 'Mott — final Mott semester (13 cr)', status: 'current', courses: [
     { code: 'ENGL 102', name: 'English Composition II', cr: 3, req: '→ ENG 112 · COMP gen ed', status: 'planned' },
-    { code: 'Fine Arts', name: 'ARTC 110 or MUSC 100', cr: 3, req: 'Fine Arts (F) gen ed — closes the last gap', status: 'planned' },
+    { code: 'FILM 181', name: 'Introduction to Film', cr: 3, req: '→ COM 272 · Fine Arts (F) gen ed', status: 'planned' },
+    { code: 'MUS. 187', name: 'History of Rock & Roll', cr: 3, req: '→ MUS 245 · Humanities (H) gen ed', status: 'planned' },
+    { code: 'MATH 164', name: 'Applied Calculus I', cr: 4, req: '→ MTH 118 · CMB math requirement (saves ~$1,840)', status: 'planned' },
   ] },
   { sem: 'Winter 2027', school: 'UM-Flint · ~67 cr entering · apply residency + Go Blue + email Dr. Sucic', status: 'planned', courses: [
     { code: 'CHM 330', name: 'Organic Chemistry I', cr: 4, req: 'Next in chem sequence', status: 'planned' },
     { code: 'CHM 331', name: 'Organic Chemistry Lab I', cr: 1, req: 'Paired with CHM 330', status: 'planned' },
     { code: 'MTH 118', name: 'Applied Calculus', cr: 4, req: 'Only math requirement', status: 'planned' },
-    { code: 'CIT 100', name: 'Technology Foundations', cr: 4, req: 'CMB req — easy A (verify Mott COMI 160 covers it)', status: 'planned' },
+    { code: 'CIT 100', name: 'Technology Foundations', cr: 4, req: 'CMB req — COMI 160 does NOT transfer as this (maps to CIS 200/BUS 115); take CIT 100 at UM-Flint', status: 'planned' },
     { code: 'H elective', name: 'Humanities (H)', cr: 3, req: 'Finish the H gen ed', status: 'planned' },
   ] },
   { sem: 'Spring/Summer 2027', school: 'UM-Flint (lighter)', status: 'planned', courses: [

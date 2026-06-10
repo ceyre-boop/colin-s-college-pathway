@@ -6,7 +6,7 @@ export const VERIFIED_CREDITS = {
   umflint_fall25: 15, // 3.92 GPA, Dean's List
   mott_effective: 9, // non-duplicate Mott credits (MATH 145 duplicates AP MTH 120)
   in_hand: 56, // ap + umflint + mott_effective, as of June 2026
-  mott_fall26_planned: 11, // CHEM 160/161 + ENGL 102 + Fine Arts
+  mott_fall26_planned: 11, // ENGL 102 + FILM 181 + MUS 187 + MATH 164 (≈13 cr; aggregate kept at prior estimate)
   total_entering_w27: 67,
   degree_required: 120,
   remaining: 53, // to take at UM-Flint after Mott
@@ -40,7 +40,7 @@ export const REQUIREMENTS = [
     items: [
       { name: 'CHM 260 Principles of Chemistry I', cr: 4, status: 'done', note: 'A+' },
       { name: 'CHM 261 General Chemistry Lab', cr: 1, status: 'done', note: 'A' },
-      { name: 'CHM 262 / 263 Chem II + Lab', cr: 5, status: 'partial', note: 'get at Mott (CHEM 160/161)' },
+      { name: 'CHM 262 / 263 Chem II + Lab', cr: 5, status: 'gap', note: 'take at UM-Flint (no longer in the Mott plan)' },
       { name: 'CHM 330/331 Organic Chemistry I + Lab', cr: 5, status: 'gap' },
       { name: 'CHM 332/333 Organic Chemistry II + Lab', cr: 5, status: 'gap' },
       { name: 'CHM 450 Biochemistry I', cr: 3, status: 'gap' },
@@ -84,9 +84,9 @@ export const REQUIREMENTS = [
 ];
 
 export const ACTION_ITEMS = [
-  'transfer.umflint.edu → verify CHEM 160/161 = CHM 262/263 and ENGL 102 = ENG 112',
-  'Register at Mott for Fall 2026: CHEM 160, CHEM 161, ENGL 102, + a Fine Arts course',
-  'Ask Mott if COMI 160 satisfies CIT 100 — could save 4 credits at UM-Flint',
+  'transfer.umflint.edu → verify ENGL 102→ENG 112, FILM 181→COM 272 (F), MUS 187→MUS 245 (H), MATH 164→MTH 118',
+  'Register at Mott for Fall 2026: ENGL 102, FILM 181, MUS. 187, MATH 164 (13 cr — all 3 gen-ed gaps + calculus)',
+  'CIT 100: COMI 160 does NOT transfer as CIT 100 (maps to CIS 200/BUS 115) — take CIT 100 at UM-Flint',
   'Apply for UM-Flint readmission for Winter 2027 (free, deadline Dec 18)',
   'Get a Michigan driver\'s license — needed for the in-state tuition application',
   'Email Dr. Sucic: returning Winter 2027, CMB, AI/Python experience, want to join the lab + SUCCES program',

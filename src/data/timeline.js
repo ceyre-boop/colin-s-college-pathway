@@ -29,7 +29,7 @@ export const INIT_TIMELINE = [
   { id: 17, year: 2026, month: 'Jan', title: 'Transferred to Mott Community College', desc: 'Strategic move — Mott pays me. Completed 15 credits, 3.7 GPA. Knocking out prereqs at community college cost.', cat: 'academic', icon: '🔄', essay: '' },
   { id: 18, year: 2026, month: 'Jun', title: "Built Colin's College Pathway", desc: 'AI-powered scholarship tracker, course planner, and essay generator. Full-stack deployed app.', cat: 'professional', icon: '💻', essay: '' },
   // FUTURE
-  { id: 19, year: 2026, month: 'Fall', title: 'Final Semester at Mott', desc: 'CHEM 160, ENGL-101, Humanities. Apply to UM Flint for Winter 2027.', cat: 'future', icon: '📅', essay: '' },
+  { id: 19, year: 2026, month: 'Fall', title: 'Final Semester at Mott', desc: 'ENGL 102, FILM 181, MUS 187, MATH 164 (13 cr) — closes all 3 gen-ed gaps + calculus. Apply to UM Flint for Winter 2027.', cat: 'future', icon: '📅', essay: '' },
   { id: 20, year: 2027, month: 'Jan', title: 'Return to UM Flint', desc: 'BS Cellular & Molecular Biology + CS minor. Back where it belongs.', cat: 'future', icon: '🎯', essay: '' },
   { id: 21, year: 2027, month: 'Fall', title: 'Join Research Lab', desc: 'SUCCES Program — Dr. Joseph Sucic. Breast cancer research. Getting paid to do research as a sophomore.', cat: 'future', icon: '🧬', essay: '' },
   { id: 22, year: 2029, month: 'Jan', title: 'Apply — Barry Goldwater Scholarship', desc: '$7,500/yr. The career-defining STEM scholarship. Faculty nomination from Dr. Sucic + REU lab; needs the research started Fall 2027.', cat: 'future', icon: '🌟', essay: '' },
