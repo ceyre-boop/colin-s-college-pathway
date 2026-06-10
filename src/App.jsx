@@ -3,7 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recha
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { semesterFinancials } from "./data/semesters";
 import { INIT_TIMELINE, CAT_META } from "./data/timeline";
-import { PATHWAY_DATA, COURSE_STATUS, ALREADY_HAVE, DEGREE_TOTAL } from "./data/pathway";
+import { PATHWAY_DATA, COURSE_STATUS, ALREADY_HAVE, DEGREE_TOTAL, UPPER_DIVISION_NEEDED, UPPER_DIVISION_HAVE, GRAD_TARGET } from "./data/pathway";
+import { REQUIREMENTS, ACTION_ITEMS, KEY_CONTACTS } from "./data/requirements";
 import { DEFAULT_SCHOLARSHIPS, STATUS_OPTIONS, PRIORITY_OPTIONS } from "./data/defaults";
 import { fullProfile, fieldsBlock } from "./data/profile";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
@@ -25,8 +26,8 @@ export default function CollegePathway() {
   const [tab, setTab] = useState("dashboard");
   const [inState, setInState] = useState(true);
   const [scholarships, setScholarships] = useLocalStorage("ccp_scholarships_v2", DEFAULT_SCHOLARSHIPS);
-  const [timeline, setTimeline] = useLocalStorage("ccp_timeline", INIT_TIMELINE);
-  const [pathway, setPathway] = useLocalStorage("ccp_pathway", PATHWAY_DATA);
+  const [timeline, setTimeline] = useLocalStorage("ccp_timeline_v2", INIT_TIMELINE);
+  const [pathway, setPathway] = useLocalStorage("ccp_pathway_v2", PATHWAY_DATA);
   const [schFilter, setSchFilter] = useState("all");
   const [catFilter, setCatFilter] = useState("all");
   const [essaySch, setEssaySch] = useState("");
@@ -43,7 +44,13 @@ export default function CollegePathway() {
   const fin = useMemo(() => semesterFinancials(inState, wonAmt), [inState, wonAmt]);
   const { rows: semData, totalCost, totalPell, totalOther, totalFunded, gap } = fin;
 
-  const completedCredits = pathway.flatMap((s) => s.courses).filter((c) => c.status === "completed").reduce((a, c) => a + c.cr, 0);
+  // ALREADY_HAVE (56) already includes the "Done" block (AP + Fall '25). Only count newly
+  // completed credits from forward semesters so the tally doesn't double-count.
+  const completedCredits = pathway
+    .filter((s) => s.status !== "completed")
+    .flatMap((s) => s.courses)
+    .filter((c) => c.status === "completed")
+    .reduce((a, c) => a + c.cr, 0);
   const haveCredits = ALREADY_HAVE + completedCredits;
 
   const filteredTimeline = timeline
@@ -135,7 +142,10 @@ export default function CollegePathway() {
     setNewEvent({ year: 2026, month: "", title: "", desc: "", cat: "academic", icon: "⭐", essay: "" });
   }
 
-  const TABS = [["dashboard", "DASHBOARD"], ["pathway", "PATHWAY"], ["timeline", "TIMELINE"], ["scholarships", "SCHOLARSHIPS"], ["essay", "AI ESSAYS"], ["queue", "APPLY QUEUE"]];
+  const TABS = [["dashboard", "DASHBOARD"], ["pathway", "PATHWAY"], ["requirements", "REQUIREMENTS"], ["timeline", "TIMELINE"], ["scholarships", "SCHOLARSHIPS"], ["essay", "AI ESSAYS"], ["queue", "APPLY QUEUE"]];
+
+  const REQ_COLOR = { done: T.green, partial: T.yellow, gap: T.red };
+  const REQ_MARK = { done: "✅", partial: "🟡", gap: "❌" };
 
   return (
     <div style={S.app}>
@@ -221,7 +231,8 @@ export default function CollegePathway() {
               <div style={{ height: 6, background: T.dim, borderRadius: 3 }}>
                 <div style={{ height: 6, background: `linear-gradient(90deg,${T.green},${T.blue})`, borderRadius: 3, width: `${Math.min(100, (haveCredits / DEGREE_TOTAL) * 100)}%`, transition: "width 0.5s" }} />
               </div>
-              <div style={{ fontSize: 9, color: T.muted, marginTop: 6, letterSpacing: 2 }}>{Math.round((haveCredits / DEGREE_TOTAL) * 100)}% TOWARD BS CELLULAR & MOLECULAR BIOLOGY</div>
+              <div style={{ fontSize: 9, color: T.muted, marginTop: 6, letterSpacing: 2 }}>{Math.round((haveCredits / DEGREE_TOTAL) * 100)}% TOWARD BS CELLULAR & MOLECULAR BIOLOGY · GRAD TARGET {GRAD_TARGET.toUpperCase()}</div>
+              <div style={{ fontSize: 9, color: T.muted, marginTop: 6, letterSpacing: 2 }}>UPPER-DIVISION (300+): <span style={{ color: UPPER_DIVISION_HAVE >= UPPER_DIVISION_NEEDED ? T.green : T.yellow }}>{UPPER_DIVISION_HAVE}/{UPPER_DIVISION_NEEDED}</span> · most core BIO/CHM/CSC courses ahead are 300+</div>
             </div>
             {pathway.map((sem, si) => (
               <div key={sem.sem} style={{ ...S.card, borderLeft: `3px solid ${sem.status === "current" ? T.green : T.muted}` }}>
@@ -248,6 +259,56 @@ export default function CollegePathway() {
                           <button key={k} onClick={() => updateCourseStatus(si, ci, k)} style={{ padding: "2px 8px", cursor: "pointer", fontSize: 8, letterSpacing: 1, background: c.status === k ? v.color + "22" : "transparent", color: c.status === k ? v.color : T.dim, border: `1px solid ${c.status === k ? v.color : T.dim}`, fontFamily: "monospace" }}>{v.label}</button>
                         ))}
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* REQUIREMENTS */}
+        {tab === "requirements" && (
+          <div>
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 4 }}>
+              <div style={{ ...S.card, flex: 1, minWidth: 240 }}>
+                <div style={S.label}>Credits Verified</div>
+                {[["AP transfer", 32, T.blue], ["UM-Flint Fall '25 (3.92)", 15, T.green], ["Mott (non-duplicate)", 9, T.yellow], ["Mott Fall '26 (planned)", 11, T.muted]].map(([l, v, c]) => (
+                  <div key={l} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 4 }}><span style={{ color: T.muted }}>{l}</span><span style={{ color: c }}>{v} cr</span></div>
+                ))}
+                <div style={{ borderTop: `1px solid ${T.border}`, marginTop: 8, paddingTop: 8, display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                  <span style={{ color: T.white }}>Entering Winter '27</span><span style={{ color: T.green, fontFamily: "Impact,sans-serif" }}>67 / 120</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginTop: 4 }}>
+                  <span style={{ color: T.muted }}>Upper-division (300+)</span><span style={{ color: T.yellow }}>{UPPER_DIVISION_HAVE} / {UPPER_DIVISION_NEEDED}</span>
+                </div>
+              </div>
+              <div style={{ ...S.card, flex: 2, minWidth: 280 }}>
+                <div style={S.label}>This Week — Action Items</div>
+                <ol style={{ margin: 0, paddingLeft: 18, fontSize: 10.5, color: T.white, lineHeight: 1.9 }}>
+                  {ACTION_ITEMS.map((a, i) => <li key={i}>{a}</li>)}
+                </ol>
+                <div style={{ marginTop: 12, display: "flex", gap: 16, flexWrap: "wrap" }}>
+                  {KEY_CONTACTS.map((c) => (
+                    <div key={c.name} style={{ fontSize: 9, color: T.muted }}><span style={{ color: T.blue }}>{c.name}</span> · {c.role}<br />{c.info}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {REQUIREMENTS.map((req) => (
+              <div key={req.group} style={{ ...S.card, borderLeft: `3px solid ${REQ_COLOR[req.status]}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+                  <span style={{ fontFamily: "Impact,sans-serif", fontSize: 16, color: T.white, letterSpacing: 1 }}>{req.group}</span>
+                  <span style={{ fontSize: 9, color: REQ_COLOR[req.status], letterSpacing: 2, border: `1px solid ${REQ_COLOR[req.status]}`, padding: "2px 8px" }}>{req.required}</span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  {req.items.map((it, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, alignItems: "baseline", padding: "5px 8px", background: T.bg, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 11 }}>{REQ_MARK[it.status]}</span>
+                      <span style={{ flex: 1, minWidth: 180, fontSize: 11, color: it.status === "gap" ? T.white : T.muted }}>{it.name}</span>
+                      <span style={{ fontSize: 9, color: T.muted }}>{it.cr} cr</span>
+                      {it.note && <span style={{ fontSize: 9, color: REQ_COLOR[it.status], minWidth: 120 }}>{it.note}</span>}
                     </div>
                   ))}
                 </div>

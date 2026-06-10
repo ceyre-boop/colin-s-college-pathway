@@ -2,8 +2,9 @@
 export const PROFILE = `
 Name: Colin Eyre — 19, Swartz Creek, Michigan (Michigan resident).
 School: University of Michigan–Flint — BS Cellular & Molecular Biology, CS minor.
-  Currently knocking out prereqs at Mott Community College (strategic, lower cost), 3.7 GPA, ~50 credits banked.
-Academics: 3.7 GPA. AP Scholar with Distinction (x2 — back-to-back). 9 total AP exams. SAT 1260.
+  Knocking out remaining prereqs at Mott Community College (strategic, lower cost); returns to UM-Flint Winter 2027.
+Academics: 3.92 GPA at University of Michigan–Flint, Dean's List (Fall 2025: A+, A, A, A, A-).
+  AP Scholar with Distinction (x2, back-to-back), 9 total AP exams (32 transfer credits). SAT 1260.
 Financial: FAFSA SAI -1500 — maximum need-based eligibility (full Pell). High financial need.
 
 Character / athletics:
@@ -17,8 +18,6 @@ Work / building:
 - Founder of Alta Investments — a sovereign quantitative trading system built from scratch at 18.
   Live forex, Sharpe 1.08, 0% bust probability across 100K simulations.
 
-Goal: Computational oncology / AI drug discovery — building AI for cancer treatment planning.
-
 Origin story (THE moment — real, specific):
 - At his uncle's radiation oncology clinic in North Dakota, Colin outlined actual tumors on MRI scans that
   were then used to plan radiation targeting. That direct line from data to a human life is why he's building
@@ -28,6 +27,15 @@ Voice: direct, concrete, a little wry. "The gap is just a variable. Variables ca
 Avoid: clichés, generic ambition statements, anything not grounded in the facts above.
 `.trim();
 
+// The precise career framing (the "tech oncology" path Colin couldn't name before).
+export const CAREER = `
+Career path: Computational Oncology / AI-assisted cancer research — using machine learning, computer
+vision, and statistical modeling to segment tumors on MRI/CT scans (literally automating what he did by
+hand at his uncle's clinic), predict treatment response from genomic data, model drug interactions, and
+build early-detection systems from pathology images. Target field of companies like Tempus AI, PathAI,
+Recursion, Foundation Medicine; path runs through a funded Bioinformatics PhD (UM Ann Arbor).
+`.trim();
+
 // Structured fields for form-filling (copied into Claude for Chrome alongside the essay).
 export const PROFILE_FIELDS = {
   'Full name': 'Colin Eyre',
@@ -35,8 +43,8 @@ export const PROFILE_FIELDS = {
   Location: 'Swartz Creek, Michigan',
   School: 'University of Michigan–Flint (via Mott CC for prereqs)',
   Major: 'BS Cellular & Molecular Biology, CS minor',
-  GPA: '3.7',
-  Honors: 'AP Scholar with Distinction (x2), 9 AP exams, Eagle Scout, Black Belt, state wrestler',
+  GPA: '3.92 (University of Michigan–Flint, Dean\'s List)',
+  Honors: 'Dean\'s List, AP Scholar with Distinction (x2), 9 AP exams, Eagle Scout, Black Belt, state wrestler',
   Work: 'Founding AI Engineer @ TABOOST; Founder @ Alta Investments',
   'Career goal': 'Computational oncology / AI drug discovery',
   'Financial need': 'FAFSA SAI -1500 (maximum Pell), high need, Michigan resident',
@@ -57,8 +65,7 @@ export function storyBank(timeline = []) {
   return lines.length ? `STORY BANK (pick the angle that fits the prompt):\n${lines.join('\n')}` : '';
 }
 
-// Full profile for the essay backend: facts + story bank.
+// Full profile for the essay backend: facts + career framing + story bank.
 export function fullProfile(timeline) {
-  const bank = storyBank(timeline);
-  return bank ? `${PROFILE}\n\n${bank}` : PROFILE;
+  return [PROFILE, CAREER, storyBank(timeline)].filter(Boolean).join('\n\n');
 }

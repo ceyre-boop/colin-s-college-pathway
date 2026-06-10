@@ -1,14 +1,16 @@
-// Real per-semester financials (Colin's actual plan: Mott Fall '26 → UM-Flint Winter '29).
-// cost/pell/other are dollars; school drives the in-state/out-of-state adjustment.
+// Per-semester financials aligned to the verified academic plan (Mott Fall '26 → UM-Flint,
+// graduating Spring 2030). cost/pell/other are dollars; UM-Flint cost ≈ credits × ~$590 in-state
+// (editable estimate — verify against UM-Flint's published per-credit rate). Mott is far cheaper.
 export const SEMESTERS_COST = [
   { id: 'F26', label: "Fall '26", school: 'Mott', credits: 10, cost: 1900, pell: 3500, other: 0 },
   { id: 'W27', label: "Win '27", school: 'UM-Flint', credits: 16, cost: 9440, pell: 3697, other: 2500 },
-  { id: 'SS27', label: "Sum '27", school: 'UM-Flint', credits: 9, cost: 5310, pell: 1500, other: 0 },
+  { id: 'SS27', label: "Sum '27", school: 'UM-Flint', credits: 12, cost: 7080, pell: 1500, other: 0 },
   { id: 'F27', label: "Fall '27", school: 'UM-Flint', credits: 16, cost: 9440, pell: 3697, other: 0 },
   { id: 'W28', label: "Win '28", school: 'UM-Flint', credits: 14, cost: 8260, pell: 3697, other: 0 },
-  { id: 'SS28', label: "Sum '28", school: 'UM-Flint', credits: 9, cost: 5310, pell: 1500, other: 0 },
+  { id: 'SS28', label: "Sum '28", school: 'UM-Flint', credits: 11, cost: 6490, pell: 1500, other: 0 },
   { id: 'F28', label: "Fall '28", school: 'UM-Flint', credits: 14, cost: 8260, pell: 3697, other: 0 },
-  { id: 'W29', label: "Win '29", school: 'UM-Flint', credits: 14, cost: 8260, pell: 3697, other: 0 },
+  { id: 'W29', label: "Win '29", school: 'UM-Flint', credits: 13, cost: 7670, pell: 3697, other: 0 },
+  { id: 'F29', label: "'29-'30", school: 'UM-Flint', credits: 12, cost: 7080, pell: 3697, other: 0 },
 ];
 
 // In-state tuition baseline vs out-of-state (UM-Flint per-year est.). Applied to UM-Flint cost only.
