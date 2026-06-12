@@ -28,7 +28,7 @@ Fill this scholarship application using my profile:
 - Age: 19, Swartz Creek MI
 - School: University of Michigan–Flint
 - Major: BS Cellular & Molecular Biology, CS minor
-- GPA: 3.7; AP Scholar with Distinction (x2)
+- GPA: 3.92 at UM-Flint (Dean's List); AP Scholar with Distinction (x2)
 - Work: Founding AI Engineer @ TABOOST; Founder @ Alta Investments (quant trading)
 - Goal: Computational oncology / AI drug discovery
 - Financial: FAFSA SAI -1500 (max Pell), high need, Michigan resident
