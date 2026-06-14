@@ -1,0 +1,16 @@
+{
+  "name": "CyberCorps&reg;: Scholarship For Service",
+  "org": "U.S. Office of Personnel Management",
+  "amount": 22500,
+  "amount_text": "$22,500 $34,000",
+  "amount_estimated": false,
+  "deadline": null,
+  "url": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989429",
+  "match_pct": 60,
+  "effort": "high",
+  "expected_value": 13500,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "careeronestop",
+  "selected_at": "2026-06-12"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "BlackRock Founders Scholarship",
+  "org": null,
+  "amount": 20000,
+  "amount_text": "$20,000",
+  "amount_estimated": false,
+  "deadline": "Jul 1, 2026",
+  "url": "https://www.unigo.com/scholarships/undergraduate-students/scholarships-for-college-seniors/blackrock-founders-scholarship",
+  "match_pct": 65,
+  "effort": "med",
+  "expected_value": 13000,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "unigo",
+  "selected_at": "2026-06-12"
+}

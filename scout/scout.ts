@@ -5,16 +5,24 @@
 // per ScholarshipAutomation.md — nothing here submits anything.
 //
 // Sources are split honestly:
-//   - HTTP-scrapeable: CareerOneStop (US DOL database, server-rendered), Scholarships360
-//     (server-rendered article cards). Fetched directly.
-//   - Login-walled / client-side apps: Bold.org, Fastweb, Scholarships.com, Niche, Appily.
-//     Emitted as a needs_browser worklist instead of pretending an HTTP fetch would work.
+//   - HTTP-scrapeable: CareerOneStop (US DOL database, server-rendered, paginated),
+//     Scholarships360 (server-rendered article cards), Unigo (server-rendered WP
+//     directory cards). Fetched directly.
+//   - Login-walled / client-side apps: Bold.org, Fastweb, Scholarships.com, Niche, Appily
+//     (cappex.com redirects here), Petersons (Vue app over an authenticated JSON:API),
+//     Raise.me (login-walled micro-scholarships), Sallie (myscholly.com redirects here —
+//     Scholly was sunset into Sallie's search). The four probe adapters below re-fetch
+//     these every run and report an honest blocked/empty status instead of pretending an
+//     HTTP fetch would work; they all stay on the needs_browser worklist.
 //
 // Usage: bun scout/scout.ts [--no-score] [--emit-app] [--top N] [--limit N]
-//   --no-score   skip Claude scoring (rank by amount only; no API key needed)
-//   --emit-app   also print top finds in the src/data/defaults.js scholarship shape
-//   --top N      how many ranked entries in the console summary (default 20)
-//   --limit N    cap candidates sent to scoring (default 120)
+//                           [--from-cache] [--rescore-failed]
+//   --no-score        skip Claude scoring (rank by amount only; no API key needed)
+//   --emit-app        also print top finds in the src/data/defaults.js scholarship shape
+//   --top N           how many ranked entries in the console summary (default 20)
+//   --limit N         cap candidates sent to scoring (default 120)
+//   --from-cache      rebuild scoutFound.js from the last run's JSON (no scrape/score)
+//   --rescore-failed  re-score only score_failed entries from the cache, re-rank
 
 import { homedir } from "os";
 import { join } from "path";
@@ -103,6 +111,7 @@ const parseAmount = (text: string | null): number | null => {
 // ---------------------------------------------------------------------------
 
 const COS_KEYWORDS = [
+  // original profile core
   "biology",
   "computer science",
   "artificial intelligence",
@@ -110,47 +119,79 @@ const COS_KEYWORDS = [
   "eagle scout",
   "wrestling",
   "transfer student",
+  // field-adjacent (computational oncology path)
+  "medicine",
+  "oncology",
+  "health",
+  "science",
+  "technology",
+  "engineering",
+  "research",
+  "chemistry",
+  "mathematics",
+  // circumstance
+  "michigan",
+  "community college",
+  "sophomore",
+  "undergraduate",
+  "low income",
+  // character / activities
+  "leadership",
+  "community service",
+  "volunteer",
+  "entrepreneurship",
+  "business",
+  "christian",
+  "athlete",
 ];
+
+const COS_MAX_PAGES = 3; // broad keywords overflow pagesize=100; deeper pages are diminishing returns
 
 async function scrapeCareerOneStop(statuses: SourceStatus[]): Promise<Candidate[]> {
   const byId = new Map<string, Candidate>();
   for (const kw of COS_KEYWORDS) {
-    const url = `https://www.careeronestop.org/toolkit/training/find-scholarships.aspx?keyword=${encodeURIComponent(kw)}&curPage=1&pagesize=100`;
-    const page = await fetchPage(url);
-    if (page.status !== "ok") {
-      statuses.push({ source: `careeronestop (${kw})`, status: page.status, count: 0 });
-      continue;
-    }
     let count = 0;
-    // Each result row: detail link + Organization/Purposes blocks, then LOS/type/amount/deadline cells.
-    const rows = page.html.split(/<tr>/).slice(1);
-    for (const row of rows) {
-      const link = row.match(/<a href="(\/Toolkit\/Training\/find-scholarships-detail\.aspx[^"]*scholarshipId=(\d+))"[^>]*>\s*([^<]+?)\s*<\/a>/i);
-      if (!link) continue;
-      const [, href, id, name] = link;
-      const org = row.match(/Organization:\s*<div[^>]*>\s*([^<]+?)\s*</i)?.[1] ?? null;
-      const purpose = row.match(/Purposes?:\s*([^<]+?)\s*</i)?.[1] ?? null;
-      const levels = stripTags(row.match(/headers="thLOS"[^>]*>([\s\S]*?)<\/td>/i)?.[1] ?? "");
-      const amountText = stripTags(row.match(/headers="thAA"[^>]*>([\s\S]*?)<\/td>/i)?.[1] ?? "") || null;
-      const deadline = stripTags(row.match(/headers="thD"[^>]*>([\s\S]*?)<\/td>/i)?.[1] ?? "") || null;
-      // Colin is an undergrad: keep rows open to Associate/Bachelor's (or unspecified).
-      if (levels && !/bachelor|associate/i.test(levels)) continue;
-      if (!byId.has(id))
-        byId.set(id, {
-          name: stripTags(name),
-          org,
-          amount: parseAmount(amountText),
-          amountText,
-          deadline,
-          // The href echoes the search keyword with raw spaces, which breaks the URL —
-          // only scholarshipId matters for the detail page.
-          url: `https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=${id}`,
-          description: purpose,
-          source: "careeronestop",
-        });
-      count++;
+    let fetchStatus: SourceStatus["status"] = "ok";
+    for (let curPage = 1; curPage <= COS_MAX_PAGES; curPage++) {
+      const url = `https://www.careeronestop.org/toolkit/training/find-scholarships.aspx?keyword=${encodeURIComponent(kw)}&curPage=${curPage}&pagesize=100`;
+      const page = await fetchPage(url);
+      if (page.status !== "ok") {
+        if (curPage === 1) fetchStatus = page.status; // later-page failures keep what page 1 gave us
+        break;
+      }
+      let rowsThisPage = 0;
+      // Each result row: detail link + Organization/Purposes blocks, then LOS/type/amount/deadline cells.
+      const rows = page.html.split(/<tr>/).slice(1);
+      for (const row of rows) {
+        const link = row.match(/<a href="(\/Toolkit\/Training\/find-scholarships-detail\.aspx[^"]*scholarshipId=(\d+))"[^>]*>\s*([^<]+?)\s*<\/a>/i);
+        if (!link) continue;
+        rowsThisPage++;
+        const [, href, id, name] = link;
+        const org = row.match(/Organization:\s*<div[^>]*>\s*([^<]+?)\s*</i)?.[1] ?? null;
+        const purpose = row.match(/Purposes?:\s*([^<]+?)\s*</i)?.[1] ?? null;
+        const levels = stripTags(row.match(/headers="thLOS"[^>]*>([\s\S]*?)<\/td>/i)?.[1] ?? "");
+        const amountText = stripTags(row.match(/headers="thAA"[^>]*>([\s\S]*?)<\/td>/i)?.[1] ?? "") || null;
+        const deadline = stripTags(row.match(/headers="thD"[^>]*>([\s\S]*?)<\/td>/i)?.[1] ?? "") || null;
+        // Colin is an undergrad: keep rows open to Associate/Bachelor's (or unspecified).
+        if (levels && !/bachelor|associate/i.test(levels)) continue;
+        if (!byId.has(id))
+          byId.set(id, {
+            name: stripTags(name),
+            org,
+            amount: parseAmount(amountText),
+            amountText,
+            deadline,
+            // The href echoes the search keyword with raw spaces, which breaks the URL —
+            // only scholarshipId matters for the detail page.
+            url: `https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=${id}`,
+            description: purpose,
+            source: "careeronestop",
+          });
+        count++;
+      }
+      if (rowsThisPage < 90) break; // a non-full page is the last page for this keyword
     }
-    statuses.push({ source: `careeronestop (${kw})`, status: count ? "ok" : "empty", count });
+    statuses.push({ source: `careeronestop (${kw})`, status: fetchStatus !== "ok" ? fetchStatus : count ? "ok" : "empty", count });
   }
   return [...byId.values()];
 }
@@ -160,12 +201,20 @@ async function scrapeCareerOneStop(statuses: SourceStatus[]): Promise<Candidate[
 // linking to scholarships360.org/scholarships/search/<slug>/)
 // ---------------------------------------------------------------------------
 
+// All slugs verified live 2026-06-11 (the old scholarships-for-college-sophomores page now 404s).
 const S360_PAGES = [
   "https://scholarships360.org/scholarships/stem-scholarships/",
   "https://scholarships360.org/scholarships/no-essay-scholarships/",
   "https://scholarships360.org/scholarships/easy-scholarships-to-apply-for/",
-  "https://scholarships360.org/scholarships/scholarships-for-college-sophomores/",
   "https://scholarships360.org/scholarships/michigan-scholarships/",
+  "https://scholarships360.org/scholarships/community-college-scholarships/",
+  "https://scholarships360.org/scholarships/biology-scholarships/",
+  "https://scholarships360.org/scholarships/computer-science-scholarships/",
+  "https://scholarships360.org/scholarships/healthcare-scholarships/",
+  "https://scholarships360.org/scholarships/engineering-scholarships/",
+  "https://scholarships360.org/scholarships/leadership-scholarships/",
+  "https://scholarships360.org/scholarships/scholarships-for-men/",
+  "https://scholarships360.org/scholarships/christian-scholarships/",
 ];
 
 function slugToName(slug: string): string {
@@ -216,6 +265,118 @@ async function scrapeScholarships360(statuses: SourceStatus[]): Promise<Candidat
 }
 
 // ---------------------------------------------------------------------------
+// Source adapter: Unigo (server-rendered WordPress directory pages — curated
+// "top N" cards per category page; rich taxonomy under /scholarships/{slug}).
+// Card shape: <a class="scholarship-group-title-link"> then detail/title span
+// pairs (Award Amount / Awards / Deadline / Total Amount Awarded).
+// ---------------------------------------------------------------------------
+
+// Profile-derived category slugs. 302s (martial-arts, pre-med) are followed by
+// fetchPage; a slug that lands somewhere card-less just reports empty.
+const UNIGO_PAGES = [
+  "merit-based",
+  "undergraduate-students",
+  "our-scholarships",
+  "company-sponsored",
+  "religious",
+  "grants-for-college",
+  "by-major/biology-scholarships",
+  "by-major/computer-science-scholarships",
+  "by-major/science-scholarships",
+  "by-major/chemistry-scholarships",
+  "by-major/engineering-scholarships",
+  "by-major/pre-med-scholarships",
+  "by-state/michigan-scholarships",
+  "by-state/georgia-scholarships",
+  "by-type/need-based-scholarships",
+  "by-type/entrepreneurship-scholarships",
+  "by-type/full-ride-scholarships",
+  "athletic/wrestling-scholarships",
+  "athletic/martial-arts-scholarships",
+];
+
+async function scrapeUnigo(statuses: SourceStatus[]): Promise<Candidate[]> {
+  const byKey = new Map<string, Candidate>();
+  let first = true;
+  for (const slug of UNIGO_PAGES) {
+    // Unigo's WAF blocks burst fetches (2026-06-12 run: pages 9+ all came back
+    // blocked). ~600KB pages, so pace requests instead of hammering.
+    if (!first) await new Promise((r) => setTimeout(r, 1500));
+    first = false;
+    const page = await fetchPage(`https://www.unigo.com/scholarships/${slug}`);
+    const label = `unigo (${slug})`;
+    if (page.status !== "ok") {
+      statuses.push({ source: label, status: page.status, count: 0 });
+      continue;
+    }
+    let count = 0;
+    const links = [...page.html.matchAll(/<a href="(https:\/\/www\.unigo\.com\/scholarships\/[^"?]+)[^"]*" class="scholarship-group-title-link">([^<]+)<\/a>/g)];
+    for (let i = 0; i < links.length; i++) {
+      const [, href, rawName] = links[i];
+      // Detail/title pairs live between this card's title link and the next one.
+      const winEnd = i + 1 < links.length ? links[i + 1].index : Math.min(page.html.length, links[i].index! + 6000);
+      const win = page.html.slice(links[i].index, winEnd);
+      const pairs: Record<string, string> = {};
+      const pairRe = /scholarship-listing-detail">([^<]*)<\/span>\s*<span class="scholarship-listing-title">([^<]*)</g;
+      let p: RegExpExecArray | null;
+      while ((p = pairRe.exec(win))) pairs[stripTags(p[2]).toLowerCase()] = stripTags(p[1]);
+      // "Total Amount Awarded" is the pool across all winners, not the award —
+      // using it inflated one $140K phantom to the top of the EV list. A missing
+      // award amount ranks at the conservative "Varies" stand-in instead.
+      const amountText = pairs["award amount"] ?? null;
+      const key = href.replace(/\/$/, "").split("/").pop()!;
+      count++;
+      if (byKey.has(key)) continue;
+      byKey.set(key, {
+        name: stripTags(rawName),
+        org: null,
+        amount: parseAmount(amountText),
+        amountText,
+        deadline: pairs["deadline"] ?? null,
+        url: href,
+        description: null,
+        source: "unigo",
+      });
+    }
+    statuses.push({ source: label, status: count ? "ok" : "empty", count });
+  }
+  return [...byKey.values()];
+}
+
+// ---------------------------------------------------------------------------
+// Probe adapters: Petersons, Raise.me, Appily (cappex.com), Sallie (myscholly.com).
+// All four were probed 2026-06-11 and are client-side apps or login walls — no
+// server-rendered directory to harvest. Each probe re-checks every run and
+// reports an honest status; if one ever ships parseable cards, flip it to a
+// real adapter. They all stay on the NEEDS_BROWSER worklist below.
+// ---------------------------------------------------------------------------
+
+async function probeSource(
+  statuses: SourceStatus[],
+  label: string,
+  url: string,
+  note: string,
+  hasContent: (html: string) => boolean,
+): Promise<Candidate[]> {
+  const page = await fetchPage(url);
+  const status: SourceStatus["status"] = page.status !== "ok" ? page.status : hasContent(page.html) ? "ok" : "empty";
+  statuses.push({ source: label, status, count: 0, note: status === "ok" ? `reachable but unparsed — ${note}` : note });
+  return [];
+}
+
+const scrapePetersons = (s: SourceStatus[]) =>
+  probeSource(s, "petersons (probe)", "https://www.petersons.com/scholarship-search.aspx", "client-side Vue app over an authenticated JSON:API — use browser", (h) => h.length > 100_000);
+
+const scrapeRaiseMe = (s: SourceStatus[]) =>
+  probeSource(s, "raise.me (probe)", "https://www.raise.me/", "login-walled micro-scholarship app — use browser", (h) => /scholarship-listing|__NEXT_DATA__/.test(h));
+
+const scrapeAppily = (s: SourceStatus[]) =>
+  probeSource(s, "appily/cappex (probe)", "https://www.appily.com/scholarships/college-sophomores", "client-side search app (cappex.com redirects here) — use browser", (h) => /scholarship-card|award-amount/i.test(h));
+
+const scrapeScholly = (s: SourceStatus[]) =>
+  probeSource(s, "scholly→sallie (probe)", "https://myscholly.com", "Scholly was sunset into Sallie's search (myscholly.com → sallie.com) — login tool, use browser", (h) => /scholarship-directory|award amount/i.test(h));
+
+// ---------------------------------------------------------------------------
 // Login-walled / client-side sources → browser worklist (Claude for Chrome
 // handles these per ScholarshipAutomation.md; an HTTP scraper gets nothing).
 // ---------------------------------------------------------------------------
@@ -225,7 +386,10 @@ const NEEDS_BROWSER = [
   { site: "Fastweb", url: "https://www.fastweb.com/", note: "Login required. Profile-matched feed; set profile once, harvest matches." },
   { site: "Scholarships.com", url: "https://www.scholarships.com/", note: "Login required. Directory search after profile setup." },
   { site: "Niche", url: "https://www.niche.com/colleges/scholarships/", note: "Bot-detected. $10K no-essay monthly drawing — re-enter every month." },
-  { site: "Appily", url: "https://www.appily.com/scholarships/college-sophomores", note: "Client-side search app. Sophomore + transfer filters." },
+  { site: "Appily", url: "https://www.appily.com/scholarships/college-sophomores", note: "Client-side search app (cappex.com redirects here since the Cappex rebrand). Sophomore + transfer filters." },
+  { site: "Petersons", url: "https://www.petersons.com/scholarship-search.aspx", note: "Client-side Vue app over an authenticated JSON:API. Search by major + state after free signup." },
+  { site: "Raise.me", url: "https://www.raise.me/", note: "Login-walled micro-scholarships, college-specific — check UM-Flint awards before the Winter 2027 transfer." },
+  { site: "Sallie (ex-Scholly)", url: "https://www.sallie.com/scholarships/scholly", note: "myscholly.com redirects here — Scholly was sunset into Sallie's free search. Login tool + monthly no-essay sweepstakes." },
 ];
 
 // ---------------------------------------------------------------------------
@@ -447,16 +611,27 @@ async function main() {
 
   const statuses: SourceStatus[] = [];
   console.log("\nFetching sources…");
-  const [cos, s360] = await Promise.all([scrapeCareerOneStop(statuses), scrapeScholarships360(statuses)]);
+  const [cos, s360, unigo, ...probes] = await Promise.all([
+    scrapeCareerOneStop(statuses),
+    scrapeScholarships360(statuses),
+    scrapeUnigo(statuses),
+    scrapePetersons(statuses),
+    scrapeRaiseMe(statuses),
+    scrapeAppily(statuses),
+    scrapeScholly(statuses),
+  ]);
+  const probed = probes.flat();
 
-  for (const s of statuses) console.log(`  [${s.status.toUpperCase().padEnd(7)}] ${s.source}: ${s.count}`);
+  for (const s of statuses) console.log(`  [${s.status.toUpperCase().padEnd(7)}] ${s.source}: ${s.count}${s.note ? ` — ${s.note}` : ""}`);
+  const rawTotal = statuses.reduce((sum, s) => sum + s.count, 0);
+  console.log(`\n${rawTotal} raw candidates harvested before filtering`);
 
   // Cross-source dedupe by normalized name.
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
   const byName = new Map<string, Candidate>();
-  for (const c of [...cos, ...s360]) if (!byName.has(norm(c.name))) byName.set(norm(c.name), c);
+  for (const c of [...cos, ...s360, ...unigo, ...probed]) if (!byName.has(norm(c.name))) byName.set(norm(c.name), c);
   let candidates = [...byName.values()];
-  console.log(`\n${candidates.length} unique candidates (${cos.length} CareerOneStop, ${s360.length} Scholarships360)`);
+  console.log(`${candidates.length} unique candidates (${cos.length} CareerOneStop, ${s360.length} Scholarships360, ${unigo.length} Unigo, ${probed.length} probes)`);
 
   if (candidates.length > SCORE_LIMIT) {
     // Cap fairly: round-robin across sources, each source's list sorted by amount

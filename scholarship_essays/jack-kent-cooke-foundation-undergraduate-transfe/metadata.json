@@ -1,0 +1,16 @@
+{
+  "name": "Jack Kent Cooke Foundation Undergraduate Transfer Scholarship",
+  "org": "Jack Kent Cooke Foundation",
+  "amount": 55000,
+  "amount_text": "$55,000",
+  "amount_estimated": false,
+  "deadline": "January",
+  "url": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9994025",
+  "match_pct": 88,
+  "effort": "high",
+  "expected_value": 48400,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "careeronestop",
+  "selected_at": "2026-06-12"
+}

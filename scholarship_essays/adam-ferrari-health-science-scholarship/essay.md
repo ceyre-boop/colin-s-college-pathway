@@ -1,0 +1,13 @@
+# Adam Ferrari Health Science Scholarship
+
+There's a specific sound a mouse click makes in a quiet clinic. I heard it a few hundred times the day my uncle, a radiation oncologist in North Dakota, let me outline tumors on real MRI scans — click, drag, click, one vertex at a time around a boundary that decided where radiation would and would not go. I was 19. Every click was a small judgment call about someone's brain tissue, made by hand, by a teenager, because that is genuinely how the workflow works.
+
+That day is why I'm in health science. Not the idea of medicine — the mechanics of it. Treatment planning turned out to be a measurement problem: where does the tumor end, how confident are we, and how do we make that answer consistent across forty slices and a thousand patients? I'm building toward answering it from both directions at once. Cellular and Molecular Biology major, computer science minor — Mott Community College now with a 3.7, back to the University of Michigan-Flint in Winter 2027, where my GPA is 3.92 with Dean's List standing. Nine AP exams and AP Scholar with Distinction twice got me 32 credits of head start.
+
+The computational half isn't theoretical for me. I'm the founding AI engineer at TABOOST, where my system reads and routes 200+ emails a day across 16 inboxes. I founded Alta Investments at 18 — a live quant trading system holding a Sharpe ratio of 1.08 with bust probability modeled at 0%. Noisy inputs, hard decisions, real consequences: that's a trading system, and it's also a tumor boundary. The transferable part is the discipline of building something that has to be right every day, not just on demo day.
+
+Anyway, health science rewards people who stay, and staying is my oldest skill. Six years of martial arts before a black belt at 11. Eagle Scout at 13 — top 4% of scouts. Fourth at Georgia state wrestling my junior year while holding a 4.1 GPA. The pattern repeats: pick a long thing, finish it. A maximum-Pell budget (FAFSA SAI of negative 1500) made the path lumpier — community college was the strategic move, not the consolation — but the gap is just a variable, and variables can be solved.
+
+The destination hasn't moved since that afternoon at the clinic: computational oncology. AI that proposes the tumor boundary so the physician verifies instead of draws. Faster planning, tighter margins, fewer judgment calls resting on whoever happens to be holding the mouse.
+
+This scholarship would buy back the hours I currently spend out-engineering a funding gap and put them into coursework and lab work — the two things between me and the version of that clinic where the software does the clicking and the humans do the medicine.

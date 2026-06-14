@@ -1,0 +1,16 @@
+{
+  "name": "National Institute of Health Undergraduate Scholarship Program (NIH",
+  "org": "National Institutes of Health",
+  "amount": 20000,
+  "amount_text": "$20,000",
+  "amount_estimated": false,
+  "deadline": null,
+  "url": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989452",
+  "match_pct": 85,
+  "effort": "high",
+  "expected_value": 17000,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "careeronestop",
+  "selected_at": "2026-06-12"
+}

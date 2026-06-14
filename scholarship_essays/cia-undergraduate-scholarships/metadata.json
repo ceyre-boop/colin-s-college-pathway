@@ -1,0 +1,16 @@
+{
+  "name": "CIA Undergraduate Scholarships",
+  "org": "Association of Former Intelligence Officers",
+  "amount": 18000,
+  "amount_text": "$18,000",
+  "amount_estimated": false,
+  "deadline": "August",
+  "url": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998358",
+  "match_pct": 45,
+  "effort": "med",
+  "expected_value": 8100,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "careeronestop",
+  "selected_at": "2026-06-12"
+}

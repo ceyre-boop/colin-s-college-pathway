@@ -1,0 +1,13 @@
+# Jack Kent Cooke Foundation Undergraduate Transfer Scholarship
+
+The first tumor I ever outlined took me eleven minutes. I was 19, sitting in my uncle's radiation oncology clinic in North Dakota, dragging a mouse cursor around a gray smudge on an MRI slice — and when I finished, there were forty more slices waiting. Somewhere behind that smudge was a person with a radiation appointment. That is the moment my plans stopped being abstract.
+
+Here is the plan in numbers. I'm at Mott Community College carrying a 3.7, transferring back to the University of Michigan-Flint, where my GPA is 3.92 with Dean's List standing. Cellular and Molecular Biology major, computer science minor. My FAFSA SAI is negative 1500 — maximum Pell eligibility. Community college was not a fallback. It was the answer I got when I treated the funding gap like an engineering problem: the gap is just a variable, and variables can be solved. Mott delivers the same prerequisite credits at a fraction of the cost, so the four-year money goes where the labs are.
+
+People hear "community college" and assume the ambition got downgraded. The evidence says otherwise. While carrying those credits I work as the founding AI engineer at TABOOST, where the system I built reads and routes 200+ emails a day across 16 inboxes for real users. I also founded Alta Investments, a quant trading system I started building at 18. It runs live with a Sharpe of 1.08, and the risk model I wrote holds bust probability at 0%. I did not wait for a bachelor's degree to start shipping. The degree is the next component, installed on schedule, Winter 2027.
+
+Anyway, the pattern is older than the code. Black belt at 11 after six years of training. Eagle Scout at 13 — top 4% of all scouts. Fourth place at Georgia state wrestling my junior year while holding a 4.1. Nine AP exams, AP Scholar with Distinction twice. I start long projects and I finish them, and transferring to finish this degree is simply the next one.
+
+Because those eleven minutes are the real problem. A patient's treatment margin should not depend on how steady a 19-year-old's hand is, and an oncologist's attention is too scarce to spend tracing boundaries by hand. The segmentation models that exist aren't good enough for the clinics that need them, and the space between the research papers and the treatment room is exactly where I want to work: computational oncology — AI that reads the scan, proposes the boundary, and lets a human verify instead of draw.
+
+What I'm asking the Cooke Foundation to fund is the bridge between a community college transcript and that work. I'll supply the rest — the 3.92, the systems already running, the finish-what-you-start record, and one very specific mouse cursor I intend to make obsolete.

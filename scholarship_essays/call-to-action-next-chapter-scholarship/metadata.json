@@ -1,0 +1,16 @@
+{
+  "name": "Call to Action Next Chapter Scholarship",
+  "org": "Call to Action Foundation",
+  "amount": 25000,
+  "amount_text": "$25,000",
+  "amount_estimated": false,
+  "deadline": "April",
+  "url": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015674",
+  "match_pct": 45,
+  "effort": "med",
+  "expected_value": 11250,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "careeronestop",
+  "selected_at": "2026-06-12"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "U.S. Bank Student Scholarship",
+  "org": "U.S. Bank",
+  "amount": 20000,
+  "amount_text": "$20,000",
+  "amount_estimated": false,
+  "deadline": "October",
+  "url": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015251",
+  "match_pct": 75,
+  "effort": "low",
+  "expected_value": 15000,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "careeronestop",
+  "selected_at": "2026-06-12"
+}

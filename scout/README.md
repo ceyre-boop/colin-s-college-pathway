@@ -11,9 +11,16 @@ bun scout/scout.ts                  # full run: scrape + score + rank
 bun scout/scout.ts --no-score      # scrape only (no AI, no key needed; ranks by amount)
 bun scout/scout.ts --emit-app      # also regenerate src/data/scoutFound.js for the app
 bun scout/scout.ts --from-cache    # rebuild scoutFound.js from the last run's JSON (no scrape/score)
-bun scout/scout.ts --limit 200     # score more candidates (default 120, round-robin per source)
+bun scout/scout.ts --rescore-failed # re-score only score_failed entries from cache, re-rank
+bun scout/scout.ts --limit 3000    # score the whole harvest (default 120, round-robin per source)
 bun scout/scout.ts --top 30        # longer console summary (default 20)
+bun scout/select.ts [--dry]        # pick top 20 for essays → scholarship_essays/ metadata + queue
 ```
+
+A full-harvest run (`--limit 3000`) scores ~3,000 candidates — batches of 15 through
+Inference.ts, expect 30-60+ min and some timed-out batches. Always chase it with
+`--rescore-failed --emit-app` to replace the failed batches' default 50% matches
+with real scores.
 
 Or just run `/scout` in a Claude Code session — it does the full run, regenerates the
 app data, commits, and pushes (Render autodeploys).
@@ -43,10 +50,25 @@ Each scholarship gets: `match` (0–100, *do I actually qualify* — not win odd
 
 ## Sources (HTTP-scrapeable today)
 
-- **CareerOneStop** (US Dept of Labor database) — 7 keyword queries derived from the profile
-  (biology, computer science, AI, cancer, eagle scout, wrestling, transfer student),
-  100 results each, deduped, filtered to Associate/Bachelor level.
-- **Scholarships360** — STEM / no-essay / easy / Michigan listing pages.
+- **CareerOneStop** (US Dept of Labor database) — 28 keyword queries derived from the profile
+  (field, circumstance, character — biology through athlete), paginated up to 3×100 per
+  keyword, deduped, filtered to Associate/Bachelor level. The volume source: ~2,900 of the
+  ~3,300 uniques in the 2026-06-12 run.
+- **Scholarships360** — 12 listing pages (STEM, no-essay, easy, Michigan, community college,
+  biology, CS, healthcare, engineering, leadership, men, Christian). Slugs verified live
+  2026-06-11; the old sophomores page 404s and was dropped.
+- **Unigo** — 19 category pages (majors, states, types, athletic, religious). Server-rendered
+  cards with real dated deadlines. Unigo's WAF blocks burst fetches, so pages are paced 1.5s
+  apart; blocked pages report honestly and recover on the next run.
+
+## Probed every run (client-side / login-walled — browser work, not HTTP)
+
+**Petersons** (Vue app over an authenticated JSON:API), **Raise.me** (login-walled
+micro-scholarships — college-specific, worth a browser pass before the UM-Flint transfer),
+**Appily** (client-side; cappex.com has redirected here since the Cappex rebrand), and
+**Sallie** (myscholly.com redirects here — Scholly was sunset into Sallie's search).
+Each probe adapter re-fetches per run and reports an honest blocked/empty status; all four
+sit on the `needs_browser` worklist with Bold.org, Fastweb, Scholarships.com, and Niche.
 
 Amounts and deadlines are **the listing's claims — verify at the URL before writing essays.**
 Entries with "Varies" amounts rank with a conservative $1,500 stand-in (marked `amountEstimated`).

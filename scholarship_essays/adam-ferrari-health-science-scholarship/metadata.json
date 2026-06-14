@@ -1,0 +1,16 @@
+{
+  "name": "Adam Ferrari Health Science Scholarship",
+  "org": null,
+  "amount": 20000,
+  "amount_text": "$20,000",
+  "amount_estimated": false,
+  "deadline": "Jun 30, 2026",
+  "url": "https://www.unigo.com/scholarships/high-school-students/scholarships-for-high-school-seniors/the-adam-ferrari-health-science-scholarship",
+  "match_pct": 80,
+  "effort": "med",
+  "expected_value": 16000,
+  "angle_used": "stem_mri",
+  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "source": "unigo",
+  "selected_at": "2026-06-12"
+}
