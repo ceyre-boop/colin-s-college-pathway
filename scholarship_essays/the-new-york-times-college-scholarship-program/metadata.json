@@ -12,5 +12,26 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "the-new-york-times-college-scholarship-program",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992331",
+    "applyUrl": "https://www.nytco.com/investors/",
+    "probedAt": "2026-06-15T22:03:15.588Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": true,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [],
+    "notes": [
+      "single external host investors.nytco.com (homepage, not the form)",
+      "⚠ application/processing fee detected — hard stop",
+      "no <form> on page (likely JS-rendered, PDF, or email/mail application)",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

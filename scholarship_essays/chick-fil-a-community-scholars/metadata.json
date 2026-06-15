@@ -12,5 +12,27 @@
   "angle_used": "service_worship",
   "angle_summary": "Worship gatherings → TABOOST: infrastructure people stand on",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "chick-fil-a-community-scholars",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9990594",
+    "applyUrl": "https://scholarshipamerica.org/",
+    "probedAt": "2026-06-15T22:02:47.388Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [
+      "s"
+    ],
+    "notes": [
+      "single external host scholarshipamerica.org (homepage, not the form)",
+      "forms present but look like search/newsletter, not an application",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

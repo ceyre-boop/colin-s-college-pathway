@@ -12,5 +12,26 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "call-to-action-next-chapter-scholarship",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015674",
+    "applyUrl": "https://calltoactionphilanthropies.org/fo%20cus-areas/scholarships/next-chapter",
+    "probedAt": "2026-06-15T22:03:14.089Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [],
+    "notes": [
+      "single external host calltoactionphilanthropies.org (homepage, not the form)",
+      "apply page fetch failed (404)",
+      "forms present but look like search/newsletter, not an application",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

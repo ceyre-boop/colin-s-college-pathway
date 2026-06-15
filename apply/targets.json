@@ -1,0 +1,472 @@
+{
+  "probedAt": "2026-06-15T22:03:51.562Z",
+  "targets": [
+    {
+      "slug": "jack-kent-cooke-foundation-undergraduate-transfe",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9994025",
+      "applyUrl": "https://www.jkcf.org/",
+      "probedAt": "2026-06-15T22:02:45.799Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "s"
+      ],
+      "notes": [
+        "single external host jkcf.org (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "chick-fil-a-community-scholars",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9990594",
+      "applyUrl": "https://scholarshipamerica.org/",
+      "probedAt": "2026-06-15T22:02:47.388Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "s"
+      ],
+      "notes": [
+        "single external host scholarshipamerica.org (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "nase-future-entrepreneur-award",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992884",
+      "applyUrl": "https://www.nase.org/",
+      "probedAt": "2026-06-15T22:02:48.898Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "ctl00$ctl00$Master_txtSearch",
+        "ctl00$ctl00$TextBox1"
+      ],
+      "notes": [
+        "single external host nase.org (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "national-institute-of-health-undergraduate-schol",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989452",
+      "applyUrl": "https://www.nih.gov/",
+      "probedAt": "2026-06-15T22:03:03.438Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "notes": [
+        "single external host nih.gov (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "foot-locker-scholar-athletes",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9995586",
+      "applyUrl": null,
+      "platform": "careeronestop-info",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "probedAt": "2026-06-15T22:03:04.721Z",
+      "notes": [
+        "no outbound application link on info page (likely JS-rendered)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "adam-ferrari-health-science-scholarship",
+      "infoUrl": "https://www.unigo.com/scholarships/high-school-students/scholarships-for-high-school-seniors/the-adam-ferrari-health-science-scholarship",
+      "applyUrl": "https://www.adamferrarischolarship.com/",
+      "probedAt": "2026-06-15T22:03:06.052Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "notes": [
+        "resolved via link text \"apply now\"",
+        "no <form> on page (likely JS-rendered, PDF, or email/mail application)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "u-s-bank-student-scholarship",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015251",
+      "applyUrl": "https://www.usbank.com/about-us-bank/community/student-scholarship.html?ecid=OTHE_65708",
+      "probedAt": "2026-06-15T22:03:08.546Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "email"
+      ],
+      "notes": [
+        "single external host usbank.com (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "cybercorps-reg-scholarship-for-service",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989429",
+      "applyUrl": "https://www.opm.gov/",
+      "probedAt": "2026-06-15T22:03:09.824Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "SiteSearchString",
+        "TopFAQsSearchText"
+      ],
+      "notes": [
+        "single external host opm.gov (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "blackrock-founders-scholarship",
+      "infoUrl": "https://www.unigo.com/scholarships/undergraduate-students/scholarships-for-college-seniors/blackrock-founders-scholarship",
+      "applyUrl": "https://www.unigo.com/new-login?__page=login",
+      "probedAt": "2026-06-15T22:03:12.123Z",
+      "platform": "unigo",
+      "hasWebForm": true,
+      "loginRequired": true,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "s",
+        "email",
+        "password",
+        "usertypechoice",
+        "student_grad_year",
+        "student_college_grad_year",
+        "firstname",
+        "lastname",
+        "show-password",
+        "birthdate",
+        "gpa",
+        "confirmpassword",
+        "address_full",
+        "address_2",
+        "streetaddress",
+        "city",
+        "zipcode",
+        "my_currentIntended_school",
+        "txtUserHighSchool",
+        "interested_field_of_study_other_text",
+        "interested_field_of_study_student",
+        "student_user_phone",
+        "tcpa_phone",
+        "userNotifiedAboutNews",
+        "CollegeAdvisorChecked",
+        "parent_firstname",
+        "parent_lastname",
+        "parent_email",
+        "parent_phone",
+        "student_phone",
+        "agree_to_under_16",
+        "parent_grad_year",
+        "parent_college_grad_year",
+        "my_child_currentIntended_school",
+        "my_Child_Area_Of_Study",
+        "show-password2",
+        "child_firstname",
+        "child_lastname",
+        "child_email",
+        "child_phone"
+      ],
+      "notes": [
+        "resolved via link text \"apply now\"",
+        "login/account required to apply"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "call-to-action-next-chapter-scholarship",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015674",
+      "applyUrl": "https://calltoactionphilanthropies.org/fo%20cus-areas/scholarships/next-chapter",
+      "probedAt": "2026-06-15T22:03:14.089Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "notes": [
+        "single external host calltoactionphilanthropies.org (homepage, not the form)",
+        "apply page fetch failed (404)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "the-new-york-times-college-scholarship-program",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992331",
+      "applyUrl": "https://www.nytco.com/investors/",
+      "probedAt": "2026-06-15T22:03:15.588Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": true,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "notes": [
+        "single external host investors.nytco.com (homepage, not the form)",
+        "⚠ application/processing fee detected — hard stop",
+        "no <form> on page (likely JS-rendered, PDF, or email/mail application)",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "cia-undergraduate-scholarships",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998358",
+      "applyUrl": "https://www.afio.com/",
+      "probedAt": "2026-06-15T22:03:18.360Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "search"
+      ],
+      "notes": [
+        "single external host afio.com (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "nanog-scholarship-program",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9990554",
+      "applyUrl": "https://scholarshipamerica.org/",
+      "probedAt": "2026-06-15T22:03:20.719Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "s"
+      ],
+      "notes": [
+        "single external host scholarshipamerica.org (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "the-netapp-scholarship-program",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015477",
+      "applyUrl": "https://learnmore.scholarsapply.org/netapp/",
+      "probedAt": "2026-06-15T22:03:25.110Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "notes": [
+        "resolved via link text \"https://learnmore.scholarsapply.org/neta\"",
+        "no <form> on page (likely JS-rendered, PDF, or email/mail application)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "alice-kleeman-and-joseph-buttram-impact-scholars",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9990407",
+      "applyUrl": "https://www.svcf.org/",
+      "probedAt": "2026-06-15T22:03:27.510Z",
+      "platform": "direct",
+      "hasWebForm": true,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "FNAME",
+        "LNAME",
+        "MMERGE5",
+        "EMAIL",
+        "b_f8d14f8c726bf8f5e829bd0b2_91c146c939"
+      ],
+      "notes": [
+        "single external host svcf.org (homepage, not the form)",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "amazon-future-engineer-scholarship",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9990622",
+      "applyUrl": "https://scholarshipamerica.org/",
+      "probedAt": "2026-06-15T22:03:29.257Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "s"
+      ],
+      "notes": [
+        "single external host scholarshipamerica.org (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "james-e-foy-john-w-sagabiel-undergraduate-leader",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9991252",
+      "applyUrl": "https://www.phietasigma.org/",
+      "probedAt": "2026-06-15T22:03:30.568Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "notes": [
+        "single external host phietasigma.org (homepage, not the form)",
+        "no <form> on page (likely JS-rendered, PDF, or email/mail application)",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "jeptha-wade-schureman-scholarship-program",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9996680",
+      "applyUrl": "https://cfsem.org/",
+      "probedAt": "2026-06-15T22:03:32.454Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "s"
+      ],
+      "notes": [
+        "single external host cfsem.org (homepage, not the form)",
+        "forms present but look like search/newsletter, not an application",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "thermo-fisher-scientific-antibody-scholarship-pr",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015398",
+      "applyUrl": "https://www.thermofisher.com/us/en/home/life-science/antibodies/thermo-fisher-scientific-antibody-scholarship-program.html",
+      "probedAt": "2026-06-15T22:03:33.622Z",
+      "platform": "direct",
+      "hasWebForm": true,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [
+        "query",
+        "header-typeahead-suggested",
+        "masterUserEmailAddress"
+      ],
+      "notes": [
+        "single external host thermofisher.com (homepage, not the form)",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    },
+    {
+      "slug": "the-bailey-family-foundation-college-scholarship",
+      "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998207",
+      "applyUrl": "http://bailey-family.org/",
+      "probedAt": "2026-06-15T22:03:35.550Z",
+      "platform": "direct",
+      "hasWebForm": false,
+      "loginRequired": false,
+      "applicationFee": false,
+      "essayRequired": false,
+      "essayPrompts": [],
+      "detectedFields": [],
+      "notes": [
+        "single external host bailey-family.org (homepage, not the form)",
+        "apply page fetch failed (0: The operation was aborted.)",
+        "no <form> on page (likely JS-rendered, PDF, or email/mail application)",
+        "resolution confidence medium → Chrome (human navigates to the real form)"
+      ],
+      "autoSubmitEligible": false,
+      "route": "chrome"
+    }
+  ]
+}

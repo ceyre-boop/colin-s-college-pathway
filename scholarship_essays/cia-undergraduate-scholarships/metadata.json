@@ -12,5 +12,27 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "cia-undergraduate-scholarships",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998358",
+    "applyUrl": "https://www.afio.com/",
+    "probedAt": "2026-06-15T22:03:18.360Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [
+      "search"
+    ],
+    "notes": [
+      "single external host afio.com (homepage, not the form)",
+      "forms present but look like search/newsletter, not an application",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

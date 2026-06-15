@@ -12,5 +12,27 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "jack-kent-cooke-foundation-undergraduate-transfe",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9994025",
+    "applyUrl": "https://www.jkcf.org/",
+    "probedAt": "2026-06-15T22:02:45.799Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [
+      "s"
+    ],
+    "notes": [
+      "single external host jkcf.org (homepage, not the form)",
+      "forms present but look like search/newsletter, not an application",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

@@ -2,7 +2,7 @@
 export const PROFILE = `
 Name: Colin Eyre — 19, Swartz Creek, Michigan (Michigan resident).
 School: University of Michigan–Flint — BS Cellular & Molecular Biology, CS minor.
-  Knocking out remaining prereqs at Mott Community College (strategic, lower cost); returns to UM-Flint Winter 2027.
+  Knocking out remaining prereqs at Mott Community College (strategic, lower cost); returns to UM-Flint Fall 2027.
 Academics: 3.92 GPA at University of Michigan–Flint, Dean's List (Fall 2025: A+, A, A, A, A-).
   AP Scholar with Distinction (x2, back-to-back), 9 total AP exams (32 transfer credits). SAT 1260.
 Financial: FAFSA SAI -1500 — maximum need-based eligibility (full Pell). High financial need.
@@ -36,14 +36,17 @@ build early-detection systems from pathology images. Target field of companies l
 Recursion, Foundation Medicine; path runs through a funded Bioinformatics PhD (UM Ann Arbor).
 `.trim();
 
-// Structured fields for form-filling (copied into Claude for Chrome alongside the essay).
+// Non-sensitive structured fields for the Claude-for-Chrome payload. This file ships in the
+// CLIENT bundle, so it deliberately omits DOB / phone / email — those live server-side only in
+// applicant.local.json (gitignored), read by apply/fill.ts. Keep these facts in sync with it.
 export const PROFILE_FIELDS = {
   'Full name': 'Colin Eyre',
   Age: '19',
   Location: 'Swartz Creek, Michigan',
-  School: 'University of Michigan–Flint (via Mott CC for prereqs)',
+  School: 'University of Michigan–Flint (via Mott CC for prereqs; returns Fall 2027)',
   Major: 'BS Cellular & Molecular Biology, CS minor',
   GPA: '3.92 (University of Michigan–Flint, Dean\'s List)',
+  'Expected graduation': 'Spring 2030',
   Honors: 'Dean\'s List, AP Scholar with Distinction (x2), 9 AP exams, Eagle Scout, Black Belt, state wrestler',
   Work: 'Founding AI Engineer @ TABOOST; Founder @ Alta Investments',
   'Career goal': 'Computational oncology / AI drug discovery',

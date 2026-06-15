@@ -12,5 +12,23 @@
   "angle_used": "achievement_blackbelt",
   "angle_summary": "Black belt at 11 (6 years) → finish-what-you-start: Eagle, wrestling, production code",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "foot-locker-scholar-athletes",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9995586",
+    "applyUrl": null,
+    "platform": "careeronestop-info",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [],
+    "probedAt": "2026-06-15T22:03:04.721Z",
+    "notes": [
+      "no outbound application link on info page (likely JS-rendered)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

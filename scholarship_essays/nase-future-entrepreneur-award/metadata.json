@@ -12,5 +12,28 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "nase-future-entrepreneur-award",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992884",
+    "applyUrl": "https://www.nase.org/",
+    "probedAt": "2026-06-15T22:02:48.898Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [
+      "ctl00$ctl00$Master_txtSearch",
+      "ctl00$ctl00$TextBox1"
+    ],
+    "notes": [
+      "single external host nase.org (homepage, not the form)",
+      "forms present but look like search/newsletter, not an application",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

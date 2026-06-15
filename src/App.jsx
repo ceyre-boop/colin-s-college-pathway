@@ -7,6 +7,7 @@ import { PATHWAY_DATA, COURSE_STATUS, ALREADY_HAVE, DEGREE_TOTAL, UPPER_DIVISION
 import { REQUIREMENTS, ACTION_ITEMS, KEY_CONTACTS } from "./data/requirements";
 import { DEFAULT_SCHOLARSHIPS, STATUS_OPTIONS, PRIORITY_OPTIONS } from "./data/defaults";
 import { SCOUT_SCHOLARSHIPS, SCOUT_GENERATED_AT } from "./data/scoutFound";
+import { APPLY_KITS } from "./data/essays";
 import { fullProfile, fieldsBlock } from "./data/profile";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
 import "./index.css";
@@ -19,6 +20,10 @@ const T = {
 
 const usd = (n) => (n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}K` : `$${n.toLocaleString()}`);
 const fullUsd = (n) => `$${Math.round(n).toLocaleString()}`;
+// Match a dashboard scholarship to its pre-written essay/triage kit by normalized name
+// (same slug rule as scout/select.ts + emit-essays.ts).
+const slugOf = (name) => (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48);
+const chipStyle = (c) => ({ fontSize: 8, color: c, border: `1px solid ${c}`, borderRadius: 3, padding: "1px 6px", letterSpacing: 1, fontFamily: "monospace" });
 
 const STATUS_META = Object.fromEntries(STATUS_OPTIONS.map((s) => [s.value, s]));
 const PURSUING = ["apply", "research", "applied"];
@@ -28,7 +33,7 @@ export default function CollegePathway() {
   const [inState, setInState] = useState(true);
   const [scholarships, setScholarships] = useLocalStorage("ccp_scholarships_v2", DEFAULT_SCHOLARSHIPS);
   const [timeline, setTimeline] = useLocalStorage("ccp_timeline_v2", INIT_TIMELINE);
-  const [pathway, setPathway] = useLocalStorage("ccp_pathway_v2", PATHWAY_DATA);
+  const [pathway, setPathway] = useLocalStorage("ccp_pathway_v3", PATHWAY_DATA);
   const [schFilter, setSchFilter] = useState("all");
   const [catFilter, setCatFilter] = useState("all");
   const [essaySch, setEssaySch] = useState("");
@@ -136,12 +141,26 @@ export default function CollegePathway() {
   const updateCourseStatus = (si, ci, status) => setPathway((prev) => prev.map((s, i) => i !== si ? s : { ...s, courses: s.courses.map((c, j) => j !== ci ? c : { ...c, status }) }));
 
   async function copyForChrome(s) {
+    // Assemble a complete, paste-ready Claude-for-Chrome payload: the §3 fill-then-STOP
+    // instructions + non-sensitive profile + the pre-written essay + the resolved apply URL +
+    // any triage warnings. Contact PII (email/phone/DOB) is deliberately NOT here — it lives in
+    // Colin's saved "Apply to Scholarship" shortcut, so it never ships in the web bundle.
+    const kit = APPLY_KITS[slugOf(s.name)];
+    const essay = kit?.essay || s.draftEssay || "";
+    const warn = [];
+    if (kit?.applicationFee) warn.push("⚠ An application/processing FEE was detected — do NOT pay. Legitimate scholarships don't charge to apply; verify before continuing.");
+    if (kit?.loginRequired) warn.push("🔒 This platform needs a login/account — sign in first, then run this on the actual application page.");
+    if (kit?.essayRequired) warn.push(`✍ This form has an essay field${kit?.essayWordLimit ? ` (~${kit.essayWordLimit} words)` : ""} — the essay below is pre-written; trim to the form's limit.`);
+    const applyLine = kit?.applyUrl ? `APPLICATION URL: ${kit.applyUrl}` : (s.url ? `START URL (find the application link here): ${s.url}` : "");
     const text = [
-      `Fill this scholarship application using my profile, then STOP before submitting so I can review.`,
+      `You are filling a scholarship application for me on the current page. Read the page, fill every field from MY INFO, paste the ESSAY into the essay field (trim to the form's word limit), then STOP before submitting so I review and click submit myself. If the page charges an application fee or redirects to a paid service, STOP and tell me — do not fill anything.`,
       ``, `SCHOLARSHIP: ${s.name}${s.amount ? ` ($${Number(s.amount).toLocaleString()})` : ""}`,
-      ``, `MY INFO:`, fieldsBlock(),
-      ``, `ESSAY (trim to the form's word limit):`, s.draftEssay,
-    ].join("\n");
+      applyLine,
+      warn.length ? `\n${warn.join("\n")}` : ``,
+      ``, `MY INFO (for contact fields — email/phone/DOB/address — use my saved "Apply to Scholarship" shortcut profile):`, fieldsBlock(),
+      ``, `ESSAY (pre-written in my voice — trim to the form's word limit; never invent facts):`,
+      essay || "(no essay yet — draft one on the AI Essays tab first)",
+    ].filter(Boolean).join("\n");
     await navigator.clipboard.writeText(text);
     patchSch(s.id, { copied: Date.now() });
     setTimeout(() => patchSch(s.id, { copied: 0 }), 1500);
@@ -255,6 +274,7 @@ export default function CollegePathway() {
                   </div>
                   <span style={{ fontSize: 9, color: sem.status === "current" ? T.green : T.muted, letterSpacing: 3, border: `1px solid ${sem.status === "current" ? T.green : T.dim}`, padding: "3px 8px" }}>{sem.status.toUpperCase()}</span>
                 </div>
+                {sem.note && <div style={{ fontSize: 10, color: T.yellow, lineHeight: 1.6, padding: "6px 10px", background: T.yellow + "11", borderLeft: `2px solid ${T.yellow}`, marginBottom: 10 }}>{sem.note}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {sem.courses.map((c, ci) => (
                     <div key={ci} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: T.bg, flexWrap: "wrap" }}>
@@ -263,6 +283,7 @@ export default function CollegePathway() {
                           <span style={{ color: T.red, fontSize: 10, letterSpacing: 1, fontWeight: "bold" }}>{c.code}</span>
                           <span style={{ color: T.white, fontSize: 11 }}>{c.name}</span>
                           <span style={{ color: T.muted, fontSize: 9 }}>{c.cr} cr</span>
+                          {c.grade && <span style={{ fontSize: 8, color: T.green, border: `1px solid ${T.green}`, borderRadius: 3, padding: "0 5px", letterSpacing: 1 }}>{c.grade}</span>}
                         </div>
                         <div style={{ fontSize: 9, color: T.muted, marginTop: 2 }}>{c.req}</div>
                       </div>
@@ -285,11 +306,11 @@ export default function CollegePathway() {
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 4 }}>
               <div style={{ ...S.card, flex: 1, minWidth: 240 }}>
                 <div style={S.label}>Credits Verified</div>
-                {[["AP transfer", 32, T.blue], ["UM-Flint Fall '25 (3.92)", 15, T.green], ["Mott (non-duplicate)", 9, T.yellow], ["Mott Fall '26 (planned)", 11, T.muted]].map(([l, v, c]) => (
+                {[["AP transfer", 32, T.blue], ["UM-Flint Fall '25 (3.92)", 15, T.green], ["Mott Winter '26 (non-dup)", 9, T.yellow], ["Mott Fall '26 (enrolled)", 13, T.muted], ["Mott Winter '27 residency", 8, T.muted]].map(([l, v, c]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 4 }}><span style={{ color: T.muted }}>{l}</span><span style={{ color: c }}>{v} cr</span></div>
                 ))}
                 <div style={{ borderTop: `1px solid ${T.border}`, marginTop: 8, paddingTop: 8, display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                  <span style={{ color: T.white }}>Entering Winter '27</span><span style={{ color: T.green, fontFamily: "Impact,sans-serif" }}>67 / 120</span>
+                  <span style={{ color: T.white }}>Entering Fall '27</span><span style={{ color: T.green, fontFamily: "Impact,sans-serif" }}>77 / 120</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginTop: 4 }}>
                   <span style={{ color: T.muted }}>Upper-division (300+)</span><span style={{ color: T.yellow }}>{UPPER_DIVISION_HAVE} / {UPPER_DIVISION_NEEDED}</span>
@@ -421,7 +442,9 @@ export default function CollegePathway() {
               .filter((s) => schFilter === "all" || s.status === schFilter)
               .slice()
               .sort((a, b) => (STATUS_META[a.status]?.sort ?? 9) - (STATUS_META[b.status]?.sort ?? 9))
-              .map((s) => (
+              .map((s) => {
+                const kit = APPLY_KITS[slugOf(s.name)];
+                return (
                 <div key={s.id} style={{ ...S.card, borderLeft: `3px solid ${STATUS_META[s.status]?.color || T.muted}`, marginBottom: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
                     <div style={{ flex: 1, minWidth: 220 }}>
@@ -434,6 +457,15 @@ export default function CollegePathway() {
                           </span>
                         )}
                       </div>
+                      {kit && (
+                        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 6 }}>
+                          <span style={chipStyle(T.green)}>📝 ESSAY READY · {kit.wordCount}w</span>
+                          {kit.applicationFee && <span style={chipStyle(T.red)}>⚠ FEE — VERIFY</span>}
+                          {kit.loginRequired && <span style={chipStyle(T.yellow)}>🔒 LOGIN FIRST</span>}
+                          {kit.essayRequired && <span style={chipStyle(T.yellow)}>✍ ESSAY FIELD{kit.essayWordLimit ? ` ${kit.essayWordLimit}w` : ""}</span>}
+                          <span style={chipStyle(T.muted)}>{kit.route === "chrome" ? "VIA CHROME" : (kit.route || "").toUpperCase()}</span>
+                        </div>
+                      )}
                       <div style={{ fontSize: 10, color: T.muted, marginTop: 4, lineHeight: 1.6 }}>{s.notes}</div>
                       <div style={{ fontSize: 9, color: T.muted, marginTop: 4 }}>DEADLINE: {s.deadline}{s.url ? <> · <a href={s.url} target="_blank" rel="noreferrer" style={{ color: T.blue }}>link ↗</a></> : null}</div>
                     </div>
@@ -444,11 +476,15 @@ export default function CollegePathway() {
                           <button key={k} style={S.btn(s.status === k ? STATUS_META[k].color : T.dim)} onClick={() => updateSchStatus(s.id, k)}>{k.toUpperCase()}</button>
                         ))}
                       </div>
-                      <button style={S.btn(T.blue)} onClick={() => { setEssaySch(s.id); setTab("essay"); }}>ESSAY →</button>
+                      <div style={{ display: "flex", gap: 4, justifyContent: "flex-end", flexWrap: "wrap" }}>
+                        {kit && <button style={S.btn(T.green)} onClick={() => copyForChrome(s)}>{s.copied ? "COPIED ✓" : "COPY APPLY KIT"}</button>}
+                        <button style={S.btn(T.blue)} onClick={() => { setEssaySch(s.id); setTab("essay"); }}>ESSAY →</button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
           </div>
         )}
 

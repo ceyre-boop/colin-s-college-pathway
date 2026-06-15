@@ -4,12 +4,13 @@
 export const VERIFIED_CREDITS = {
   ap_transfer: 32, // official UM-Flint transcript (AP exams)
   umflint_fall25: 15, // 3.92 GPA, Dean's List
-  mott_effective: 9, // non-duplicate Mott credits (MATH 145 duplicates AP MTH 120)
+  mott_effective: 9, // non-duplicate Mott Winter '26 credits (MATH 145 duplicates AP MTH 120)
   in_hand: 56, // ap + umflint + mott_effective, as of June 2026
-  mott_fall26_planned: 11, // ENGL 102 + FILM 181 + MUS 187 + MATH 164 (≈13 cr; aggregate kept at prior estimate)
-  total_entering_w27: 67,
+  mott_fall26_enrolled: 13, // ENGL 102 + MATH 165 + FILM 181 + PHIL 101 (closes 3 gen-ed gaps + calculus)
+  mott_winter27_residency: 8, // residency semester: COMM 131 + TECH 121A + open elective
+  total_entering_f27: 77, // 56 + 13 + 8 — enters UM-Flint Fall 2027 (Winter '27 residency padding may not all apply to the degree)
   degree_required: 120,
-  remaining: 53, // to take at UM-Flint after Mott
+  remaining: 43, // to take at UM-Flint after Mott
   upper_division_required: 33, // at least 33 must be 300+
   upper_division_have: 3, // PHL 168
 };
@@ -65,9 +66,9 @@ export const REQUIREMENTS = [
       { name: 'FQ Quantitative Literacy', cr: 3, status: 'done', note: 'AP Stats' },
       { name: 'Natural Science + Lab', cr: 4, status: 'done', note: 'CHM 260/261' },
       { name: 'Social Science', cr: 6, status: 'done', note: 'way over (24 cr from AP)' },
-      { name: 'COMP — ENG 112', cr: 3, status: 'gap', note: 'Mott ENGL 102 this fall' },
-      { name: 'Fine Arts (F)', cr: 3, status: 'gap', note: '⚠ ZERO — add ARTC 110 / MUSC 100 at Mott this fall' },
-      { name: 'Humanities (H)', cr: 6, status: 'partial', note: 'have PHL 168 (3) — need 3 more' },
+      { name: 'COMP — ENG 112', cr: 3, status: 'gap', note: 'Mott ENGL 102 (Fall 2026)' },
+      { name: 'Fine Arts (F)', cr: 3, status: 'gap', note: 'Mott FILM 181 (Fall 2026) → COM 272' },
+      { name: 'Humanities (H)', cr: 6, status: 'partial', note: 'PHL 168 (3) done + Mott PHIL 101 (Fall 2026) → PHL 101 closes it' },
     ],
   },
   {
@@ -84,12 +85,14 @@ export const REQUIREMENTS = [
 ];
 
 export const ACTION_ITEMS = [
-  'transfer.umflint.edu → verify ENGL 102→ENG 112, FILM 181→COM 272 (F), MUS 187→MUS 245 (H), MATH 164→MTH 118',
-  'Register at Mott for Fall 2026: ENGL 102, FILM 181, MUS. 187, MATH 164 (13 cr — all 3 gen-ed gaps + calculus)',
+  'transfer.umflint.edu → verify ENGL 102→ENG 112, MATH 165→MTH 118, FILM 181→COM 272 (F), PHIL 101→PHL 101 (H)',
+  'Fall 2026 at Mott: ENGL 102, MATH 165, FILM 181, PHIL 101 (13 cr — closes all 3 gen-ed gaps + CMB calculus)',
+  'Winter 2027 = Mott residency semester (8 cr, half-time for partial Pell) — establishes 12+ months MI residency',
+  'Get a Michigan driver\'s license, then submit the MI residency application Feb 2027 for in-state tuition',
+  'Apply for UM-Flint readmission for Fall 2027 (deadline Aug 10)',
   'CIT 100: COMI 160 does NOT transfer as CIT 100 (maps to CIS 200/BUS 115) — take CIT 100 at UM-Flint',
-  'Apply for UM-Flint readmission for Winter 2027 (free, deadline Dec 18)',
-  'Get a Michigan driver\'s license — needed for the in-state tuition application',
-  'Email Dr. Sucic: returning Winter 2027, CMB, AI/Python experience, want to join the lab + SUCCES program',
+  'CHM chain: take CHM 262/263 in Fall 2027 BEFORE CHM 330 Organic (Winter 2028)',
+  'Email Dr. Sucic: returning Fall 2027, CMB, AI/Python experience, want to join the lab + SUCCES/UROP',
 ];
 
 export const KEY_CONTACTS = [

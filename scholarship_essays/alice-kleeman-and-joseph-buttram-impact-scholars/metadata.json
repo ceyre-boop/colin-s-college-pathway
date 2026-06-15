@@ -12,5 +12,30 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "alice-kleeman-and-joseph-buttram-impact-scholars",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9990407",
+    "applyUrl": "https://www.svcf.org/",
+    "probedAt": "2026-06-15T22:03:27.510Z",
+    "platform": "direct",
+    "hasWebForm": true,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [
+      "FNAME",
+      "LNAME",
+      "MMERGE5",
+      "EMAIL",
+      "b_f8d14f8c726bf8f5e829bd0b2_91c146c939"
+    ],
+    "notes": [
+      "single external host svcf.org (homepage, not the form)",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

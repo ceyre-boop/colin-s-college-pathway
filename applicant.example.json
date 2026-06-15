@@ -1,0 +1,45 @@
+{
+  "_README": "Copy this file to applicant.local.json and fill in real values. applicant.local.json is gitignored (holds PII: DOB, phone, address) and is read ONLY server-side by apply/fill.ts — it is never bundled to the browser. Leave a field as \"\" to have the filler skip it (and flag it for manual entry). Decline-to-state fields (gender/ethnicity) are intentionally blank by default.",
+  "identity": {
+    "legalFirstName": "First",
+    "legalLastName": "Last",
+    "preferredName": "First",
+    "dateOfBirth": "YYYY-MM-DD",
+    "gender": "",
+    "ethnicity": "",
+    "citizenship": "US citizen"
+  },
+  "contact": {
+    "email": "you@example.com",
+    "phone": "+1 (555) 555-5555",
+    "address": { "street": "123 Main St", "city": "City", "state": "ST", "zip": "00000", "country": "USA" }
+  },
+  "academic": {
+    "currentSchool": "Your University",
+    "enrollmentNote": "e.g. completing prereqs at Community College, returning Fall 20XX",
+    "major": "Your Major",
+    "minor": "Your Minor",
+    "classLevel": "Sophomore",
+    "gpa": "0.00",
+    "gpaScale": "4.0",
+    "gpaContext": "School name (honors)",
+    "priorGpa": "",
+    "sat": "",
+    "act": "",
+    "expectedGraduation": "Spring 20XX",
+    "highSchool": ""
+  },
+  "financial": {
+    "fafsaSAI": "",
+    "pellEligible": false,
+    "financialNeed": "",
+    "residency": ""
+  },
+  "honors": ["Honor 1", "Honor 2"],
+  "activities": ["Activity 1"],
+  "work": [{ "title": "Role", "org": "Org", "detail": "What you did" }],
+  "intendedField": "Your intended field",
+  "careerGoal": "One sentence.",
+  "documents": { "resumePdf": "", "transcriptPdf": "" },
+  "doNotClaim": ["anything unverified"]
+}

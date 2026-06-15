@@ -12,5 +12,26 @@
   "angle_used": "need_mott",
   "angle_summary": "Mott as strategic choice → the gap is just a variable",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "the-bailey-family-foundation-college-scholarship",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998207",
+    "applyUrl": "http://bailey-family.org/",
+    "probedAt": "2026-06-15T22:03:35.550Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [],
+    "notes": [
+      "single external host bailey-family.org (homepage, not the form)",
+      "apply page fetch failed (0: The operation was aborted.)",
+      "no <form> on page (likely JS-rendered, PDF, or email/mail application)",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

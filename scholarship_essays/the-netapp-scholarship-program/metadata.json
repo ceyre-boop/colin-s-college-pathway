@@ -12,5 +12,24 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "the-netapp-scholarship-program",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015477",
+    "applyUrl": "https://learnmore.scholarsapply.org/netapp/",
+    "probedAt": "2026-06-15T22:03:25.110Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [],
+    "notes": [
+      "resolved via link text \"https://learnmore.scholarsapply.org/neta\"",
+      "no <form> on page (likely JS-rendered, PDF, or email/mail application)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

@@ -63,7 +63,7 @@ STEP 2 — MY PROFILE (ground every field and every essay claim in these facts; 
 - Email: Colineyre222@gmail.com · Phone: +1 (470) 573-8908
 - Address: Swartz Creek, MI 48473 · DOB: December 19, 2006 (age 19) · US citizen
 - School: University of Michigan–Flint (BS Cellular & Molecular Biology, CS minor);
-  currently completing prereqs at Mott Community College, returning to UM-Flint Winter 2027
+  currently completing prereqs at Mott Community College, returning to UM-Flint Fall 2027
 - GPA: 3.92 at UM-Flint (Dean's List); 3.7 at Mott; SAT 1260
 - Honors: AP Scholar with Distinction x2 (9 AP exams, 32 transfer credits)
 - Financial: FAFSA SAI -1500 — maximum Pell eligibility, high need, Michigan resident

@@ -12,5 +12,25 @@
   "angle_used": "leadership_lunchbunch",
   "angle_summary": "Lunch Bunch reverse inclusion → systems that help people belong",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "james-e-foy-john-w-sagabiel-undergraduate-leader",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9991252",
+    "applyUrl": "https://www.phietasigma.org/",
+    "probedAt": "2026-06-15T22:03:30.568Z",
+    "platform": "direct",
+    "hasWebForm": false,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [],
+    "notes": [
+      "single external host phietasigma.org (homepage, not the form)",
+      "no <form> on page (likely JS-rendered, PDF, or email/mail application)",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }

@@ -12,5 +12,28 @@
   "angle_used": "stem_mri",
   "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
   "source": "careeronestop",
-  "selected_at": "2026-06-12"
+  "selected_at": "2026-06-12",
+  "formMeta": {
+    "slug": "thermo-fisher-scientific-antibody-scholarship-pr",
+    "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015398",
+    "applyUrl": "https://www.thermofisher.com/us/en/home/life-science/antibodies/thermo-fisher-scientific-antibody-scholarship-program.html",
+    "probedAt": "2026-06-15T22:03:33.622Z",
+    "platform": "direct",
+    "hasWebForm": true,
+    "loginRequired": false,
+    "applicationFee": false,
+    "essayRequired": false,
+    "essayPrompts": [],
+    "detectedFields": [
+      "query",
+      "header-typeahead-suggested",
+      "masterUserEmailAddress"
+    ],
+    "notes": [
+      "single external host thermofisher.com (homepage, not the form)",
+      "resolution confidence medium → Chrome (human navigates to the real form)"
+    ],
+    "autoSubmitEligible": false,
+    "route": "chrome"
+  }
 }
