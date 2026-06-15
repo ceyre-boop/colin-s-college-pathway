@@ -4,7 +4,7 @@ The first thing you do before a worship gathering is make the space ready for pe
 
 I've been doing some version of that work for years, and I think about it now the way I think about infrastructure: service is what you build so other people can do what they came to do.
 
-At TABOOST, I'm the founding AI engineer. The system I built processes 200-plus emails a day across 16 inboxes for creators — musicians, writers, educators, freelancers — who need professional infrastructure but don't have the engineering background to build it themselves. When it works, they don't notice it. That is the design goal. Infrastructure that serves people well looks invisible from the inside.
+At TABOOST, I'm the founding AI engineer. The system I built processes 200-plus emails a day across 16 inboxes for creators who need professional infrastructure but don't have the engineering background to build it themselves. When it works, they don't notice it. That is the design goal. Infrastructure that serves people well looks invisible from the inside.
 
 Before I understood anything about software, I understood this at the level of service: show up, do the part nobody applauds, and the important thing becomes possible. Eagle Scout at 13 — top 4% of all scouts — ran on exactly this logic. The Eagle project isn't a trophy; it's a thing your community can now use that it couldn't before. Same pattern with Lunch Bunch, a reverse-inclusion program where instead of placing isolated students into general groups, we join theirs. The point is not credit — the point is that somebody who couldn't find a room now has one.
 

@@ -1,6 +1,6 @@
 # The NetApp Scholarship Program
 
-An MRI scan is not one image. The brain scan I worked from at my uncle's radiation oncology clinic in North Dakota was 50-plus slices, each a separate grayscale file, loaded sequentially on a treatment planning workstation that took a few seconds per load. The total study was hundreds of megabytes. Across a busy clinic in a year, that is terabytes of imaging data that someone's treatment depends on being right, accessible, and consistent.
+An MRI scan is not one image. The brain scan I worked from at my uncle's radiation oncology clinic in North Dakota was forty-plus slices, each a separate grayscale file, loaded sequentially on a treatment planning workstation that took a few seconds per load. The total study was hundreds of megabytes. Across a busy clinic in a year, that is terabytes of imaging data that someone's treatment depends on being right, accessible, and consistent.
 
 I am a Cellular and Molecular Biology major at the University of Michigan-Flint, computer science minor, 3.92 GPA with Dean's List standing. The long-term research goal is computational oncology — AI that reads the tumor boundary so the physician verifies rather than draws. Getting there requires understanding the data layer as well as the biological one: where medical imaging data lives, how it moves, what happens when storage fails or the transfer is corrupted, and how to build systems that produce reproducible results from a data pipeline that runs through multiple clinical handoffs.
 
