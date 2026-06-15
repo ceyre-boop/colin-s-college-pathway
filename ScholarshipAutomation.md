@@ -25,7 +25,7 @@ batch applications. Everything below is paste-ready.
 ```
 Fill this scholarship application using my profile:
 - Name: Colin Eyre
-- Age: 19, Swartz Creek MI
+- Age: 19, Michigan
 - School: University of Michigan–Flint
 - Major: BS Cellular & Molecular Biology, CS minor
 - GPA: 3.92 at UM-Flint (Dean's List); AP Scholar with Distinction (x2)
@@ -60,8 +60,8 @@ or redirects to a paid service, STOP and tell me — do not fill anything.
 
 STEP 2 — MY PROFILE (ground every field and every essay claim in these facts; never invent)
 - Full name: Colin Eyre
-- Email: Colineyre222@gmail.com · Phone: +1 (470) 573-8908
-- Address: Swartz Creek, MI 48473 · DOB: December 19, 2006 (age 19) · US citizen
+- Contact (email · phone · street address · DOB): NOT stored in this repo — pull from my saved
+  "Apply to Scholarship" shortcut profile / applicant.local.json (gitignored). US citizen, Michigan resident.
 - School: University of Michigan–Flint (BS Cellular & Molecular Biology, CS minor);
   currently completing prereqs at Mott Community College, returning to UM-Flint Fall 2027
 - GPA: 3.92 at UM-Flint (Dean's List); 3.7 at Mott; SAT 1260
