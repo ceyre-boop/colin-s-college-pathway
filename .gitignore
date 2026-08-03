@@ -1,0 +1,35 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Applicant PII + auto-apply run artifacts (never commit — real DOB/phone/screenshots)
+# NB: the `*.local` rule above does NOT match `applicant.local.json`, so list it explicitly.
+applicant.local.json
+apply/results/
+apply/.userdata/
