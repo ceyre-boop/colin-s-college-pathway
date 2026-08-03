@@ -6,7 +6,7 @@ That is also the core problem in intelligence analysis.
 
 The analogy runs deeper than the surface: both domains require extracting reliable signal from noisy inputs, building models that generalize across conditions the analyst has not yet encountered, and maintaining enough epistemic humility to know when the model is wrong before the position costs too much. The difference is the stakes, not the structure.
 
-I'm a Cellular and Molecular Biology major at the University of Michigan-Flint, computer science minor, carrying a 3.92 GPA with Dean's List standing. The academic path runs through Mott Community College (3.7) first — a deliberate decision that treats the funding gap as a variable to optimize around rather than an obstacle that defines the outcome. FAFSA SAI of negative 1500, maximum Pell. Same credits, fraction of the cost, same trajectory.
+I'm a Cellular and Molecular Biology major at the University of Michigan-Flint, with optional CS / computational support courses, carrying a 3.92 GPA with Dean's List standing. The academic path runs through Mott Community College (3.7) first — a deliberate decision that treats the funding gap as a variable to optimize around rather than an obstacle that defines the outcome. FAFSA SAI of negative 1500, maximum Pell. Same credits, fraction of the cost, same trajectory.
 
 At TABOOST, I'm the founding AI engineer. The routing system I built handles 200-plus emails a day across 16 inboxes; the architecture decisions it required — privilege separation, routing logic, failure modes — are the same decisions that appear at the infrastructure level in any production system handling sensitive information.
 

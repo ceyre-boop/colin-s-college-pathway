@@ -10,6 +10,6 @@ The academic record bears out: 3.7 at Mott, 3.92 at UM-Flint with Dean's List st
 
 Anyway, the reason any of this matters beyond my own finances: at 19 I sat in my uncle's radiation oncology clinic in North Dakota outlining tumors on MRI scans. Slice after slice, mouse cursor, boundary by hand. Somewhere in that hour I decided that the most important software I will ever build is the software that automates that process — computational oncology, AI-proposed boundaries, physician-verified instead of physician-drawn. That end goal has not moved since. Everything on the spreadsheet is in service of it.
 
-The Call to Action scholarship is, for me, exactly what the name implies: the next chapter is UM-Flint, Winter 2027, and the research lab where the biology and the code meet. Funding that transition directly buys back the bandwidth I currently spend managing the gap between what education costs and what Pell covers.
+The Call to Action scholarship is, for me, exactly what the name implies: the next chapter is UM-Flint, Fall 2027, and the research lab where the biology and the code meet. Funding that transition directly buys back the bandwidth I currently spend managing the gap between what education costs and what Pell covers.
 
 The chapter after this one is building the software that retires a mouse cursor that is, at this moment, still someone's job.

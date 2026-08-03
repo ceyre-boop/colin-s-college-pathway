@@ -4,7 +4,7 @@ The software running on a radiation therapy treatment planning workstation was w
 
 That is the software problem I want to work on.
 
-I'm studying Cellular and Molecular Biology with a computer science minor at the University of Michigan-Flint — 3.92 GPA, Dean's List. Finishing prerequisites at Mott Community College (3.7) now, returning to UM-Flint Winter 2027. Nine AP exams, 32 transfer credits, AP Scholar with Distinction twice.
+I'm studying Cellular and Molecular Biology with optional CS / computational support courses at the University of Michigan-Flint — 3.92 GPA, Dean's List. Finishing prerequisites at Mott Community College (3.7) now, returning to UM-Flint Fall 2027. Nine AP exams, 32 transfer credits, AP Scholar with Distinction twice.
 
 The CS work is already production-level. I built Alta Investments at 18 — a live quantitative trading system that runs daily on real capital with a Sharpe ratio of 1.08 and a risk model holding bust probability at zero. I'm the founding AI engineer at TABOOST, where the system I built processes 200-plus emails a day across 16 inboxes. Both systems required the same engineering discipline: design for the failure case first, instrument everything, and maintain the system under live conditions where the cost of being wrong is real.
 

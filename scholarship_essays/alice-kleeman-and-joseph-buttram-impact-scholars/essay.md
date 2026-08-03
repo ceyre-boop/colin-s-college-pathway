@@ -4,7 +4,7 @@ The number on my FAFSA summary is negative 1500. That is the lowest possible Stu
 
 So I engineered around it.
 
-Mott Community College is not a fallback. I transferred there after my first year at the University of Michigan-Flint because the math was straightforward: the same prerequisite credits at a fraction of the cost, which means the four-year institutional funding goes where it produces the most leverage. I carry a 3.7 at Mott. When I return to UM-Flint in Winter 2027 for the BS in Cellular and Molecular Biology with a CS minor, I'll return with a 3.92 cumulative GPA and Dean's List standing, with 32 transfer credits already done.
+Mott Community College is not a fallback. I transferred there after my first year at the University of Michigan-Flint because the math was straightforward: the same prerequisite credits at a fraction of the cost, which means the four-year institutional funding goes where it produces the most leverage. I carry a 3.7 at Mott. When I return to UM-Flint in Fall 2027 for the BS in Cellular and Molecular Biology with optional CS / computational support courses, I'll return with a 3.92 cumulative GPA and Dean's List standing, with 32 transfer credits already done.
 
 The constraint shaped the path. What happened inside the constraint is the more interesting story.
 

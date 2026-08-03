@@ -43,7 +43,7 @@ At 19, at his uncle's radiation oncology clinic (North Dakota), Colin outlined t
 - TABOOST — founding AI engineer. Production AI inbox system: **200+ emails/day** automated across **16 inboxes**. Real users, real infrastructure for creators who couldn't build it themselves.
 
 **Academics & money.**
-- Mott Community College now (3.7), **returning to UM-Flint Winter 2027** — BS Cellular & Molecular Biology + CS minor. **3.92 at UM-Flint, Dean's List.**
+- Mott Community College now (3.7), **returning to UM-Flint Fall 2027** — BS Cellular & Molecular Biology with optional CS / computational support courses. **3.92 at UM-Flint, Dean's List.**
 - AP Scholar with Distinction ×2, 9 AP exams, 32 transfer credits, SAT 1260, 4.1 HS GPA.
 - **FAFSA SAI −1500 — maximum Pell eligibility.** Mott is the strategic choice, not a failure state: same credits, fraction of the cost. His framing: **"the gap is just a variable — variables can be solved."**
 

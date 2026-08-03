@@ -8,7 +8,7 @@ It also turned out to be transferable. As the founding AI engineer at TABOOST, I
 
 Anyway, the entrepreneurship didn't come from nowhere. I've been finishing long, unsupervised projects my whole life: six years of martial arts to a black belt at 11, Eagle Scout at 13 (top 4% of scouts), fourth place at Georgia state wrestling while holding a 4.1 GPA. An Eagle project and a startup have the same shape — scope it, recruit the resources, ship it, own the result.
 
-The education plan is run like the businesses. My FAFSA SAI is negative 1500 — maximum Pell — so I engineered the cost structure: prerequisites at Mott Community College (3.7), then back to the University of Michigan-Flint, where my GPA is 3.92 with Dean's List standing, for Cellular and Molecular Biology with a CS minor. The gap is just a variable, and variables can be solved.
+The education plan is run like the businesses. My FAFSA SAI is negative 1500 — maximum Pell — so I engineered the cost structure: prerequisites at Mott Community College (3.7), then back to the University of Michigan-Flint, where my GPA is 3.92 with Dean's List standing, for Cellular and Molecular Biology with optional CS / computational support courses. The gap is just a variable, and variables can be solved.
 
 Here's the part that makes the degree and the businesses one story instead of two. At 19 I sat in my uncle's radiation oncology clinic outlining tumors on MRI scans with a mouse cursor, slice by slice, and realized the most valuable company I could ever build lives exactly there: computational oncology — software that proposes the tumor boundary so physicians verify instead of draw. Alta funds the skills. TABOOST proves the infrastructure. The biology degree supplies the domain.
 

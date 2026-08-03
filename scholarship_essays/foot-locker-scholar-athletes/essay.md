@@ -10,7 +10,7 @@ The same thing is true of my code. I founded Alta Investments at 18 — a live q
 
 At TABOOST, I'm the founding AI engineer. The system I built routes 200-plus emails a day across 16 inboxes for real users. Both of these are production — meaning they fail in public if I fail to maintain them. That is the version of athletic accountability that transferred.
 
-The academic record fits the same shape. Nine AP exams, AP Scholar with Distinction twice. Now at Mott Community College carrying a 3.7 while completing prerequisites; returning to the University of Michigan-Flint, where my GPA is 3.92 with Dean's List standing, in Winter 2027 for a BS in Cellular and Molecular Biology with a computer science minor.
+The academic record fits the same shape. Nine AP exams, AP Scholar with Distinction twice. Now at Mott Community College carrying a 3.7 while completing prerequisites; returning to the University of Michigan-Flint, where my GPA is 3.92 with Dean's List standing, in Fall 2027 for a BS in Cellular and Molecular Biology with optional CS / computational support courses.
 
 The degree is a component in a longer project that started at 19, sitting in my uncle's radiation oncology clinic in North Dakota, outlining tumors on MRI scans with a mouse cursor. Slice after slice, the cursor traced a boundary that decided where radiation would go. My goal is to automate that boundary — computational oncology, software that reads the scan and proposes the margin so the physician checks rather than draws.
 

@@ -4,7 +4,7 @@ The tumor boundaries I outlined at my uncle's radiation oncology clinic in North
 
 I have been thinking about that step ever since, and the more biology I take, the more dimensions the problem reveals. Radiation oncology targets the tumor you can see on imaging. What cancer immunotherapy targets is more distributed — the relationship between a tumor and the immune microenvironment that either attacks it or fails to. The imaging and the molecular biology are not separate problems; they are two layers of a system that has to work together.
 
-I am a Cellular and Molecular Biology major at the University of Michigan-Flint, computer science minor, 3.92 GPA with Dean's List standing. Finishing prerequisites at Mott Community College (3.7) now, returning to UM-Flint Winter 2027. Nine AP exams, AP Scholar with Distinction twice, 32 transfer credits in.
+I am a Cellular and Molecular Biology major at the University of Michigan-Flint, with optional CS / computational support courses, 3.92 GPA with Dean's List standing. Finishing prerequisites at Mott Community College (3.7) now, returning to UM-Flint Fall 2027. Nine AP exams, AP Scholar with Distinction twice, 32 transfer credits in.
 
 The computational work runs alongside: Alta Investments is a live quant trading system (Sharpe 1.08, bust probability 0%) I built at 18 and maintain today. At TABOOST I'm the founding AI engineer, building and running production infrastructure for real users — 200-plus emails a day across 16 inboxes. Both systems require that I solve biological-scale signal-to-noise problems — market data and email classification look random until they don't — under conditions where being wrong has real consequences.
 

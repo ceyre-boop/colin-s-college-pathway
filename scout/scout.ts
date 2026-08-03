@@ -31,6 +31,10 @@ import { PRICING, costUsd } from "../src/lib/essayCost.js";
 const HOME = homedir();
 const PROFILE_PATH = join(HOME, ".claude", "memory", "scholarship_profile.json");
 const OUTPUT_PATH = join(HOME, "scholarships_found.json");
+// BigFuture (CollegeBoard) curated harvest, written by scout/bigfuture-harvest.ts
+// (logged-in browser capture — client-side app, no HTTP scrape). Local, gitignored,
+// optional: if the file is absent this source is simply skipped with an honest status.
+const BIGFUTURE_RAW_PATH = join(HOME, ".claude", "memory", "bigfuture_raw.json");
 const MODEL = "claude-haiku-4-5";
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
@@ -393,6 +397,66 @@ const NEEDS_BROWSER = [
 ];
 
 // ---------------------------------------------------------------------------
+// BigFuture (CollegeBoard) — curated, profile-matchable directory of ~36k vetted
+// scholarships. It's a login-walled client-side app (no HTTP scrape), so the
+// harvest is done separately by scout/bigfuture-harvest.ts, which drives a
+// logged-in browser and writes BIGFUTURE_RAW_PATH. Here we just READ that cache
+// and map it into Candidates — no network. Absent file → honest "empty" status.
+// ---------------------------------------------------------------------------
+
+interface BigFutureRaw {
+  name: string;
+  slug: string;
+  url: string;
+  amount: number | null;
+  amountVaries?: boolean;
+  opens?: string | null;
+  closes?: string | null;
+  merit?: boolean;
+  need?: boolean;
+  essay?: boolean;
+  status?: string; // "deadline-soon" | "not-open" | "accepting" | ""
+}
+
+async function harvestBigFuture(statuses: SourceStatus[]): Promise<Candidate[]> {
+  const label = "bigfuture (CollegeBoard)";
+  const file = Bun.file(BIGFUTURE_RAW_PATH);
+  if (!(await file.exists())) {
+    statuses.push({ source: label, status: "empty", count: 0, note: "no harvest cache — run scout/bigfuture-harvest.ts" });
+    return [];
+  }
+  let raw: BigFutureRaw[];
+  try {
+    raw = await file.json();
+  } catch {
+    statuses.push({ source: label, status: "error", count: 0, note: `unreadable JSON at ${BIGFUTURE_RAW_PATH}` });
+    return [];
+  }
+  const out: Candidate[] = [];
+  for (const r of raw) {
+    if (!r?.name || !r?.url) continue;
+    const facts = [
+      r.need ? "need-based" : null,
+      r.merit ? "merit-based" : null,
+      r.essay ? "essay required" : "no essay",
+      r.opens ? `opens ${r.opens}` : null,
+    ].filter(Boolean);
+    out.push({
+      name: r.name,
+      org: null, // card view has no sponsor; the detail page does, not harvested
+      amount: r.amountVaries ? null : (r.amount ?? null),
+      amountText: r.amountVaries ? "Varies" : r.amount != null ? `$${r.amount.toLocaleString()}` : null,
+      deadline: r.closes ?? null, // only "Closes" is a real deadline; "Opens" goes in the notes
+      url: r.url,
+      description: `BigFuture curated (CollegeBoard). ${facts.join("; ")}.`,
+      source: "bigfuture",
+    });
+  }
+  statuses.push({ source: label, status: out.length ? "ok" : "empty", count: out.length });
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Scoring (Layer 2): Claude scores eligibility match, effort, legitimacy.
 // Primary: Anthropic API via raw fetch (same pattern as server.ts).
 // Fallback: PAI Inference.ts CLI (subscription-billed, no API key needed).
@@ -552,14 +616,19 @@ async function emitAppFile(ranked: Candidate[], generatedAt: string) {
   const entries = [...byId.entries()].slice(0, EMIT_MAX).map(([id, c]) => ({
     id,
     name: c.name,
-    org: c.org ?? c.source,
+    // BigFuture cards carry no sponsor (that's only on the detail page), and the green
+    // BIGFUTURE badge already signals provenance — so leave org blank rather than echoing
+    // "bigfuture". Other sources keep their source tag as the org fallback.
+    org: c.org ?? (c.source === "bigfuture" ? "" : c.source),
     amount: c.amount ?? 0,
     deadline: c.deadline ?? "Verify at URL",
     status: deadlineBucket(c.deadline) === "apply_now" ? "apply" : "future",
     priority: (c.expectedValue ?? 0) >= 5000 ? "high" : "medium",
     url: c.url,
     notes: `Scout find (match ${c.match}%, effort ${c.effort}). ${c.description ?? ""}`.trim().slice(0, 160),
-    source: "scout",
+    // Preserve BigFuture provenance so the app can badge curated finds; everything
+    // else keeps the generic "scout" tag the dashboard already understands.
+    source: c.source === "bigfuture" ? "bigfuture" : "scout",
     match: c.match,
     effort: c.effort,
     expectedValue: c.expectedValue,
@@ -611,10 +680,11 @@ async function main() {
 
   const statuses: SourceStatus[] = [];
   console.log("\nFetching sources…");
-  const [cos, s360, unigo, ...probes] = await Promise.all([
+  const [cos, s360, unigo, bigfuture, ...probes] = await Promise.all([
     scrapeCareerOneStop(statuses),
     scrapeScholarships360(statuses),
     scrapeUnigo(statuses),
+    harvestBigFuture(statuses),
     scrapePetersons(statuses),
     scrapeRaiseMe(statuses),
     scrapeAppily(statuses),
@@ -629,9 +699,11 @@ async function main() {
   // Cross-source dedupe by normalized name.
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
   const byName = new Map<string, Candidate>();
-  for (const c of [...cos, ...s360, ...unigo, ...probed]) if (!byName.has(norm(c.name))) byName.set(norm(c.name), c);
+  // BigFuture first: it's the curated/vetted source, so on a name collision its
+  // entry wins over the raw-directory duplicates.
+  for (const c of [...bigfuture, ...cos, ...s360, ...unigo, ...probed]) if (!byName.has(norm(c.name))) byName.set(norm(c.name), c);
   let candidates = [...byName.values()];
-  console.log(`${candidates.length} unique candidates (${cos.length} CareerOneStop, ${s360.length} Scholarships360, ${unigo.length} Unigo, ${probed.length} probes)`);
+  console.log(`${candidates.length} unique candidates (${bigfuture.length} BigFuture, ${cos.length} CareerOneStop, ${s360.length} Scholarships360, ${unigo.length} Unigo, ${probed.length} probes)`);
 
   if (candidates.length > SCORE_LIMIT) {
     // Cap fairly: round-robin across sources, each source's list sorted by amount

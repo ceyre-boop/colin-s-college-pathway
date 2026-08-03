@@ -1,6 +1,6 @@
 # The Bailey Family Foundation College Scholarship
 
-When I enrolled at Mott Community College, the decision did not require explanation — it required arithmetic. My FAFSA SAI is negative 1500, maximum Pell eligibility, and the question of where to complete my prerequisites had one efficient answer. I carry a 3.7 at Mott. I return to the University of Michigan-Flint in Winter 2027 to finish the BS in Cellular and Molecular Biology with a CS minor, where my cumulative GPA is 3.92 with Dean's List standing. The gap is a variable. Variables can be solved.
+When I enrolled at Mott Community College, the decision did not require explanation — it required arithmetic. My FAFSA SAI is negative 1500, maximum Pell eligibility, and the question of where to complete my prerequisites had one efficient answer. I carry a 3.7 at Mott. I return to the University of Michigan-Flint in Fall 2027 to finish the BS in Cellular and Molecular Biology with optional CS / computational support courses, where my cumulative GPA is 3.92 with Dean's List standing. The gap is a variable. Variables can be solved.
 
 The service part of my life has run in parallel since before the financial constraint was a factor.
 
@@ -10,6 +10,6 @@ That is also the design principle of the code I write. At TABOOST, I'm the found
 
 Anyway, the finish-what-you-start record is longer than the code: black belt at 11 after 6 years, Eagle Scout at 13 (top 4%), fourth at Georgia state wrestling on a 4.1. Nine AP exams. The pattern across all of these is not talent — it is commitment to whatever the long, hard version of the task requires.
 
-The long hard version of this one started at 19, at my uncle's radiation oncology clinic in North Dakota. I spent an afternoon outlining tumors on MRI scans — cursor, boundary, forty-plus slices. The problem I found is still unsolved: treatment targeting depends on a human drawing a line by hand, and the quality of that line depends on time and attention the clinical setting cannot always guarantee. Computational oncology — AI-proposed boundaries, physician-verified — is where the biology degree, the CS minor, and the service work all converge.
+The long hard version of this one started at 19, at my uncle's radiation oncology clinic in North Dakota. I spent an afternoon outlining tumors on MRI scans — cursor, boundary, forty-plus slices. The problem I found is still unsolved: treatment targeting depends on a human drawing a line by hand, and the quality of that line depends on time and attention the clinical setting cannot always guarantee. Computational oncology — AI-proposed boundaries, physician-verified — is where the biology degree, the optional CS / computational support coursework, and the service work all converge.
 
 The Bailey scholarship funds the part of this path that arithmetic alone cannot close. I bring the rest.

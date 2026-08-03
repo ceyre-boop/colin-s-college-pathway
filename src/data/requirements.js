@@ -6,11 +6,11 @@ export const VERIFIED_CREDITS = {
   umflint_fall25: 15, // 3.92 GPA, Dean's List
   mott_effective: 9, // non-duplicate Mott Winter '26 credits (MATH 145 duplicates AP MTH 120)
   in_hand: 56, // ap + umflint + mott_effective, as of June 2026
-  mott_fall26_enrolled: 13, // ENGL 102 + MATH 165 + FILM 181 + PHIL 101 (closes 3 gen-ed gaps + calculus)
+  mott_fall26_enrolled: 14, // COMM 131 + FILM 181 + MATH 170 + PHIL 101 (waitlists are padding/backups)
   mott_winter27_residency: 8, // residency semester: COMM 131 + TECH 121A + open elective
-  total_entering_f27: 77, // 56 + 13 + 8 — enters UM-Flint Fall 2027 (Winter '27 residency padding may not all apply to the degree)
+  total_entering_f27: 70, // 56 + 14 — current secured Fall '26 schedule before residency padding
   degree_required: 120,
-  remaining: 43, // to take at UM-Flint after Mott
+  remaining: 50, // conservative remaining credits after Fall '26 secured schedule; residency padding is excluded until transfer review
   upper_division_required: 33, // at least 33 must be 300+
   upper_division_have: 3, // PHL 168
 };
@@ -66,33 +66,32 @@ export const REQUIREMENTS = [
       { name: 'FQ Quantitative Literacy', cr: 3, status: 'done', note: 'AP Stats' },
       { name: 'Natural Science + Lab', cr: 4, status: 'done', note: 'CHM 260/261' },
       { name: 'Social Science', cr: 6, status: 'done', note: 'way over (24 cr from AP)' },
-      { name: 'COMP — ENG 112', cr: 3, status: 'gap', note: 'Mott ENGL 102 (Fall 2026)' },
+      { name: 'COMP — ENG 112', cr: 3, status: 'gap', note: 'COMM 131 may satisfy this; verify transfer first' },
       { name: 'Fine Arts (F)', cr: 3, status: 'gap', note: 'Mott FILM 181 (Fall 2026) → COM 272' },
       { name: 'Humanities (H)', cr: 6, status: 'partial', note: 'PHL 168 (3) done + Mott PHIL 101 (Fall 2026) → PHL 101 closes it' },
     ],
   },
   {
-    group: 'CS Minor', required: '~16-20 cr', status: 'gap',
+    group: 'Optional Support — CS / Computation', required: 'Not required for the degree', status: 'partial',
     items: [
-      { name: 'CSC 175 Programming I', cr: 4, status: 'partial', note: 'petition to waive — you code in production' },
-      { name: 'CSC 275 Programming II', cr: 4, status: 'gap' },
-      { name: 'CSC 375 Data Structures', cr: 3, status: 'gap' },
-      { name: 'CSC 379 Algorithm Analysis', cr: 3, status: 'gap', note: 'your quant backtester is this' },
-      { name: 'CSC 384 Database Design', cr: 3, status: 'gap', note: 'Firebase/Supabase = easy A' },
-      { name: 'CSC 370 Info Security (elective)', cr: 3, status: 'gap' },
+      { name: 'CIT 100 Technology Foundations', cr: 4, status: 'gap', note: 'nice-to-have, not required' },
+      { name: 'CSC 127 Unix Systems', cr: 1, status: 'gap', note: 'small skill-up, not a degree gate' },
+      { name: 'CSC 384 Database Design', cr: 3, status: 'gap', note: 'most directly useful computing elective' },
+      { name: 'MTH 220 Linear Algebra', cr: 3, status: 'gap', note: 'strong for computational oncology / bioinformatics' },
+      { name: 'BIO 492 Independent Study / Research', cr: 3, status: 'gap', note: 'take only if it becomes real lab work' },
     ],
   },
 ];
 
 export const ACTION_ITEMS = [
-  'transfer.umflint.edu → verify ENGL 102→ENG 112, MATH 165→MTH 118, FILM 181→COM 272 (F), PHIL 101→PHL 101 (H)',
-  'Fall 2026 at Mott: ENGL 102, MATH 165, FILM 181, PHIL 101 (13 cr — closes all 3 gen-ed gaps + CMB calculus)',
+  'transfer.umflint.edu → verify COMM 131→COM 210 or comm/gen-ed coverage, MATH 170→MTH 118 or equivalent, FILM 181→COM 272 (F), PHIL 101→PHL 101 (H)',
+  'Fall 2026 at Mott: COMM 131, MATH 170, FILM 181, PHIL 101 (14 enrolled cr; MUS 187 / PHIL waitlist are padding, not degree drivers)',
   'Winter 2027 = Mott residency semester (8 cr, half-time for partial Pell) — establishes 12+ months MI residency',
   'Get a Michigan driver\'s license, then submit the MI residency application Feb 2027 for in-state tuition',
   'Apply for UM-Flint readmission for Fall 2027 (deadline Aug 10)',
-  'CIT 100: COMI 160 does NOT transfer as CIT 100 (maps to CIS 200/BUS 115) — take CIT 100 at UM-Flint',
+  'CIT 100 / CSC 127 / CSC 384 / MTH 220 are support courses, not degree gates — do not let them push out required biology and chemistry',
   'CHM chain: take CHM 262/263 in Fall 2027 BEFORE CHM 330 Organic (Winter 2028)',
-  'Email Dr. Sucic: returning Fall 2027, CMB, AI/Python experience, want to join the lab + SUCCES/UROP',
+  'Email Dr. Sucic: returning Fall 2027, CMB, AI/Python experience, want lab access + SUCCES/UROP if the fit is real',
 ];
 
 export const KEY_CONTACTS = [

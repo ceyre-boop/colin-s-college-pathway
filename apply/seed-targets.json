@@ -1,0 +1,13 @@
+{
+  "_comment": "Hand-picked, eligibility-checked open forms to prove the fill engine before the full crawl. Session-1 seed only.",
+  "targets": [
+    {
+      "slug": "shape-plus-fitness",
+      "name": "Shape Plus Fitness Scholarship",
+      "amount": 1500,
+      "applyUrl": "https://www.shapeplus.com/scholarship-application-denver",
+      "platform": "direct",
+      "eligibility": "pass — US undergrad, health-related field incl. biology (verified)"
+    }
+  ]
+}

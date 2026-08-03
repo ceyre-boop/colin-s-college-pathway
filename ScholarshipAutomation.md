@@ -27,7 +27,7 @@ Fill this scholarship application using my profile:
 - Name: Colin Eyre
 - Age: 19, Michigan
 - School: University of Michigan–Flint
-- Major: BS Cellular & Molecular Biology, CS minor
+- Major: BS Cellular & Molecular Biology, with optional CS / computational support courses
 - GPA: 3.92 at UM-Flint (Dean's List); AP Scholar with Distinction (x2)
 - Work: Founding AI Engineer @ TABOOST; Founder @ Alta Investments (quant trading)
 - Goal: Computational oncology / AI drug discovery
@@ -62,7 +62,7 @@ STEP 2 — MY PROFILE (ground every field and every essay claim in these facts; 
 - Full name: Colin Eyre
 - Contact (email · phone · street address · DOB): NOT stored in this repo — pull from my saved
   "Apply to Scholarship" shortcut profile / applicant.local.json (gitignored). US citizen, Michigan resident.
-- School: University of Michigan–Flint (BS Cellular & Molecular Biology, CS minor);
+- School: University of Michigan–Flint (BS Cellular & Molecular Biology, with optional CS / computational support courses);
   currently completing prereqs at Mott Community College, returning to UM-Flint Fall 2027
 - GPA: 3.92 at UM-Flint (Dean's List); 3.7 at Mott; SAT 1260
 - Honors: AP Scholar with Distinction x2 (9 AP exams, 32 transfer credits)

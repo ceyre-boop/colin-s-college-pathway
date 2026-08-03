@@ -1,11 +1,12 @@
-// Colin's real course-by-course plan toward BS Cellular & Molecular Biology + CS minor.
+// Colin's course-by-course plan toward BS Cellular & Molecular Biology.
 // Source: UM-Flint 2026-2027 official catalog + real transcript + Mott transfer guide (June 2026).
+// This version separates the strict degree audit from optional CS / research support.
 // UM-Flint return moved to Fall 2027 (Winter 2027 is a Mott residency semester); grad Spring 2030.
 export { VERIFIED_CREDITS, GRAD_TARGET } from "./requirements";
 
 // Real credits in hand today (AP 32 + UM-Flint Fall '25 15 + Mott non-duplicate 9 = 56). The progress
-// bar adds 'completed' courses from the forward plan on top of this. The "Done" blocks below are marked
-// status:"completed" so App.jsx excludes them from the forward tally (they're already inside ALREADY_HAVE).
+// bar adds counted courses from the forward plan on top of this. Courses flagged countTowardDegree:false
+// are support work only and do not inflate the strict degree audit.
 export const ALREADY_HAVE = 56;
 export const DEGREE_TOTAL = 120;
 export const UPPER_DIVISION_NEEDED = 33;
@@ -47,66 +48,56 @@ export const PATHWAY_DATA = [
   ] },
 
   // ─── CURRENT SEMESTER ───────────────────────────────────────────────────
-  { sem: 'Fall 2026', school: 'Mott', status: 'current', credits: 13, note: 'Final productive Mott semester — closes all 3 gen ed gaps + CMB calculus', courses: [
-    { code: 'ENGL 102', name: 'English Composition II', cr: 3, req: '→ ENG 112 Critical Writing & Reading | COMP gen ed ✓', status: 'enrolled' },
-    { code: 'MATH 165', name: 'Applied Calculus', cr: 4, req: '→ MTH 118 Applied Calculus | CMB math requirement ✓ | saves ~$1,840 vs UM Flint', status: 'enrolled' },
+  { sem: 'Fall 2026', school: 'Mott', status: 'current', credits: 14, note: 'Current secured schedule: COMM 131, FILM 181, MATH 170, PHIL 101. MUS 187 and the alternate PHIL 101 section are waitlist padding, not degree drivers. Verify COMM 131 and MATH 170 transfer cleanly; if not, the fallback is ENGL 102 later.', courses: [
+    { code: 'COMM 131', name: 'Fund. of Public Speaking', cr: 3, req: 'Likely covers the communication component; verify transfer before count it as closed', status: 'enrolled' },
     { code: 'FILM 181', name: 'Introduction to Film', cr: 3, req: '→ COM 272 Film Genre | Fine Arts F gen ed ✓', status: 'enrolled' },
+    { code: 'MATH 170', name: 'Analytic Geometry & Calculus I', cr: 5, req: 'Likely stronger than MATH 165 for the calculus slot; verify it maps to MTH 118 or equivalent', status: 'enrolled' },
     { code: 'PHIL 101', name: 'Introduction to Philosophy', cr: 3, req: '→ PHL 101 Intro to Philosophy | Humanities H gen ed ✓ (closes last H gap)', status: 'enrolled' },
   ] },
 
   // ─── WINTER 2027 AT MOTT (RESIDENCY SEMESTER) ───────────────────────────
-  { sem: 'Winter 2027', school: 'Mott', status: 'planned', credits: 8, note: 'Light semester — establishing 12+ months Michigan residency for in-state tuition. Submit residency application Feb 2027. Apply UM Flint readmission for Fall 2027 (deadline Aug 10).', courses: [
-    { code: 'COMM 131', name: 'Fund. of Public Speaking', cr: 3, req: '→ COM 210 Intro to Public Speaking | COMP credit + actually useful skill', status: 'planned' },
-    { code: 'TECH 121A', name: 'STEM App — Guitar', cr: 2, req: '→ MUS 117 Guitar Class | no gen ed value, just fun padding', status: 'planned' },
-    { code: 'Elective TBD', name: 'Any open elective', cr: 3, req: 'Pad to 8 cr half-time for partial Pell | pick something interesting', status: 'planned' },
+  { sem: 'Winter 2027', school: 'Mott', status: 'planned', credits: 8, note: 'Residency semester. COMM 131 and the open elective are the counted credits; TECH 121A is optional padding if you need the extra load for aid/residency.', courses: [
+    { code: 'COMM 131', name: 'Fund. of Public Speaking', cr: 3, req: '→ COM 210 Intro to Public Speaking | helpful communication skill', status: 'planned' },
+    { code: 'TECH 121A', name: 'STEM App — Guitar', cr: 2, req: '→ MUS 117 Guitar Class | optional enrichment, not part of the strict audit', status: 'planned', countTowardDegree: false },
+    { code: 'Elective TBD', name: 'Any open elective', cr: 3, req: 'Keep this only if you need half-time status or want a transferable elective', status: 'planned' },
   ] },
 
   // ─── UM FLINT: RETURN ───────────────────────────────────────────────────
-  { sem: 'Fall 2027', school: 'UM-Flint', status: 'planned', credits: 14, note: 'RETURN TO UM FLINT — in-state tuition secured. Email Dr. Sucic immediately. Apply SUCCES program + UROP for paid research.', courses: [
-    { code: 'CHM 262', name: 'Principles of Chemistry II', cr: 4, req: 'CMB required — MUST take before CHM 330 Organic Chem', status: 'planned' },
+  { sem: 'Fall 2027', school: 'UM-Flint', status: 'planned', credits: 13, note: 'Core science restart. Keep the load as lean as possible while protecting GPA.', courses: [
+    { code: 'CHM 262', name: 'Principles of Chemistry II', cr: 4, req: 'CMB required — must come before Organic Chem', status: 'planned' },
     { code: 'CHM 263', name: 'Introductory Quantitative Analysis Lab', cr: 1, req: 'CMB required — paired with CHM 262', status: 'planned' },
-    { code: 'CIT 100', name: 'Technology Foundations', cr: 4, req: 'CMB required — easy A given your background', status: 'planned' },
-    { code: 'CSC 127', name: 'Using a Unix Computer System', cr: 1, req: 'CS minor — you can do this in your sleep', status: 'planned' },
-    { code: 'BIO 326', name: 'Cell Biology', cr: 4, req: 'CMB core — where molecular biology actually begins', status: 'planned' },
+    { code: 'BIO 326', name: 'Cell Biology', cr: 4, req: 'CMB core — actual molecular biology starts here', status: 'planned' },
+    { code: 'CIT 100', name: 'Technology Foundations', cr: 4, req: 'Optional support — useful, but not required for the strict degree audit', status: 'planned', countTowardDegree: false },
   ] },
-  { sem: 'Winter 2028', school: 'UM-Flint', status: 'planned', credits: 17, note: 'Hardest chemistry semester. CHM 262 prereq now done.', courses: [
-    { code: 'CHM 330', name: 'Organic Chemistry I', cr: 4, req: 'CMB required — hardest course in the sequence', status: 'planned' },
-    { code: 'CHM 331', name: 'Organic Chemistry Laboratory I', cr: 1, req: 'CMB required — always paired with CHM 330', status: 'planned' },
-    { code: 'BIO 301', name: 'Biostatistics', cr: 4, req: 'CMB required — bridges biology and data science | MTH 118 prereq now done ✓', status: 'planned' },
-    { code: 'BIO 328', name: 'Genetics', cr: 4, req: 'CMB core — foundation of everything in molecular biology', status: 'planned' },
-    { code: 'CSC 175', name: 'Problem Solving & Programming I', cr: 4, req: 'CS minor — petition to waive based on professional dev experience', status: 'planned' },
+  { sem: 'Winter 2028', school: 'UM-Flint', status: 'planned', credits: 13, note: 'Hard semester. Keep the course list clean and protect the GPA.', courses: [
+    { code: 'CHM 330', name: 'Organic Chemistry I', cr: 4, req: 'CMB required — the first real filter', status: 'planned' },
+    { code: 'CHM 331', name: 'Organic Chemistry Laboratory I', cr: 1, req: 'CMB required — paired with CHM 330', status: 'planned' },
+    { code: 'BIO 301', name: 'Biostatistics', cr: 4, req: 'CMB required — bridge biology and data', status: 'planned' },
+    { code: 'BIO 328', name: 'Genetics', cr: 4, req: 'CMB core — foundational for oncology work', status: 'planned' },
   ] },
-  { sem: 'Spring/Summer 2028', school: 'UM-Flint', status: 'planned', credits: 13, note: 'Apply NSF REU (due Feb 2028) — $5,500 stipend + housing for summer research at another university.', courses: [
+  { sem: 'Spring/Summer 2028', school: 'UM-Flint', status: 'planned', credits: 13, note: 'Summer is better used for momentum than for padding. Keep only what moves the degree.', courses: [
     { code: 'CHM 332', name: 'Organic Chemistry II', cr: 4, req: 'CMB required — complete the organic sequence', status: 'planned' },
     { code: 'CHM 333', name: 'Organic Chemistry Laboratory II', cr: 1, req: 'CMB required — paired with CHM 332', status: 'planned' },
-    { code: 'PHY 143', name: 'College Physics I', cr: 4, req: 'CMB required — start physics sequence (algebra-based)', status: 'planned' },
-    { code: 'CSC 275', name: 'Problem Solving & Programming II', cr: 4, req: 'CS minor — needs CSC 175 first', status: 'planned' },
+    { code: 'PHY 143', name: 'College Physics I', cr: 4, req: 'CMB required — start physics', status: 'planned' },
+    { code: 'MTH 220', name: 'Elementary Linear Algebra', cr: 3, req: 'Optional support — useful for computational oncology, not required for the degree', status: 'planned', countTowardDegree: false },
   ] },
-  { sem: 'Fall 2028', school: 'UM-Flint', status: 'planned', credits: 17, note: 'APPLY BARRY GOLDWATER SCHOLARSHIP — due January 2029. Need faculty nomination from Dr. Sucic. THE scholarship for STEM undergrads going to grad school ($7,500/yr).', courses: [
+  { sem: 'Fall 2028', school: 'UM-Flint', status: 'planned', credits: 11, note: 'This is the semester to add research if the lab slot exists. Keep the academic load manageable.', courses: [
     { code: 'BIO 435', name: 'Microbiology', cr: 4, req: 'CMB core required', status: 'planned' },
-    { code: 'PHY 145', name: 'College Physics II', cr: 4, req: 'CMB required — complete physics sequence', status: 'planned' },
-    { code: 'CHM 450', name: 'Biochemistry I', cr: 3, req: 'CMB required — where chemistry and biology finally merge', status: 'planned' },
-    { code: 'CSC 335', name: 'Computer Networks I', cr: 3, req: 'CS minor elective (choose 4 from: CSC 310, 335, CIS 363, CSC 382, CSC 384)', status: 'planned' },
-    { code: 'BIO 492', name: 'Independent Study / Research', cr: 3, req: 'Credit for Dr. Sucic lab work — get this on your transcript', status: 'planned' },
+    { code: 'PHY 145', name: 'College Physics II', cr: 4, req: 'CMB required — finish physics', status: 'planned' },
+    { code: 'CHM 450', name: 'Biochemistry I', cr: 3, req: 'CMB required — the chemistry/biology merge point', status: 'planned' },
+    { code: 'BIO 492', name: 'Independent Study / Research', cr: 3, req: 'Optional support — only take if the lab work is real and transcripted', status: 'planned', countTowardDegree: false },
   ] },
-  { sem: 'Winter 2029', school: 'UM-Flint', status: 'planned', credits: 16, note: 'Advanced molecular biology. Start PhD/industry applications.', courses: [
+  { sem: 'Winter 2029', school: 'UM-Flint', status: 'planned', credits: 10, note: 'Advanced molecular biology. This is where the story starts to look like a research application.', courses: [
     { code: 'BIO 467', name: 'Molecular Biology of Prokaryotes', cr: 4, req: 'CMB core — advanced molecular biology', status: 'planned' },
-    { code: 'CHM 452', name: 'Biochemistry II', cr: 3, req: 'CMB required — complete biochemistry sequence', status: 'planned' },
-    { code: 'BTC 120', name: 'Phage Hunters: Phage Discovery', cr: 3, req: 'CMB required — hands-on genomics lab', status: 'planned' },
-    { code: 'CSC 382', name: 'Software Engineering', cr: 3, req: 'CS minor elective — production code fundamentals', status: 'planned' },
-    { code: 'MTH 220', name: 'Elementary Linear Algebra', cr: 3, req: 'NOT in CS minor but REQUIRED for ML/bioinformatics/comp oncology work. Add as elective. Essential for grad school.', status: 'planned' },
+    { code: 'CHM 452', name: 'Biochemistry II', cr: 3, req: 'CMB required — finish biochemistry', status: 'planned' },
+    { code: 'BTC 120', name: 'Phage Hunters: Phage Discovery', cr: 3, req: 'CMB required — genomics / wet lab experience', status: 'planned' },
   ] },
-  { sem: 'Spring/Summer 2029', school: 'UM-Flint', status: 'planned', credits: 12, note: 'Lighter semester — research focus, PhD application prep.', courses: [
+  { sem: 'Spring/Summer 2029', school: 'UM-Flint', status: 'planned', credits: 11, note: 'Use the summer for the most useful thing you can get: either research or the last required bio work.', courses: [
     { code: 'BTC 122', name: 'Phage Hunters: Introduction to Omics', cr: 3, req: 'CMB required — genomics and computational biology', status: 'planned' },
-    { code: 'BIO 492', name: 'Independent Study / Research', cr: 3, req: 'Second research semester — aim for co-authorship', status: 'planned' },
-    { code: 'CSC 384', name: 'Database Design', cr: 3, req: 'CS minor elective — Firebase/Supabase background = easy A', status: 'planned' },
-    { code: 'CIS 363', name: 'Advanced Web Application Programming', cr: 3, req: 'CS minor elective — 4th and final elective to complete minor', status: 'planned' },
+    { code: 'BIO 468', name: 'Molecular Biology of Eukaryotes', cr: 4, req: 'CMB capstone-level — final core biology', status: 'planned' },
+    { code: 'BIO 487', name: 'General Pathology', cr: 4, req: 'Bio elective — if pathology fits the oncology goal better than immunology', status: 'planned' },
   ] },
-  { sem: 'Fall 2029', school: 'UM-Flint', status: 'planned', credits: 15, note: 'Final required courses. Apply PhD programs (Bioinformatics, Computational Biology, Biomedical Engineering) — UM Ann Arbor PIBS is the target.', courses: [
-    { code: 'BIO 468', name: 'Molecular Biology of Eukaryotes', cr: 4, req: 'CMB capstone-level — final core course', status: 'planned' },
-    { code: 'BIO 487', name: 'General Pathology', cr: 4, req: 'Bio elective — ties directly to cancer/radiation oncology', status: 'planned' },
-    { code: 'BIO 525', name: 'Immunology', cr: 4, req: 'Bio elective — oncology + drug response research', status: 'planned' },
-    { code: 'Free elective', name: 'To reach 120 credits / 33 upper div', cr: 3, req: 'Any 300+ level course if needed for credit total', status: 'planned' },
+  { sem: 'Fall 2029', school: 'UM-Flint', status: 'planned', credits: 0, note: 'Buffer only. If the advisor says a requirement is still open, use this term to close it. Otherwise, stop adding credits just to add credits.', courses: [
   ] },
-  { sem: 'Winter 2030 (buffer)', school: 'UM-Flint', status: 'planned', credits: 0, note: 'Buffer semester only if any requirements remain. Graduation: Spring 2030. Degree: BS Cellular and Molecular Biology + CS Minor, University of Michigan.', courses: [] },
+  { sem: 'Winter 2030 (buffer)', school: 'UM-Flint', status: 'planned', credits: 0, note: 'Buffer semester only if any requirements remain. Graduation: Spring 2030. Degree: BS Cellular and Molecular Biology, University of Michigan-Flint.', courses: [] },
 ];

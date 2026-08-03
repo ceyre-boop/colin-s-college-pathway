@@ -1,7 +1,7 @@
 // Colin's real essay-facts — the raw material every generated essay is grounded in.
 export const PROFILE = `
 Name: Colin Eyre — 19, Swartz Creek, Michigan (Michigan resident).
-School: University of Michigan–Flint — BS Cellular & Molecular Biology, CS minor.
+School: University of Michigan–Flint — BS Cellular & Molecular Biology, with optional CS / computational support courses.
   Knocking out remaining prereqs at Mott Community College (strategic, lower cost); returns to UM-Flint Fall 2027.
 Academics: 3.92 GPA at University of Michigan–Flint, Dean's List (Fall 2025: A+, A, A, A, A-).
   AP Scholar with Distinction (x2, back-to-back), 9 total AP exams (32 transfer credits). SAT 1260.
@@ -44,7 +44,7 @@ export const PROFILE_FIELDS = {
   Age: '19',
   Location: 'Swartz Creek, Michigan',
   School: 'University of Michigan–Flint (via Mott CC for prereqs; returns Fall 2027)',
-  Major: 'BS Cellular & Molecular Biology, CS minor',
+  Major: 'BS Cellular & Molecular Biology with optional CS/computational support',
   GPA: '3.92 (University of Michigan–Flint, Dean\'s List)',
   'Expected graduation': 'Spring 2030',
   Honors: 'Dean\'s List, AP Scholar with Distinction (x2), 9 AP exams, Eagle Scout, Black Belt, state wrestler',
