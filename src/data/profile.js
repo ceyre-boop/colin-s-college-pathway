@@ -32,8 +32,10 @@ export const CAREER = `
 Career path: Computational Oncology / AI-assisted cancer research — using machine learning, computer
 vision, and statistical modeling to segment tumors on MRI/CT scans (literally automating what he did by
 hand at his uncle's clinic), predict treatment response from genomic data, model drug interactions, and
-build early-detection systems from pathology images. Target field of companies like Tempus AI, PathAI,
-Recursion, Foundation Medicine; path runs through a funded Bioinformatics PhD (UM Ann Arbor).
+build early-detection systems from pathology images. Target field of companies like Tempus AI (building
+the largest multimodal foundation model in oncology), PathAI, Recursion, Foundation Medicine; path runs
+through UM's PIBS (Program in Biomedical Sciences) — DCMB Bioinformatics or Cancer Biology PhD track,
+no GRE required, fully funded ($43,788/yr stipend + tuition + insurance).
 `.trim();
 
 // Non-sensitive structured fields for the Claude-for-Chrome payload. This file ships in the

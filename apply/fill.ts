@@ -73,7 +73,7 @@ function liveFormExtractor() {
     // aria-label / placeholder fallback
     return inp.getAttribute("aria-label") || inp.getAttribute("placeholder") || inp.name || "";
   }
-  const out: { name: string; label: string; type: string; required: boolean; isEssay: boolean; tag: string }[] = [];
+  const out: { name: string; label: string; type: string; required: boolean; isEssay: boolean; tag: string; value: string; checked: boolean }[] = [];
   const els = document.querySelectorAll("input, textarea, select");
   els.forEach((el) => {
     const inp = el as HTMLInputElement;
@@ -83,7 +83,7 @@ function liveFormExtractor() {
     const label = (labelFor(el) || "").replace(/\s+/g, " ").trim();
     const required = inp.required || /frm_required|required/.test((el.closest(".frm_form_field") || {}).className || "") || (el.closest('[role="listitem"]')?.querySelector('[aria-label*="Required"]') != null);
     const isEssay = el.tagName === "TEXTAREA" || /describe|why |explain|tell us|essay|personal statement|in \d{2,4} words|short answer|how (have|do|will) you|what (are|do)/i.test(label);
-    out.push({ name: inp.name || inp.id || "", label, type, required, isEssay, tag: el.tagName });
+    out.push({ name: inp.name || inp.id || "", label, type, required, isEssay, tag: el.tagName, value: inp.value || "", checked: inp.checked });
   });
   return out;
 }
@@ -131,6 +131,12 @@ async function run() {
 
       let hardBlocked = false;
       let hasEssayField = false;
+      let feeDetected = false;
+      try {
+        const bodyText = await page.locator("body").innerText({ timeout: 3000 });
+        feeDetected = /application\s+fee|processing\s+fee|entry\s+fee|pay\s+to\s+apply|credit\s+card\s+required/i.test(bodyText);
+        if (feeDetected) r.blocked.push("application/processing fee language detected on page");
+      } catch { /* page may be transitioning; remain conservative below */ }
       for (const f of fields) {
         const label = f.label || f.name;
         const m: MapResult = mapField(label, applicant);
@@ -145,10 +151,12 @@ async function run() {
           continue;
         }
         if (m.kind === "fill") {
-          if (!DRY_would_skip()) await fillOne(page, f.name, m.value);
-          r.filled.push({ label, path: m.path });
+          const didFill = DRY_would_skip() ? true : await fillOne(page, f.name, m.value, f.type, f.value);
+          if (didFill) r.filled.push({ label, path: m.path });
+          else if (f.required) r.unmapped.push(`${label} — control could not be filled`);
         } else if (m.kind === "decline") {
           r.declined.push(`${label} (${m.reason})`);
+          if (f.required) r.unmapped.push(`${label} — required field intentionally left for human review`);
         } else {
           if (f.required) r.unmapped.push(label);
         }
@@ -162,9 +170,9 @@ async function run() {
 
       // classify (the gate)
       const platform = t.platform === "direct" ? "direct-formidable" : (t.platform || "unknown");
-      const safeClass = !hardBlocked && !hasEssayField && r.unmapped.length === 0 && AUTOSUBMIT_ALLOWLIST.has(platform);
+      const safeClass = !hardBlocked && !feeDetected && !hasEssayField && r.unmapped.length === 0 && AUTOSUBMIT_ALLOWLIST.has(platform);
 
-      if (hardBlocked) { r.outcome = "needs_human"; r.reasons.push("hard-blocked field present (SSN/fee/login) — never auto-filled"); }
+      if (hardBlocked || feeDetected) { r.outcome = "needs_human"; r.reasons.push("hard-blocked field or fee language present — never auto-filled/submitted"); }
       else if (hasEssayField) { r.outcome = "needs_essay"; r.reasons.push("form has an essay/short-answer prompt — filled personal fields, queued for review"); }
       else if (r.unmapped.length) { r.outcome = "filled_ready"; r.reasons.push(`${r.unmapped.length} required field(s) unmapped — human completes + submits`); }
       else if (!AUTOSUBMIT_ALLOWLIST.has(platform)) { r.outcome = "filled_ready"; r.reasons.push(`platform "${platform}" not on auto-submit allowlist — queued for review`); }
@@ -177,9 +185,16 @@ async function run() {
           await btn.click();
           await page.waitForTimeout(3000);
           await page.screenshot({ path: join(shotDir, "confirmation.png"), fullPage: true });
-          r.outcome = "auto_submitted"; r.submittedAt = new Date().toISOString();
-          submitted[t.slug] = r.submittedAt; submits++;
-          r.reasons.push("safe class — auto-submitted");
+          const confirmationText = await page.locator("body").innerText().catch(() => "");
+          const confirmed = /thank you|application (received|submitted)|submission (complete|confirmed)|successfully submitted/i.test(confirmationText) || /thank|confirmation|success/i.test(page.url());
+          if (confirmed) {
+            r.outcome = "auto_submitted"; r.submittedAt = new Date().toISOString();
+            submitted[t.slug] = r.submittedAt; submits++;
+            r.reasons.push("safe class — submission confirmation detected");
+          } else {
+            r.outcome = "needs_human";
+            r.reasons.push("submit control was clicked but no confirmation was detected — verify manually");
+          }
         }
       } else if (safeClass && DRY) {
         r.reasons.push("safe class — WOULD auto-submit (dry run)");
@@ -208,11 +223,26 @@ async function run() {
 }
 
 // helper: fill one field by its name/id via a resilient locator
-async function fillOne(page: any, name: string, value: string) {
-  if (!name) return;
+async function fillOne(page: any, name: string, value: string, type = "text", optionValue = "") {
+  if (!name) return false;
   const loc = page.locator(`[name="${name}"]`).first();
-  try { if (await loc.count()) { await loc.fill(value, { timeout: 4000 }); return; } } catch { /* fall through */ }
-  try { const byId = page.locator(`#${CSS.escape(name)}`).first(); if (await byId.count()) await byId.fill(value, { timeout: 4000 }); } catch { /* give up quietly */ }
+  try {
+    if (await loc.count()) {
+      if (type === "checkbox" || type === "radio") { await loc.check({ timeout: 4000 }); return true; }
+      if (type === "select-one") { await loc.selectOption({ label: value }).catch(() => loc.selectOption(optionValue || value)); return true; }
+      await loc.fill(value, { timeout: 4000 }); return true;
+    }
+  } catch { /* fall through */ }
+  try {
+    const byId = page.locator(`#${CSS.escape(name)}`).first();
+    if (await byId.count()) {
+      if (type === "checkbox" || type === "radio") await byId.check({ timeout: 4000 });
+      else if (type === "select-one") await byId.selectOption({ label: value }).catch(() => byId.selectOption(optionValue || value));
+      else await byId.fill(value, { timeout: 4000 });
+      return true;
+    }
+  } catch { /* report failure to caller */ }
+  return false;
 }
 
 // In dry-run we still FILL the form (so the screenshot shows real data); we only skip SUBMIT.

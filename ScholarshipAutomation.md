@@ -99,6 +99,23 @@ filled and its value, list anything you left blank, and wait for me to review an
 
 Then every new form is: open it → run **Apply to Scholarship** → review → submit. Target ~20 in an afternoon.
 
+## BigFuture workflow (current safety contract)
+
+College Board BigFuture is the preferred discovery surface because it is the trusted, logged-in
+source. A login session is still not permission to guess or mass-submit representations. The app
+tracks each opportunity through:
+
+`discovered → verified → eligible → prioritized → prepared → needs-review → submitted → confirmed → won/rejected`
+
+The prioritization score is:
+
+`estimated award × realistic win-rate × verified eligibility confidence − application effort`
+
+Eligibility confidence is evidence quality, not a license to round up an uncertain fact. If the
+official rules do not establish that Colin qualifies, the opportunity stays in review. The browser
+assistant may fill only facts explicitly present in the approved profile and must stop at the final
+review screen. Colin personally checks attestations, uploads, and submission before clicking it.
+
 ---
 
 ## 4. Essay angles (rotate to avoid repetition)

@@ -7,6 +7,10 @@ import { pickModel, costUsd, DEFAULT_MODEL } from "./src/lib/essayCost.js";
 const PORT = Number(process.env.PORT ?? 3000);
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const DIST = `${import.meta.dir}/dist`;
+const MAX_BATCH = 100;
+const MAX_PROFILE_CHARS = 24_000;
+const MAX_CONTEXT_CHARS = 6_000;
+const requestCounts = new Map<string, { started: number; count: number }>();
 
 interface Scholarship {
   id: string;
@@ -34,7 +38,8 @@ function buildPrompt(s: Scholarship, profile: string, context?: string): string 
 }
 
 async function draftEssay(s: Scholarship, profile: string, context: string | undefined, modelOverride?: string) {
-  const model = modelOverride || pickModel(s);
+  const requestedModel = modelOverride && ["claude-3-5-haiku-latest", "claude-3-7-sonnet-latest"].includes(modelOverride) ? modelOverride : undefined;
+  const model = requestedModel || pickModel(s);
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -71,6 +76,11 @@ Bun.serve({
 
     if (url.pathname.startsWith("/api/") && request.method === "POST") {
       if (!ANTHROPIC_API_KEY) return json({ error: "ANTHROPIC_API_KEY is not set on the server." }, 500);
+      const client = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+      const now = Date.now();
+      const bucket = requestCounts.get(client);
+      if (!bucket || now - bucket.started > 60_000) requestCounts.set(client, { started: now, count: 1 });
+      else if (bucket.count++ >= 30) return json({ error: "Rate limit reached. Try again in a minute." }, 429);
       let body: any;
       try {
         body = await request.json();
@@ -79,11 +89,13 @@ Bun.serve({
       }
       const profile: string = body.profile;
       if (!profile) return json({ error: "profile is required." }, 400);
+      if (typeof profile !== "string" || profile.length > MAX_PROFILE_CHARS) return json({ error: "profile is too large." }, 413);
 
       try {
         // One essay.
         if (url.pathname === "/api/draft") {
           if (!body.scholarship?.name) return json({ error: "scholarship.name required." }, 400);
+          if (typeof body.context === "string" && body.context.length > MAX_CONTEXT_CHARS) return json({ error: "context is too large." }, 413);
           const r = await draftEssay(body.scholarship, profile, body.context, body.model);
           return json({ id: body.scholarship.id, ...r });
         }
@@ -91,6 +103,7 @@ Bun.serve({
         if (url.pathname === "/api/batch") {
           const list: Scholarship[] = body.scholarships ?? [];
           if (!list.length) return json({ error: "scholarships[] required." }, 400);
+          if (list.length > MAX_BATCH) return json({ error: `Batch is limited to ${MAX_BATCH} essays.` }, 413);
           const results = [];
           for (const s of list) {
             try {

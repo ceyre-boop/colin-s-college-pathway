@@ -80,6 +80,7 @@ export const REQUIREMENTS = [
       { name: 'MTH 220 Linear Algebra', cr: 3, status: 'gap', note: 'strong for computational oncology / bioinformatics' },
       { name: 'BIO 492 Independent Study / Research', cr: 3, status: 'gap', note: 'take only if it becomes real lab work' },
     ],
+    note: 'PIBS/DCMB coursework in actual ML (bioinformatics-specific) comes AFTER admission — these courses aren\'t the gap. The pre-application gap is a documented ML portfolio: TABOOST infra + Alta Investments quant system are the evidence PIBS reviewers want, so keep writing them up as you build.',
   },
 ];
 
@@ -92,6 +93,8 @@ export const ACTION_ITEMS = [
   'CIT 100 / CSC 127 / CSC 384 / MTH 220 are support courses, not degree gates — do not let them push out required biology and chemistry',
   'CHM chain: take CHM 262/263 in Fall 2027 BEFORE CHM 330 Organic (Winter 2028)',
   'Email Dr. Sucic: returning Fall 2027, CMB, AI/Python experience, want lab access + SUCCES/UROP if the fit is real',
+  'Fall 2028 (junior year): apply for the PIBS Preview weekend at UM Ann Arbor — UM pays travel/lodging/food; meet DCMB faculty before the formal application',
+  'PIBS application (Bioinformatics Track A or Cancer Biology Track B) opens late Aug 2029, due Dec 1 2029 — no GRE required; go in with 2 years of Dr. Sucic lab experience plus TABOOST/Alta as the documented ML portfolio',
 ];
 
 export const KEY_CONTACTS = [

@@ -10,6 +10,7 @@ import { SCOUT_SCHOLARSHIPS, SCOUT_GENERATED_AT } from "./data/scoutFound";
 import { APPLY_KITS } from "./data/essays";
 import { fullProfile, fieldsBlock } from "./data/profile";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
+import { WORKFLOW_STATES, WORKFLOW_LABELS, EVIDENCE_STATUS, normalizeScholarship, expectedBenefit, advance, prioritize } from "./lib/scholarshipWorkflow";
 import "./index.css";
 
 const usd = (n) => (n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}K` : `$${n.toLocaleString()}`);
@@ -22,7 +23,7 @@ const PURSUING = ["apply", "research", "applied"];
 export default function CollegePathway() {
   const [tab, setTab] = useState("dashboard");
   const [inState, setInState] = useState(true);
-  const [scholarships, setScholarships] = useLocalStorage("ccp_scholarships_v2", DEFAULT_SCHOLARSHIPS);
+  const [scholarships, setScholarships] = useLocalStorage("ccp_scholarships_v2", DEFAULT_SCHOLARSHIPS.map(normalizeScholarship));
   const [timeline, setTimeline] = useLocalStorage("ccp_timeline_v3", INIT_TIMELINE);
   const [pathway, setPathway] = useLocalStorage("ccp_pathway_v4", PATHWAY_DATA);
   const [schFilter, setSchFilter] = useState("all");
@@ -42,8 +43,9 @@ export default function CollegePathway() {
   // the user's status/amount edits on existing ones persist.
   useEffect(() => {
     setScholarships((prev) => {
-      const fresh = SCOUT_SCHOLARSHIPS.filter((s) => !prev.some((p) => p.id === s.id));
-      return fresh.length ? [...prev, ...fresh] : prev;
+      const normalized = prev.map(normalizeScholarship);
+      const fresh = SCOUT_SCHOLARSHIPS.filter((s) => !normalized.some((p) => p.id === s.id)).map(normalizeScholarship);
+      return [...normalized, ...fresh];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -75,7 +77,7 @@ export default function CollegePathway() {
     .sort((a, b) => a.year - b.year || (a.month || "").localeCompare(b.month || ""));
 
   const drafted = scholarships.filter((s) => s.draftEssay);
-  const pursuing = scholarships.filter((s) => PURSUING.includes(s.status));
+  const pursuing = scholarships.filter((s) => ["prepared", "needs-review"].includes(s.workflowState) || PURSUING.includes(s.status));
 
   // ── actions ──
   function buildPrompt(s, profile, context) {
@@ -137,8 +139,23 @@ export default function CollegePathway() {
     setBatchLoading(false);
   }
 
-  const patchSch = (id, fields) => setScholarships((prev) => prev.map((s) => (s.id === id ? { ...s, ...fields } : s)));
-  const updateSchStatus = (id, status) => patchSch(id, { status });
+  const patchSch = (id, fields) => setScholarships((prev) => prev.map((s) => (s.id === id ? normalizeScholarship({ ...s, ...fields }) : s)));
+  const updateSchStatus = (id, status) => patchSch(id, {
+    status,
+    ...(status === "applied" ? { workflowState: "submitted" } : {}),
+    ...(status === "pending" ? { workflowState: "confirmed" } : {}),
+    ...(status === "won" || status === "rejected" ? { workflowState: "won/rejected" } : {}),
+  });
+  const updateWorkflow = (id, next) => setScholarships((prev) => prev.map((s) => {
+    if (s.id !== id) return s;
+    const result = advance(normalizeScholarship(s), next);
+    if (result.error) {
+      window.alert(result.error);
+      return s;
+    }
+    return normalizeScholarship(result.scholarship);
+  }));
+  const markPrioritized = (s) => patchSch(s.id, prioritize(normalizeScholarship(s)));
   const updateCourseStatus = (si, ci, status) => setPathway((prev) => prev.map((s, i) => i !== si ? s : { ...s, courses: s.courses.map((c, j) => j !== ci ? c : { ...c, status }) }));
 
   async function copyForChrome(s) {
@@ -150,7 +167,7 @@ export default function CollegePathway() {
     if (kit?.essayRequired) warn.push(`✍ This form has an essay field${kit?.essayWordLimit ? ` (~${kit.essayWordLimit} words)` : ""} — the essay below is pre-written; trim to the form's limit.`);
     const applyLine = kit?.applyUrl ? `APPLICATION URL: ${kit.applyUrl}` : (s.url ? `START URL (find the application link here): ${s.url}` : "");
     const text = [
-      `You are filling a scholarship application for me on the current page. Read the page, fill every field from MY INFO, paste the ESSAY into the essay field (trim to the form's word limit), then STOP before submitting so I review and click submit myself. If the page charges an application fee or redirects to a paid service, STOP and tell me — do not fill anything.`,
+      `You are assisting with a College Board BigFuture scholarship application on the current page. Use only facts explicitly present in MY INFO or confirmed by me. Never guess, infer, embellish, or claim an eligibility fact that is not verified. Fill only fields supported by those facts, flag everything else, then STOP at the final review screen. I will personally review attestations and click submit. If the page is not a BigFuture application, charges a fee, asks for a password, SSN, bank/payment information, or redirects to a paid service, STOP immediately.`,
       ``, `SCHOLARSHIP: ${s.name}${s.amount ? ` ($${Number(s.amount).toLocaleString()})` : ""}`,
       applyLine,
       warn.length ? `\n${warn.join("\n")}` : ``,
@@ -410,6 +427,7 @@ export default function CollegePathway() {
                   <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "var(--text)" }}>{req.group}</span>
                   <span className={`badge badge-${REQ_COLOR[req.status]}`}>{req.required}</span>
                 </div>
+                {req.note && <div className="alert alert-yellow" style={{ margin: "0 0 10px 0", padding: "8px 12px", fontSize: "0.85rem" }}>{req.note}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   {req.items.map((it, i) => (
                     <div key={i} style={{ display: "flex", gap: 8, alignItems: "baseline", padding: "6px 10px", background: "var(--surface2)", borderRadius: "var(--radius)", flexWrap: "wrap" }}>
@@ -541,13 +559,24 @@ export default function CollegePathway() {
                 );
               })}
             </div>
+            <div className="card" style={{ borderLeft: "4px solid var(--green)", marginBottom: 16 }}>
+              <div className="card-label">BigFuture application workflow</div>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.5, margin: "8px 0" }}>
+                College Board is the trusted discovery source, not permission to guess. The score below uses award × realistic win rate × verified eligibility confidence − effort. Any uncertain claim stays in review.
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontSize: "0.78rem" }}>
+                {WORKFLOW_STATES.map((state, i) => <span key={state} className="badge badge-gray">{i + 1}. {WORKFLOW_LABELS[state]}</span>)}
+              </div>
+            </div>
             <div className="scholarship-list">
               {scholarships
                 .filter((s) => schFilter === "all" || s.status === schFilter)
                 .slice()
-                .sort((a, b) => (STATUS_META[a.status]?.sort ?? 9) - (STATUS_META[b.status]?.sort ?? 9))
+                .sort((a, b) => expectedBenefit(b) - expectedBenefit(a))
                 .map((s) => {
                   const kit = APPLY_KITS[slugOf(s.name)];
+                  const benefit = expectedBenefit(s);
+                  const stateIndex = WORKFLOW_STATES.indexOf(s.workflowState);
                   return (
                     <div key={s.id} className={`scholarship-card status-${s.status}`}>
                       <div className="sc-header">
@@ -565,6 +594,7 @@ export default function CollegePathway() {
                                 BIGFUTURE{typeof s.match === "number" ? ` ${s.match}%` : ""}
                               </span>
                             )}
+                            <span className="badge badge-gray">{WORKFLOW_LABELS[s.workflowState] || "Discovered"}</span>
                           </div>
                           {kit && (
                             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 6, marginBottom: 6 }}>
@@ -577,6 +607,9 @@ export default function CollegePathway() {
                           )}
                           <div className="sc-notes">{s.notes}</div>
                           <div className="deadline">DEADLINE: {s.deadline}{s.url ? <> · <a href={s.url} target="_blank" rel="noreferrer">link ↗</a></> : null}</div>
+                          <div style={{ fontSize: "0.78rem", color: benefit > 0 ? "var(--green)" : "var(--text-muted)", marginTop: 5 }}>
+                            EXPECTED BENEFIT: {fullUsd(benefit)} · ELIGIBILITY EVIDENCE: {EVIDENCE_STATUS[s.evidenceStatus] || "Unknown"}
+                          </div>
                         </div>
                         <div className="sc-actions-column">
                           <div className="sc-amount">{usd(s.amount)}</div>
@@ -601,6 +634,16 @@ export default function CollegePathway() {
                                 </button>
                               );
                             })}
+                          </div>
+                          <div className="sc-actions" style={{ marginTop: 5 }}>
+                            {s.workflowState === "discovered" && <button className="btn btn-sm" onClick={() => patchSch(s.id, { workflowState: "verified", sourceTrust: "collegeboard" })}>VERIFY SOURCE</button>}
+                            {s.workflowState === "verified" && <button className="btn btn-sm" onClick={() => patchSch(s.id, { evidenceStatus: "verified", workflowState: "eligible" })}>CONFIRM ELIGIBILITY</button>}
+                            {s.workflowState === "eligible" && <button className="btn btn-sm" onClick={() => markPrioritized(s)}>PRIORITIZE</button>}
+                            {s.workflowState === "prioritized" && <button className="btn btn-sm" onClick={() => updateWorkflow(s.id, "prepared")}>MARK PREPARED</button>}
+                            {s.workflowState === "prepared" && <button className="btn btn-sm" onClick={() => updateWorkflow(s.id, "needs-review")}>QUEUE REVIEW</button>}
+                            {s.workflowState === "needs-review" && <button className="btn btn-sm btn-green" onClick={() => updateWorkflow(s.id, "submitted")}>MARK SUBMITTED</button>}
+                            {s.workflowState === "submitted" && <button className="btn btn-sm" onClick={() => updateWorkflow(s.id, "confirmed")}>CONFIRM EMAIL</button>}
+                            {stateIndex >= 0 && stateIndex < WORKFLOW_STATES.length - 1 && <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", alignSelf: "center" }}>review gate protected</span>}
                           </div>
                           <div className="sc-actions">
                             {kit && <button className="btn btn-sm btn-green" onClick={() => copyForChrome(s)}>{s.copied ? "COPIED ✓" : "COPY APPLY KIT"}</button>}
