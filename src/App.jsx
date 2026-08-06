@@ -20,6 +20,12 @@ const slugOf = (name) => (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").
 const STATUS_META = Object.fromEntries(STATUS_OPTIONS.map((s) => [s.value, s]));
 const PURSUING = ["apply", "research", "applied"];
 
+// Timeline months mix explicit month abbreviations ("Jan") and academic-term names
+// ("Fall"). Plain string sort puts "Fall" before "Spring" alphabetically, which is
+// wrong within a year — rank both onto the same numeric axis instead.
+const MONTH_RANK = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11, Winter: 0, Spring: 3, Summer: 6, Fall: 9 };
+const monthRank = (m) => (m ? MONTH_RANK[m] ?? 0 : -1);
+
 export default function CollegePathway() {
   const [tab, setTab] = useState("dashboard");
   const [inState, setInState] = useState(true);
@@ -74,7 +80,7 @@ export default function CollegePathway() {
   const filteredTimeline = timeline
     .filter((e) => catFilter === "all" || e.cat === catFilter)
     .slice()
-    .sort((a, b) => a.year - b.year || (a.month || "").localeCompare(b.month || ""));
+    .sort((a, b) => a.year - b.year || monthRank(a.month) - monthRank(b.month));
 
   const drafted = scholarships.filter((s) => s.draftEssay);
   const pursuing = scholarships.filter((s) => ["prepared", "needs-review"].includes(s.workflowState) || PURSUING.includes(s.status));
