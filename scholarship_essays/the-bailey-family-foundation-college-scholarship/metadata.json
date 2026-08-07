@@ -23,20 +23,17 @@
   "formMeta": {
     "slug": "the-bailey-family-foundation-college-scholarship",
     "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998207",
-    "applyUrl": "http://bailey-family.org/",
-    "probedAt": "2026-06-15T22:03:35.550Z",
-    "platform": "direct",
+    "applyUrl": null,
+    "platform": "careeronestop-info",
     "hasWebForm": false,
     "loginRequired": false,
     "applicationFee": false,
     "essayRequired": false,
     "essayPrompts": [],
     "detectedFields": [],
+    "probedAt": "2026-08-06T23:45:39.137Z",
     "notes": [
-      "single external host bailey-family.org (homepage, not the form)",
-      "apply page fetch failed (0: The operation was aborted.)",
-      "no <form> on page (likely JS-rendered, PDF, or email/mail application)",
-      "resolution confidence medium → Chrome (human navigates to the real form)"
+      "no outbound application link on info page (likely JS-rendered)"
     ],
     "autoSubmitEligible": false,
     "route": "chrome"

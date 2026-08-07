@@ -23,21 +23,17 @@
   "formMeta": {
     "slug": "cia-undergraduate-scholarships",
     "infoUrl": "https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998358",
-    "applyUrl": "https://www.afio.com/",
-    "probedAt": "2026-06-15T22:03:18.360Z",
-    "platform": "direct",
+    "applyUrl": null,
+    "platform": "careeronestop-info",
     "hasWebForm": false,
     "loginRequired": false,
     "applicationFee": false,
     "essayRequired": false,
     "essayPrompts": [],
-    "detectedFields": [
-      "search"
-    ],
+    "detectedFields": [],
+    "probedAt": "2026-08-06T23:45:23.845Z",
     "notes": [
-      "single external host afio.com (homepage, not the form)",
-      "forms present but look like search/newsletter, not an application",
-      "resolution confidence medium → Chrome (human navigates to the real form)"
+      "no outbound application link on info page (likely JS-rendered)"
     ],
     "autoSubmitEligible": false,
     "route": "chrome"

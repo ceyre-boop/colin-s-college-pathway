@@ -31,7 +31,7 @@
     "essayRequired": false,
     "essayPrompts": [],
     "detectedFields": [],
-    "probedAt": "2026-06-15T22:03:04.721Z",
+    "probedAt": "2026-08-06T23:45:07.368Z",
     "notes": [
       "no outbound application link on info page (likely JS-rendered)"
     ],
