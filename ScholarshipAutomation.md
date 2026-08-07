@@ -22,16 +22,21 @@ batch applications. Everything below is paste-ready.
 
 ## 2. Your profile block (paste into the side panel)
 
+> Do not hand-edit profile facts here. This section used to hold a typed copy that drifted out of
+> sync with the real profile. Generate the current block instead:
+>
+> ```
+> bun identity/emit-prompt-profile.ts
+> ```
+>
+> It prints from `identity/vault.json` — one identity source — and deliberately omits email, phone,
+> street address, and DOB, since this text gets pasted into a browser chat. The same block is kept
+> inline in section 4 between the `GENERATED PROFILE` markers.
+
+Paste the generated block, then this instruction:
+
 ```
-Fill this scholarship application using my profile:
-- Name: Colin Eyre
-- Age: 19, Michigan
-- School: University of Michigan–Flint
-- Major: BS Cellular & Molecular Biology, with optional CS / computational support courses
-- GPA: 3.92 at UM-Flint (Dean's List); AP Scholar with Distinction (x2)
-- Work: Founding AI Engineer @ TABOOST; Founder @ Alta Investments (quant trading)
-- Goal: Computational oncology / AI drug discovery
-- Financial: FAFSA SAI -1500 (max Pell), high need, Michigan resident
+Fill this scholarship application using the profile above.
 - Origin story: Outlined tumors on my uncle's MRI scans at a radiation oncology clinic —
   that turned an abstract interest in computation into a drive to build tools that fight cancer.
 - Essay angle: [pick one per form — see section 4]
@@ -59,21 +64,22 @@ every essay prompt and its word/character limit. If this page charges an applica
 or redirects to a paid service, STOP and tell me — do not fill anything.
 
 STEP 2 — MY PROFILE (ground every field and every essay claim in these facts; never invent)
-- Full name: Colin Eyre
-- Contact (email · phone · street address · DOB): NOT stored in this repo — pull from my saved
-  "Apply to Scholarship" shortcut profile / applicant.local.json (gitignored). US citizen, Michigan resident.
-- School: University of Michigan–Flint (BS Cellular & Molecular Biology, with optional CS / computational support courses);
-  currently completing prereqs at Mott Community College, returning to UM-Flint Fall 2027
-- GPA: 3.92 at UM-Flint (Dean's List); 3.7 at Mott; SAT 1260
-- Honors: AP Scholar with Distinction x2 (9 AP exams, 32 transfer credits)
-- Financial: FAFSA SAI -1500 — maximum Pell eligibility, high need, Michigan resident
-- Work: Founding AI Engineer @ TABOOST (production AI inbox manager, 200+ emails/day);
-  Founder @ Alta Investments (live quant trading system built at 18, Sharpe 1.25)
-- Character: Eagle Scout at 13 (top 4%), black belt at 11, 4th place state wrestling (GA, junior yr)
-  while holding a 4.1 HS GPA; President of Lunch Bunch (reverse-inclusion program for special-needs
-  and socially isolated students)
-- Career goal: computational oncology / AI drug discovery
-- DO NOT claim: first-generation college student (unverified) or anything not listed above.
+<!-- BEGIN GENERATED PROFILE -->
+- Name: Colin Eyre
+- Residency: MI · US citizen
+- School: Mott Community College — Transfer student completing prerequisites at Mott Community College; home institution University of Michigan-Flint (returning).
+- Major: Cellular and Molecular Biology, with optional Computer Science coursework
+- GPA: 3.92/4.0 (3.92 at UM-Flint (Dean's List); 3.7 at Mott Community College) · 3.7 prior · SAT 1260
+- Expected graduation: 2028
+- Honors: AP Scholar with Distinction (2 consecutive years); Dean's List, University of Michigan-Flint; Eagle Scout (age 13)
+- Work: Founding AI Engineer @ TABOOST (Production AI email system processing 200+ partnership emails/day across 16 inboxes); Founder @ Alta Investments (Live quantitative trading system built at 18)
+- Activities: President, Lunch Bunch — reverse-inclusion program for special-needs and socially isolated students; Black belt in martial arts (6 years); 4th place state wrestling (Georgia); Youth instructor, Legacy MMA
+- Goal: Build AI-driven computational oncology tools for cancer treatment planning and drug discovery
+- Financial: FAFSA SAI -1500 (maximum Pell eligibility)
+- NEVER claim: first-generation college student; any award requiring a demographic, geographic, institutional, or field eligibility Colin does not genuinely hold
+- Contact details (email · phone · address · DOB): NOT in this block. Pull from the saved shortcut profile.
+<!-- END GENERATED PROFILE -->
+> Regenerate with: bun identity/emit-prompt-profile.ts --write
 
 STEP 3 — FILL PERSONAL FIELDS
 Fill every personal/academic/contact field from the profile. Leave anything the profile

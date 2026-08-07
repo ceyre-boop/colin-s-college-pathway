@@ -30,24 +30,19 @@ export interface EligibilityProfile {
   allowedLevels: string[]; // grade-level tokens that pass
   isFirstGeneration: boolean; // false = cannot claim; first-gen-required awards DQ
   isUsCitizen: boolean;
-  gender: "male" | "female";
+  /** undefined = declined to state; gender-restricted awards then screen ambiguous, never DQ. */
+  gender?: "male" | "female";
 }
 
-// Colin's constants, derived from ~/.claude/memory/scholarship_profile.json.
-// Passed explicitly by callers; exported so the harvest/orchestrator share one source.
-export const COLIN_PROFILE: EligibilityProfile = {
-  stateNames: ["michigan"],
-  stateAbbrs: ["mi"],
-  institutions: [
-    "mott community college",
-    "mott college",
-    "mott",
-    "university of michigan-flint",
-    "university of michigan flint",
-    "um-flint",
-    "um flint",
-    "umflint",
-  ],
+// SCREENING POLICY — which academic fields and levels the student can honestly claim. This is
+// judgement about the scholarship landscape, not identity, so it lives here as a constant.
+//
+// The identity half (home state, institutions, citizenship, gender, first-gen) used to be
+// hardcoded alongside it in a constant named COLIN_PROFILE. That was the third copy of the
+// applicant profile in this repo, and it had already drifted: it asserted gender "male" while the
+// actual profile declines to state. Identity now comes from the vault via
+// buildEligibilityProfile(); only the policy lists remain hardcoded.
+const SCREENING_POLICY = {
   allowedFields: [
     "biology", "biological science", "biological sciences", "molecular biology",
     "cellular biology", "cell biology", "molecular and cellular biology", "life science",
@@ -70,10 +65,73 @@ export const COLIN_PROFILE: EligibilityProfile = {
     "sophomore", "community college", "current college", "college student", "any level",
     "freshman", // he's a returning/transfer student; entering-freshman-only is handled separately
   ],
-  isFirstGeneration: false,
-  isUsCitizen: true,
-  gender: "male",
 };
+
+/** Split a school name into the aliases a listing might use ("UM-Flint", "um flint", "umflint"). */
+function institutionAliases(name: string): string[] {
+  const n = (name || "").toLowerCase().trim();
+  if (!n) return [];
+  const out = new Set<string>([n]);
+  const noPunct = n.replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+  out.add(noPunct);
+  out.add(noPunct.replace(/\s+/g, ""));
+  // "University of Michigan-Flint" → "um-flint" / "um flint" / "umflint"
+  const m = noPunct.match(/^university of ([a-z]+)[ -]?([a-z]*)$/);
+  if (m) {
+    const initials = `u${m[1][0]}`;
+    if (m[2]) { out.add(`${initials}-${m[2]}`); out.add(`${initials} ${m[2]}`); out.add(`${initials}${m[2]}`); }
+  }
+  // Shorten to the distinctive part: "Mott Community College" → "mott college", "mott".
+  // Only when the leading word is actually distinctive — emitting the bare word "university" for
+  // "University of Michigan-Flint" would make EVERY university read as the student's own school,
+  // which silently defeats the wrong-institution rule.
+  const GENERIC = new Set(["university", "college", "the", "state", "community", "institute", "school", "academy", "of", "a", "an"]);
+  const words = noPunct.split(" ");
+  if (words.length > 1 && !GENERIC.has(words[0])) {
+    out.add(words[0]);
+    out.add(`${words[0]} ${words[words.length - 1]}`);
+  }
+  return [...out].filter((s) => s && s.length > 2 && !GENERIC.has(s));
+}
+
+const STATE_NAME_BY_ABBR: Record<string, string> = { mi: "michigan", ga: "georgia" };
+
+/**
+ * Build the eligibility profile from the applicant record (which resolves out of the vault),
+ * combined with the screening policy above. One identity source, not three.
+ */
+export function buildEligibilityProfile(a: {
+  identity: { citizenship: string; gender: string };
+  contact: { address: { state: string } };
+  academic: { currentSchool: string; highSchool: string; classLevel: string };
+  financial: { residency: string };
+  doNotClaim?: string[];
+}): EligibilityProfile {
+  const abbr = (a.financial?.residency || a.contact?.address?.state || "").toLowerCase().trim();
+  const stateAbbrs = abbr ? [abbr.length === 2 ? abbr : abbr.slice(0, 2)] : [];
+  const stateNames = [
+    ...(STATE_NAME_BY_ABBR[stateAbbrs[0]] ? [STATE_NAME_BY_ABBR[stateAbbrs[0]]] : []),
+    ...(abbr.length > 2 ? [abbr] : []),
+  ];
+
+  return {
+    stateNames,
+    stateAbbrs,
+    institutions: [
+      ...institutionAliases(a.academic?.currentSchool || ""),
+      ...institutionAliases(a.academic?.enrollmentInstitution || ""),
+    ],
+    allowedFields: SCREENING_POLICY.allowedFields,
+    disallowedFields: SCREENING_POLICY.disallowedFields,
+    allowedLevels: SCREENING_POLICY.allowedLevels,
+    // Never inferred: first-gen is claimable only if it is NOT on the do-not-claim list.
+    isFirstGeneration: !(a.doNotClaim ?? []).some((x) => /first[- ]?gen/i.test(x)),
+    isUsCitizen: /u\.?s\.?|american|citizen/i.test(a.identity?.citizenship || ""),
+    // "" in the profile means decline-to-state. Gender-restricted awards must then screen as
+    // ambiguous rather than being answered on the student's behalf.
+    gender: (a.identity?.gender || "").toLowerCase() === "female" ? "female" : (a.identity?.gender || "").toLowerCase() === "male" ? "male" : undefined,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // State table (full name → abbreviation), for the wrong-state rule.
@@ -132,7 +190,7 @@ function scopedStates(text: string): string[] {
 // ---------------------------------------------------------------------------
 export function screenEligibility(
   requirementsText: string | null | undefined,
-  profile: EligibilityProfile = COLIN_PROFILE,
+  profile: EligibilityProfile,
 ): EligibilityVerdict {
   const reasons: string[] = [];
   if (!requirementsText || norm(requirementsText).length < 12) {
@@ -182,9 +240,17 @@ export function screenEligibility(
 
   // 3) Demographic-identity DQ (highest-value cut). Only when scoped as a REQUIREMENT.
   //    first-generation is a hard guardrail: required first-gen → DQ (Colin can't claim it).
+  const FEMALE_REQUIRED = /\b(female|women|woman|girls?)\s+(only|students?|applicants?)\b|\bmust\s+(be|identify\s+as)\s+(a\s+)?(female|woman)\b/i;
+  // Gender is decline-to-state in the profile by default. When it is unknown we must NOT answer on
+  // the student's behalf in either direction — a gender-restricted award becomes a human question.
+  if (FEMALE_REQUIRED.test(text) && !profile.gender) {
+    return { decision: "ambiguous", reasons: ["award is gender-restricted and the profile declines to state — human decides"] };
+  }
+
   const identityDq: [RegExp, string][] = [
-    [/\b(first[- ]generation|first[- ]gen)\b/i, "requires first-generation status (student cannot verify/claim it)"],
-    [/\b(female|women|woman|girls?)\s+(only|students?|applicants?)\b|\bmust\s+(be|identify\s+as)\s+(a\s+)?(female|woman)\b/i, "requires female applicant"],
+    // first-generation DQs only when the student genuinely cannot claim it (doNotClaim).
+    ...(profile.isFirstGeneration ? [] : [[/\b(first[- ]generation|first[- ]gen)\b/i, "requires first-generation status (student cannot verify/claim it)"] as [RegExp, string]]),
+    ...(profile.gender === "female" ? [] : [[FEMALE_REQUIRED, "requires female applicant"] as [RegExp, string]]),
     [/\b(veteran|active[- ]duty|military\s+service|served\s+in\s+the\s+(armed\s+forces|military))\b/i, "requires veteran/military status"],
     [/\b(member|enrolled\s+member)\s+of\s+(a\s+)?(federally\s+recognized\s+)?(tribe|nation|band)\b|\btribal\s+enrollment\b/i, "requires tribal enrollment"],
     [/\b(lgbtq|transgender|gay|lesbian)\s+(students?|applicants?|community)\b/i, "requires LGBTQ+ identity"],

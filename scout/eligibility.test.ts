@@ -1,9 +1,21 @@
 // bun test scout/eligibility.test.ts
 import { expect, test, describe } from "bun:test";
-import { screenEligibility } from "./eligibility";
+import { buildEligibilityProfile, screenEligibility } from "./eligibility";
 
-const dq = (t: string) => screenEligibility(t).decision;
-const rule = (t: string) => screenEligibility(t).hardDqRule;
+// The screening profile is now derived from the applicant record rather than a hardcoded constant,
+// so the fixture below stands in for what the vault resolves. Values match the real profile's
+// SHAPE (Michigan resident, Mott → UM-Flint, US citizen, declines to state gender, cannot claim
+// first-gen) without hardcoding anything sensitive.
+const FIXTURE = buildEligibilityProfile({
+  identity: { citizenship: "US citizen", gender: "" },
+  contact: { address: { state: "MI" } },
+  academic: { currentSchool: "Mott Community College", enrollmentInstitution: "University of Michigan-Flint", highSchool: "", classLevel: "Sophomore" },
+  financial: { residency: "MI" },
+  doNotClaim: ["first-generation college student"],
+} as any);
+
+const dq = (t: string) => screenEligibility(t, FIXTURE).decision;
+const rule = (t: string) => screenEligibility(t, FIXTURE).hardDqRule;
 
 describe("wrong-state", () => {
   test("Florida residency scope → disqualified", () => {
@@ -43,11 +55,38 @@ describe("wrong-institution", () => {
 
 describe("demographic identity", () => {
   test("first-generation required → disqualified (never claimed)", () => {
-    const v = screenEligibility("Must be a first-generation college student studying biology.");
+    const v = screenEligibility("Must be a first-generation college student studying biology.", FIXTURE);
     expect(v.decision).toBe("disqualified");
     expect(v.hardDqRule).toBe("demographic-identity");
   });
-  test("women-only → disqualified", () => {
+  // BEHAVIOUR CHANGE: this used to disqualify, because the eligibility profile hardcoded
+  // gender "male" while the actual applicant profile declines to state. With gender derived from
+  // the profile, an unknown gender can no longer be answered on the student's behalf in either
+  // direction — a gender-restricted award becomes a human question instead of a silent DQ.
+  test("women-only, gender declined → ambiguous (never answered on the student's behalf)", () => {
+    expect(dq("Open to female students pursuing STEM degrees.")).toBe("ambiguous");
+  });
+  test("women-only, male profile → disqualified", () => {
+    const male = buildEligibilityProfile({
+      identity: { citizenship: "US citizen", gender: "male" },
+      contact: { address: { state: "MI" } },
+      academic: { currentSchool: "Mott Community College", enrollmentInstitution: "", highSchool: "", classLevel: "Sophomore" },
+      financial: { residency: "MI" },
+      doNotClaim: ["first-generation college student"],
+    } as any);
+    expect(screenEligibility("Open to female students pursuing STEM degrees.", male).decision).toBe("disqualified");
+  });
+  test("women-only, female profile → not disqualified on gender", () => {
+    const female = buildEligibilityProfile({
+      identity: { citizenship: "US citizen", gender: "female" },
+      contact: { address: { state: "MI" } },
+      academic: { currentSchool: "Mott Community College", enrollmentInstitution: "", highSchool: "", classLevel: "Sophomore" },
+      financial: { residency: "MI" },
+      doNotClaim: [],
+    } as any);
+    expect(screenEligibility("Open to female students pursuing STEM degrees.", female).hardDqRule).not.toBe("demographic-identity");
+  });
+  test.skip("legacy: women-only unconditional DQ", () => {
     expect(dq("Open to female students pursuing STEM degrees.")).toBe("disqualified");
   });
   test("tribal enrollment required → disqualified", () => {

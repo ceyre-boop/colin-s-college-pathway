@@ -27,6 +27,7 @@
 import { homedir } from "os";
 import { join } from "path";
 import { PRICING, costUsd } from "../src/lib/essayCost.js";
+import { scanForInjection, wrapUntrusted } from "../llm/untrusted";
 
 const HOME = homedir();
 const PROFILE_PATH = join(HOME, ".claude", "memory", "scholarship_profile.json");
@@ -484,15 +485,25 @@ function scoringPrompt(profile: any, batch: Candidate[]): { system: string; user
     'Note: a category "first generation college student (verify)" is UNVERIFIED — never count it toward a match.',
     'Respond with ONLY a JSON array: [{"i":0,"match":85,"effort":"low","flags":[]},...] — one entry per scholarship, same order.',
   ].join("\n");
-  const items = batch.map((c, i) => ({
-    i,
-    name: c.name,
-    org: c.org,
-    amount: c.amountText ?? c.amount,
-    deadline: c.deadline,
-    description: c.description?.slice(0, 250) ?? null,
-  }));
-  const user = `STUDENT PROFILE:\n${compactProfile(profile)}\n\nSCHOLARSHIPS:\n${JSON.stringify(items)}`;
+  // Listing text is scraped from third-party sites — on several aggregators it is submitted by
+  // strangers. It must never be interpolated into a prompt raw. Anything that looks like an
+  // injection attempt is dropped from the payload and flagged rather than scored on its own terms.
+  const items = batch.map((c, i) => {
+    const raw = c.description?.slice(0, 250) ?? null;
+    const scan = raw ? scanForInjection(raw) : { suspicious: false, reasons: [] as string[] };
+    return {
+      i,
+      name: c.name,
+      org: c.org,
+      amount: c.amountText ?? c.amount,
+      deadline: c.deadline,
+      description: scan.suspicious ? null : raw,
+      ...(scan.suspicious ? { descriptionWithheld: scan.reasons } : {}),
+    };
+  });
+  const user =
+    `STUDENT PROFILE:\n${compactProfile(profile)}\n\n` +
+    wrapUntrusted(JSON.stringify(items), { label: "scholarship listings", maxChars: 24_000 });
   return { system, user };
 }
 

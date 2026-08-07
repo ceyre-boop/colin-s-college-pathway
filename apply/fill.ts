@@ -25,17 +25,20 @@ import { homedir } from "os";
 import { join } from "path";
 import { existsSync, mkdirSync, readFileSync } from "fs";
 import type { Applicant } from "./types";
-import { mapField, type MapResult } from "./field-map";
+import { mapField, pathForLabel, type MapResult } from "./field-map";
 import { loadEssayLibrary, matchEssay } from "../scout/essay-match";
 import { append as logEvent } from "../state/log";
 import { scholarshipId } from "../src/lib/ids.js";
+import { loadVault } from "../identity/vault";
+import { grantForLabels, open } from "../identity/broker";
 
 const HOME = homedir();
 const ROOT = join(import.meta.dir, "..");
 const RESULTS_DIR = join(ROOT, "apply", "results");
 const USER_DATA_DIR = join(ROOT, "apply", ".userdata");
 const SUBMITTED_PATH = join(RESULTS_DIR, "submitted.json");
-const APPLICANT_PATH = join(ROOT, "applicant.local.json");
+// Identity is read from identity/vault.json via the broker — applicant.local.json is now only the
+// migration source (see identity/migrate-vault.ts) and is no longer read at fill time.
 
 const args = process.argv.slice(2);
 const has = (f: string) => args.includes(f);
@@ -48,14 +51,27 @@ const TARGETS_FILE = val("--targets", join(ROOT, "apply", "seed-targets.json"));
 // Trusted platforms allowed to AUTO-submit. Conservative on purpose.
 const AUTOSUBMIT_ALLOWLIST = new Set(["googleform", "direct-formidable"]);
 
+// Confidence gates.
+//   >= AUTOFILL : fill silently.
+//   >= ASK      : fill, but flag for review — and never auto-submit the form.
+//   <  ASK      : do not type anything; hand the field to the human.
+// Full confidence-gated auto-submit also requires a proven portal adapter (a later phase); until
+// then this only ever TIGHTENS the existing allowlist gate, never loosens it.
+const AUTOFILL_THRESHOLD = 0.98;
+const ASK_THRESHOLD = 0.8;
+
 interface Target { slug: string; name: string; amount?: number | null; applyUrl: string; platform?: string; }
 
 type Outcome = "auto_submitted" | "filled_ready" | "needs_human" | "needs_essay" | "skipped_dedupe" | "error";
 interface Result {
   slug: string; name: string; amount: number | null; applyUrl: string;
   outcome: Outcome; reasons: string[];
-  filled: { label: string; path: string }[];
+  filled: { label: string; path: string; confidence?: number; factors?: Record<string, number> }[];
   declined: string[]; unmapped: string[]; blocked: string[];
+  /** Filled, but under the autofill bar — a human should glance at these before submitting. */
+  flagged?: { label: string; path: string; confidence: number }[];
+  /** Not filled: either policy-blocked or below the ask bar. */
+  lowConfidence?: { label: string; path: string; confidence: number; reason: string }[];
   essay?: { bucket: string; angle: string | null };
   filledShot?: string; submittedAt?: string;
 }
@@ -122,8 +138,16 @@ function liveFormExtractor() {
 function loadJson<T>(p: string, d: T): T { try { return JSON.parse(readFileSync(p, "utf8")); } catch { return d; } }
 
 async function run() {
-  if (!existsSync(APPLICANT_PATH)) { console.error(`Missing ${APPLICANT_PATH} — populate it first (gitignored).`); process.exit(1); }
-  const applicant: Applicant = loadJson(APPLICANT_PATH, {} as Applicant);
+  // Identity now comes from the vault, not the flat profile file. The vault carries per-field
+  // verification metadata, which is what makes the freshness factor in the confidence score real
+  // rather than a constant.
+  let vault;
+  try {
+    vault = loadVault();
+  } catch (e) {
+    console.error(`✗ ${e instanceof Error ? e.message : e}`);
+    process.exit(1);
+  }
   const essayLib = loadEssayLibrary();
   const targetsData = loadJson<{ targets: Target[] }>(TARGETS_FILE, { targets: [] });
   let targets = targetsData.targets || [];
@@ -143,6 +167,7 @@ async function run() {
   let submits = 0;
 
   for (const t of targets) {
+    const appId = scholarshipId(t.name, t.applyUrl);
     const r: Result = { slug: t.slug, name: t.name, amount: t.amount ?? null, applyUrl: t.applyUrl, outcome: "filled_ready", reasons: [], filled: [], declined: [], unmapped: [], blocked: [] };
     try {
       if (submitted[t.slug]) { r.outcome = "skipped_dedupe"; r.reasons.push(`already submitted ${submitted[t.slug]}`); results.push(r); console.log(`  ⏭  ${t.slug}: already submitted`); continue; }
@@ -173,7 +198,21 @@ async function run() {
         platform: t.platform ?? null,
         fieldCount: fields.length,
         essayPrompts,
-      }, { applicationId: scholarshipId(t.name, t.applyUrl) });
+      }, { applicationId: appId });
+
+      // Grant is computed from THIS form's labels, before the vault is opened. A form asking for
+      // six things gets six paths — a hidden seventh field cannot be answered even if something
+      // tried, and the attempt is logged as capability_denied rather than passing silently.
+      const grant = grantForLabels(
+        fields.map((f) => f.label || f.name),
+        pathForLabel,
+        `fill:${t.slug}`,
+        appId,
+      );
+      const broker = open(grant, vault);
+      const applicant: Applicant = broker.restrictedApplicant();
+      const flagged: NonNullable<Result["flagged"]> = [];
+      const lowConfidence: NonNullable<Result["lowConfidence"]> = [];
 
       let hardBlocked = false;
       let hasEssayField = false;
@@ -185,7 +224,11 @@ async function run() {
       } catch { /* page may be transitioning; remain conservative below */ }
       for (const f of fields) {
         const label = f.label || f.name;
-        const m: MapResult = mapField(label, applicant);
+        const path = pathForLabel(label);
+        const m: MapResult = mapField(label, applicant, {
+          labelTier: f.labelTier,
+          freshness: path ? broker.freshnessOf(path) : 1.0,
+        });
         if (m.kind === "block") { r.blocked.push(`${label} (${m.reason})`); hardBlocked = true; continue; }
         if (f.isEssay) {
           hasEssayField = true;
@@ -197,8 +240,32 @@ async function run() {
           continue;
         }
         if (m.kind === "fill") {
+          const c = m.confidence.score;
+          // Vault policy first: some paths are never auto-typed regardless of how confident the
+          // mapper is (financial answers, document uploads). Policy outranks probability.
+          if (!broker.autofillAllowed(m.path)) {
+            r.declined.push(`${label} → ${m.path} is policy-blocked from autofill`);
+            if (f.required) r.unmapped.push(`${label} — policy requires a human to enter this`);
+            lowConfidence.push({ label, path: m.path, confidence: c, reason: "policy" });
+            continue;
+          }
+          if (c < ASK_THRESHOLD) {
+            // Below the ask bar: do not type anything. This is the case that used to fill
+            // silently and wrongly — "Marital Status" resolving to a class level, for instance.
+            r.declined.push(`${label} → confidence ${c.toFixed(2)} below ${ASK_THRESHOLD} — left for human`);
+            r.unmapped.push(`${label} — mapping uncertain (${m.path} @ ${c.toFixed(2)})`);
+            lowConfidence.push({ label, path: m.path, confidence: c, reason: "below-ask-threshold" });
+            logEvent("field_skipped", { label, path: m.path, confidence: m.confidence }, { applicationId: appId });
+            continue;
+          }
           const didFill = DRY_would_skip() ? true : await fillOne(page, f.name, m.value, f.type, f.value);
-          if (didFill) r.filled.push({ label, path: m.path });
+          if (didFill) {
+            r.filled.push({ label, path: m.path, confidence: c, factors: m.confidence.factors });
+            // Value is deliberately NOT logged — the log records which profile path answered which
+            // label and why, which is what an audit needs, without duplicating PII into a second file.
+            logEvent("field_filled", { label, path: m.path, confidence: m.confidence, flagged: c < AUTOFILL_THRESHOLD }, { applicationId: appId });
+            if (c < AUTOFILL_THRESHOLD) flagged.push({ label, path: m.path, confidence: c });
+          }
           else if (f.required) r.unmapped.push(`${label} — control could not be filled`);
         } else if (m.kind === "decline") {
           r.declined.push(`${label} (${m.reason})`);
@@ -215,14 +282,24 @@ async function run() {
       r.filledShot = shot;
 
       // classify (the gate)
+      if (flagged.length) r.flagged = flagged;
+      if (lowConfidence.length) r.lowConfidence = lowConfidence;
+
       const platform = t.platform === "direct" ? "direct-formidable" : (t.platform || "unknown");
-      const safeClass = !hardBlocked && !feeDetected && !hasEssayField && r.unmapped.length === 0 && AUTOSUBMIT_ALLOWLIST.has(platform);
+      // Every filled field must have cleared the autofill bar. This is an ADDITIONAL condition on
+      // top of the pre-existing allowlist gate — it can only shrink the auto-submit class.
+      const allConfident = flagged.length === 0;
+      const safeClass = !hardBlocked && !feeDetected && !hasEssayField && r.unmapped.length === 0 && allConfident && AUTOSUBMIT_ALLOWLIST.has(platform);
 
       if (hardBlocked || feeDetected) { r.outcome = "needs_human"; r.reasons.push("hard-blocked field or fee language present — never auto-filled/submitted"); }
       else if (hasEssayField) { r.outcome = "needs_essay"; r.reasons.push("form has an essay/short-answer prompt — filled personal fields, queued for review"); }
       else if (r.unmapped.length) { r.outcome = "filled_ready"; r.reasons.push(`${r.unmapped.length} required field(s) unmapped — human completes + submits`); }
+      else if (!allConfident) { r.outcome = "filled_ready"; r.reasons.push(`${flagged.length} field(s) filled below ${AUTOFILL_THRESHOLD} confidence — human verifies before submitting`); }
       else if (!AUTOSUBMIT_ALLOWLIST.has(platform)) { r.outcome = "filled_ready"; r.reasons.push(`platform "${platform}" not on auto-submit allowlist — queued for review`); }
       else r.outcome = "filled_ready";
+
+      const denials = broker.denied();
+      if (denials.length) r.reasons.push(`${denials.length} identity path(s) requested outside the grant — see capability_denied events`);
 
       // real submission — only safe class, only with --submit, only under the cap
       if (safeClass && !DRY && submits < MAX_SUBMIT) {

@@ -1,0 +1,4 @@
+# Tests must never append to the real audit log — an audit log containing fixture data is not an
+# audit log. The preload redirects state/log.ts at a scratch file before any test module loads.
+[test]
+preload = ["./test-setup.ts"]

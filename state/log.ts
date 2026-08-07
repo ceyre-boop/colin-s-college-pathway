@@ -17,7 +17,23 @@ import { createHash } from "crypto";
 import { dirname, join } from "path";
 
 export const STATE_DIR = join(import.meta.dir);
-export const EVENTS_PATH = join(STATE_DIR, "events.jsonl");
+
+// Overridable so tests (and any dry-run tooling) never append to the real audit log. An audit log
+// that contains fixture data is not an audit log.
+const DEFAULT_EVENTS_PATH = join(STATE_DIR, "events.jsonl");
+let eventsPath = process.env.CCP_EVENTS_PATH || DEFAULT_EVENTS_PATH;
+
+/** Redirect the log. Returns a restore function. */
+export function setEventsPath(p: string): () => void {
+  const prev = eventsPath;
+  eventsPath = p;
+  return () => { eventsPath = prev; };
+}
+
+/** Where events are currently being written. */
+export function currentEventsPath(): string {
+  return eventsPath;
+}
 
 export type EventType =
   // lifecycle
@@ -71,8 +87,8 @@ function canonical(e: Omit<LogEvent, "prevHash"> & { prevHash: string | null }):
 }
 
 export function readAll(): LogEvent[] {
-  if (!existsSync(EVENTS_PATH)) return [];
-  return readFileSync(EVENTS_PATH, "utf8")
+  if (!existsSync(eventsPath)) return [];
+  return readFileSync(eventsPath, "utf8")
     .split("\n")
     .filter((l) => l.trim())
     .map((l) => JSON.parse(l) as LogEvent);
@@ -93,7 +109,7 @@ export function append(
   data: Record<string, unknown>,
   opts: { applicationId?: string; actor?: LogEvent["actor"]; at?: string } = {},
 ): LogEvent {
-  mkdirSync(dirname(EVENTS_PATH), { recursive: true });
+  mkdirSync(dirname(eventsPath), { recursive: true });
   const prev = lastEvent();
   const event: LogEvent = {
     seq: (prev?.seq ?? 0) + 1,
@@ -104,7 +120,7 @@ export function append(
     data,
     prevHash: prev ? sha256(canonical(prev)) : null,
   };
-  appendFileSync(EVENTS_PATH, JSON.stringify(event) + "\n", "utf8");
+  appendFileSync(eventsPath, JSON.stringify(event) + "\n", "utf8");
   return event;
 }
 
