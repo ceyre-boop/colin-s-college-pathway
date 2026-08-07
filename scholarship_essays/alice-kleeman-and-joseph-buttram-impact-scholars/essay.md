@@ -1,17 +1,19 @@
 # Alice Kleeman and Joseph Buttram Impact Scholars
 
-The number on my FAFSA summary is negative 1500. That is the lowest possible Student Aid Index — it means maximum Pell eligibility, and it means that standard college cost structures do not work on my situation without engineering.
+My FAFSA SAI is negative fifteen hundred. I'm going to say that once and then talk about something better.
 
-So I engineered around it.
+I've been trying to work out how you'd actually measure impact, because the word gets used for a lot of things that don't survive contact with a Tuesday. The definition I keep coming back to is subtraction: whatever you're doing, take yourself out of it and see what stops. If nothing stops, it wasn't impact, it was attendance.
 
-Mott Community College is not a fallback. I transferred there after my first year at the University of Michigan-Flint because the math was straightforward: the same prerequisite credits at a fraction of the cost, which means the four-year institutional funding goes where it produces the most leverage. I carry a 3.7 at Mott. When I return to UM-Flint in Fall 2027 for the BS in Cellular and Molecular Biology with optional CS / computational support courses, I'll return with a 3.92 cumulative GPA and Dean's List standing, with 32 transfer credits already done.
+The first time that idea got tested on me I was sixteen, in my uncle's radiation oncology clinic in North Dakota, outlining a tumor on an MRI scan with a mouse — forty-some slices, eleven minutes a slice, tracing where cancer stopped and a person started. If I got up and walked out, the work didn't continue without me. Somebody else sat down and did the exact same eleven minutes. That's not a compliment to me. That's a bottleneck, and I've thought about it almost every day since.
 
-The constraint shaped the path. What happened inside the constraint is the more interesting story.
+So I got interested in building things that keep running when I'm not in the room, which turns out to be a different skill than working hard.
 
-While finishing prerequisites, I built Alta Investments: a live quantitative trading system running a Sharpe ratio of 1.08 with bust probability held at zero. I founded it at 18. I run it alone. At TABOOST, the AI email system I built as founding AI engineer processes 200-plus emails a day across 16 inboxes for real users. Neither of these was assigned. Both run every day, in production, because I built them and maintain them. The constraint did not stop the output. It redirected the schedule.
+At TABOOST — the largest social media agency in the United States, five million in profit last year — I'm the founding AI engineer. The system I built reads and routes over two hundred emails a day across sixteen inboxes. I don't touch it most days. That's the whole point of it. Nobody thanks a system for working, and the correct amount of visible effort on a good day is zero.
 
-Anyway, the record before the financial constraint is the same pattern. Black belt at 11 after six years of training. Eagle Scout at 13, top 4% of all scouts. Fourth place, Georgia state wrestling, junior year, 4.1 GPA. I do not do things quickly, but I finish them.
+That's the version of impact I want to be judged on, and it's an awkward one, because it looks like nothing is happening. The essays that win these things usually describe motion — hours, drives, hands raised. Mine describes something that quietly does not require me anymore.
 
-The destination has been fixed since I was 19, at my uncle's radiation oncology clinic in North Dakota, drawing tumor boundaries on MRI scans with a mouse cursor, slice by slice. The problem was visible: treatment planning accuracy should not be limited by how steady any individual's hand is or how much time an oncologist has to spend with the cursor. Computational oncology — AI-proposed boundaries, physician-verified — is what the degree, the code, and the community college credits are all building toward.
+I'm finishing prerequisites at Mott and going back to UM-Flint in Fall 2027 for the biology, because the thing I want to build sits exactly where those two halves meet: software that reads a scan and proposes the tumor boundary, so the oncologist verifies instead of traces. Every clinic that installs it gets those eleven minutes back, forever, without me being there.
 
-The Kleeman and Buttram scholarship would reduce the distance between the current funding equation and the research lab. That is a direct impact on the part of this path that a scholarship can actually change.
+I don't know how many clinics that ends up being. I don't know if I'm the one who gets it working, honestly — plenty of smarter people are trying.
+
+But I know what the room looks like. I've been in it. And I know that right now, somewhere, a doctor is dragging a cursor around a gray smudge with thirty-nine slices to go.

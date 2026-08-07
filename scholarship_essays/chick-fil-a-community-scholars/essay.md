@@ -1,17 +1,21 @@
 # Chick-fil-A Community Scholars
 
-The first thing you do before a worship gathering is make the space ready for people who don't yet know it exists for them. That is not a poetic framing — it is the literal sequence: show up early, arrange what needs arranging, stay until the last person has somewhere to go, and make sure none of the load lands on the people who came to receive something rather than run it. The invisible part is the job.
+Most of what I do for my church happens before anyone arrives and after everyone leaves.
 
-I've been doing some version of that work for years, and I think about it now the way I think about infrastructure: service is what you build so other people can do what they came to do.
+That's not modesty, it's just the schedule. Somebody has to be there early so that the thing people come for is already possible by the time they walk in, and somebody has to still be there when it's over. It is not interesting work. It is also the entire reason the gathering exists, and I've never once heard anyone mention it, which is correct — you're not supposed to notice a room that was ready.
 
-At TABOOST, I'm the founding AI engineer. The system I built processes 200-plus emails a day across 16 inboxes for creators who need professional infrastructure but don't have the engineering background to build it themselves. When it works, they don't notice it. That is the design goal. Infrastructure that serves people well looks invisible from the inside.
+I got attached to that shape of work before I could have told you why.
 
-Before I understood anything about software, I understood this at the level of service: show up, do the part nobody applauds, and the important thing becomes possible. Eagle Scout at 13 — top 4% of all scouts — ran on exactly this logic. The Eagle project isn't a trophy; it's a thing your community can now use that it couldn't before. Same pattern with Lunch Bunch, a reverse-inclusion program where instead of placing isolated students into general groups, we join theirs. The point is not credit — the point is that somebody who couldn't find a room now has one.
+Now I can. I'm the founding AI engineer at TABOOST, the largest social media agency in the United States — the company cleared five million in profit last year. What I built there reads and routes over two hundred emails a day across sixteen inboxes. The specification I wrote for myself was that nobody should ever think about it. When it's working, the people it serves have no idea it exists; they just find that the thing they needed was already handled. Same job as the chairs. Bigger building.
 
-Anyway, the academic work connects to the same destination. I'm finishing prerequisites at Mott Community College, carrying a 3.7, before returning to the University of Michigan-Flint in Fall 2027 for a BS in Cellular and Molecular Biology with optional CS / computational support courses. My GPA at UM-Flint is 3.92, Dean's List. FAFSA SAI of negative 1500 — maximum Pell — and I've treated the funding gap the way I treat every constraint: find the efficient path, execute it, and don't let the gap become the story.
+I think that's the part of service people undersell. The visible kind gets photographed — the drive, the fundraiser, the day everyone shows up in matching shirts. The kind that actually holds a community together is somebody doing an unglamorous thing on a normal Tuesday, on purpose, for years, with no audience. It's a much harder sell in an essay and a much better predictor of who's still doing it at thirty.
 
-The story is what I'm building. At 19 I sat in my uncle's radiation oncology clinic in North Dakota, moving a mouse cursor around tumor boundaries on MRI scans, slice by slice. Every click was a judgment call that belonged downstream in a patient's radiation plan. Computational oncology — software that reads the boundary so the physician verifies rather than draws — is the end of every road I'm currently on.
+I want to spend my life on the largest version of that I can find.
 
-Service is the time between now and that. You build what people stand on — the routines, the infrastructure, the rooms — until you build the thing that changes what people can do.
+When I was sixteen my uncle, a radiation oncologist in North Dakota, let me sit at his planning workstation and outline a tumor on an MRI. Cursor around a gray smudge, eleven minutes for a single slice, and forty more slices before the plan was done. That's a person's treatment being assembled by hand, one tired judgment call at a time, in a room the patient never sees.
 
-The Chick-fil-A Community Scholars award would help by letting me spend less energy managing the funding gap and more time building the thing that makes the gap irrelevant.
+So: biology at UM-Flint, the computational work already running, and at the end of it software that proposes the boundary so the physician verifies instead of traces. Infrastructure. The kind nobody notices.
+
+Somewhere down the line there's a clinic where the doctor sits down and the scan already has a line on it, and she spends that hour with the patient instead. She won't think about who built it.
+
+That's how I'll know it worked.

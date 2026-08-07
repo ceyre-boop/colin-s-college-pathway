@@ -10,7 +10,7 @@
   "effort": "low",
   "expected_value": 16400,
   "angle_used": "achievement_blackbelt",
-  "angle_summary": "Black belt at 11 (6 years) → finish-what-you-start: Eagle, wrestling, production code",
+  "angle_summary": "Black belt at 11 (6 years) \u2192 finish-what-you-start: Eagle, wrestling, production code",
   "source": "careeronestop",
   "selected_at": "2026-06-12",
   "revisions": [
@@ -18,6 +18,11 @@
       "date": "2026-06-12",
       "by": "draft",
       "note": "Initial AI draft from voice_profile.md + facts bank; not yet reviewed by Colin."
+    },
+    {
+      "date": "2026-08-07",
+      "by": "draft",
+      "note": "Batch rewrite under the narrative doctrine + storytelling engine: distinct spine per essay, fact count cut to <=5, TABOOST described at true scale (largest US social media agency, $5M profit), no ask, ends on an image."
     }
   ],
   "formMeta": {

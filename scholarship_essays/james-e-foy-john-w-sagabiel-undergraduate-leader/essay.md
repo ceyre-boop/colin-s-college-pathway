@@ -1,17 +1,17 @@
-# James E. Foy / John W. Sagabiel Undergraduate Leadership Scholarship
+# James E. Foy / John W. Sagabiel Undergraduate Leadership Award
 
-Lunch Bunch runs backward from the standard model. The standard model takes a student who has been isolated — by disability, by social anxiety, by whatever gap exists between them and the group — and tries to integrate them into general-student settings. What Lunch Bunch does instead is bring the general-student side across. We come to their space. The program's founding insight was that the barrier is not the isolated student's inability to join — it is the structure that makes joining harder than it needs to be. Change the structure.
+There is a five-year-old at Legacy MMA who cannot yet tie his own belt, and on Tuesdays that is my problem.
 
-I helped run that program, and what I noticed was that the design question and the engineering question are the same: who is excluded by the current setup, and what would you have to build differently to include them?
+I teach the kids' classes. I started martial arts at exactly his age and got my black belt at eleven, six years later, so I know something he doesn't yet: nothing that happens in this room today will feel like progress. Not today, not in March. The whole thing is a bet on accumulation, and he is five, and five-year-olds do not do compound interest.
 
-That question has followed me into every other project.
+So the actual job isn't teaching him a technique. It's making the room worth coming back to on a day when he'd rather not, roughly two hundred times, until the accumulation does what accumulation does. That's the only leadership I've ever seen work. Everything else is announcements.
 
-At TABOOST, I'm the founding AI engineer. The system I built processes 200-plus emails a day across 16 inboxes for creators — people building real things who don't have the technical infrastructure to handle the volume. The decision to build that tool was the Lunch Bunch problem restated: there is a gap between the tools powerful teams take for granted and the tools available to someone working alone. Close the gap, build the infrastructure, and let the person on the other side do what they came to do.
+I run Lunch Bunch at school on the same theory. It's a reverse-inclusion program, which means it runs backwards from how these usually go — instead of walking the isolated kid over to the big table, the general students come to his. Nobody makes a speech about it. The table just exists, every week, and somebody is already sitting there before the first person arrives, because nobody wants to be the one who starts a table. That's most of the presidency: arrive first, sit down, stay put.
 
-The academic path is Cellular and Molecular Biology with optional CS / computational support courses at the University of Michigan-Flint — 3.92 GPA, Dean's List, returning Fall 2027 after prerequisite coursework at Mott Community College (3.7). The leadership path and the research path converge at the same long-term project: computational oncology. At 19, I spent part of an afternoon at my uncle's radiation oncology clinic outlining tumors on MRI scans — slice by slice, mouse cursor, judgment call by judgment call. The software does not yet exist that removes that task from a human hand. I want to build it.
+I couldn't articulate for a long time why the reversal mattered so much, and I'm still not sure I've got all of it. The closest I can get is that it changes who has to cross the room. When you walk somebody over, the whole arrangement is a favor and everyone in it knows. When people come to him, he's the host. It quietly stops being charity, and nobody has to say so.
 
-That is also a leadership problem. Deploying AI into clinical workflows requires people who understand the biology, the computation, and the institutional dynamics of getting a tool adopted by physicians who are already overloaded and rightly skeptical. The technical part is the beginning, not the end.
+I notice I keep building things whose success looks like nothing happening. That's true of the code too — at TABOOST, the largest social media agency in the country, the system I built as founding AI engineer routes over two hundred emails a day across sixteen inboxes and is designed so that no one ever thinks about it.
 
-Anyway, the finishing record is long: Eagle Scout at 13 (top 4%), black belt at 11 after 6 years, fourth at Georgia state wrestling on a 4.1. Alta Investments, the live quant trading system I built at 18, runs a Sharpe of 1.08 with bust probability at zero. These are not credentials for their own sake. They are proof that the ambition and the follow-through are pointed in the same direction.
+It's a strange thing to lead with in an application, because it doesn't photograph. There's no moment. There's just a room that was ready, a table that was already occupied, and a kid who kept showing up on Tuesdays until one day he could tie the belt himself.
 
-The James E. Foy / John W. Sagabiel scholarship is for students who lead by building something useful. That is the only kind of leadership I know how to do.
+I'd rather be that than memorable.

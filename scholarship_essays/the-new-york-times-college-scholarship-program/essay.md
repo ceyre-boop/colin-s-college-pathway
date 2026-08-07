@@ -1,15 +1,19 @@
 # The New York Times College Scholarship Program
 
-The summer I turned 19, I spent part of an afternoon in a radiation oncology clinic watching a physician plan a cancer treatment the same way I had imagined planes were designed in the 1940s — by hand, by feel, by however much patience the person behind the cursor had that day. I was the person behind the cursor. The plan was for a real patient. The margin I drew mattered.
+The summer I turned sixteen, I watched a cancer treatment get designed the way I'd imagined airplanes were designed in the 1940s — by hand, by feel, by however much patience the person at the desk had left that day.
 
-I have been thinking about that afternoon ever since.
+The person at the desk was me.
 
-The academic context is as follows. I'm finishing prerequisites at Mott Community College on a 3.7, returning to the University of Michigan-Flint in Fall 2027 for a BS in Cellular and Molecular Biology with optional CS / computational support courses. At UM-Flint my cumulative GPA is 3.92, Dean's List, built on a 9-AP-exam, AP-Scholar-with-Distinction-twice foundation. My FAFSA SAI is negative 1500 — maximum Pell eligibility — and I have handled that fact by treating it as a design constraint: prerequisites at Mott, then four-year money at UM-Flint where the labs are.
+My uncle is a radiation oncologist in North Dakota, and he sat me down at the treatment planning workstation and pulled up an MRI: a brain in grayscale, sliced thin, forty-some images deep. My job was to drag a cursor around the tumor's edge on each slice, marking where the tissue changed, so the machine would know where to aim. The first slice took eleven minutes. Gray smudges don't have edges, they have opinions, and every few pixels I was making a call about somebody's brain with no training and a mouse.
 
-What makes the constraint interesting, rather than just difficult, is that I am not waiting to do serious work until the funding situation resolves. Alta Investments, a quantitative trading system I built and deployed at 18, runs today with a Sharpe ratio of 1.08 and a risk model holding bust probability at zero. At TABOOST, I'm the founding AI engineer; the system I built processes 200-plus emails a day across 16 inboxes for real users who depend on it. The hardship is real, and so is the work happening inside it.
+I keep coming back to the contrast, because it's genuinely strange. The scanner that produced those images represents a century of physics. The accelerator that would fire down my line on Thursday represents another one. And the step in the middle — the one that decides which tissue gets the dose — is a person squinting, because the software isn't good enough to be trusted and so a human is kept in the loop as a kind of biological error correction.
 
-Anyway, none of these projects are where I am going. They are evidence that I can get there. At 13 I earned Eagle Scout — top 4% — after years in scouting. At 11 I earned a black belt after 6 years of martial arts. At 16 I placed fourth in Georgia state wrestling while carrying a 4.1. These are the kind of numbers that only mean something if you know that every one of them took longer than it looks, cost something, and was not assigned by anyone.
+Nobody in that building thought this was remarkable. That's the part that stayed with me. From inside a system, its worst bottleneck usually just looks like the schedule.
 
-The place I'm going is computational oncology. Software that reads the tumor boundary on a scan and lets the physician verify instead of draw. Faster planning, consistent margins, and the removal of the moment I sat through: one hand, one cursor, one patient's outcome, by feel.
+My FAFSA SAI is negative fifteen hundred, so the path from that afternoon to the lab where that problem gets solved is not a straight line. It runs through Mott Community College, where I'm finishing prerequisites at a fraction of the cost, and back to UM-Flint in Fall 2027 for the biology degree. That's not a detour I'm apologizing for. It's the same instinct as the risk model I wrote before I let my trading system touch real money: figure out what actually has to be true, and stop paying for the parts that only look necessary.
 
-The New York Times scholarship would reduce the number of hours I spend solving a funding equation and increase the number I spend inside a lab, which is the most direct contribution anyone outside my university can make to that project right now.
+And I'm not waiting. I'm the founding AI engineer at TABOOST, the largest social media agency in the country — five million in profit last year — where the system I built reads and routes over two hundred emails a day across sixteen inboxes.
+
+But none of that is the point. The point is a room where the last decision in a century of physics is made by whoever is awake.
+
+I'd like to be the person who finally automates the squinting.

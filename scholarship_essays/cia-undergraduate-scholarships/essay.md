@@ -1,15 +1,19 @@
-# CIA Undergraduate Scholarships
+# CIA Undergraduate Scholarship Program
 
-The noise in a financial data feed looks random until you've spent enough hours with it to know what signals actually look like. I founded Alta Investments at 18 specifically to learn that distinction — not theoretically, but in production, with real capital exposed to real market conditions every trading day. The system I built runs a Sharpe ratio of 1.08. The risk model holds bust probability at zero. Both numbers require that the system's judgment be consistently correct on data that is never clean.
+A live market data feed looks like static. That's the first thing nobody tells you.
 
-That is also the core problem in intelligence analysis.
+You come in expecting signal buried in noise, some clean shape you'll find with enough math, and what you get is thousands of ticks an hour of stuff that is genuinely meaningless plus a very small amount of stuff that isn't, and no label on either. I built Alta Investments at eighteen mostly to find out whether I could tell the difference — not in a backtest, where you already know how the story ends, but forward, in production, with real money exposed to a market that does not care what my model believed.
 
-The analogy runs deeper than the surface: both domains require extracting reliable signal from noisy inputs, building models that generalize across conditions the analyst has not yet encountered, and maintaining enough epistemic humility to know when the model is wrong before the position costs too much. The difference is the stakes, not the structure.
+It runs on a Sharpe of 1.25 with probability of ruin held at zero by a risk model I wrote before I wrote the strategy. Those two numbers together are the only real claim I'd make about myself: I can hold a judgment on dirty data and be right often enough to survive, and I built the thing that stops me when I'm not.
 
-I'm a Cellular and Molecular Biology major at the University of Michigan-Flint, with optional CS / computational support courses, carrying a 3.92 GPA with Dean's List standing. The academic path runs through Mott Community College (3.7) first — a deliberate decision that treats the funding gap as a variable to optimize around rather than an obstacle that defines the outcome. FAFSA SAI of negative 1500, maximum Pell. Same credits, fraction of the cost, same trajectory.
+What I learned doing it is that the hard skill isn't extraction. It's calibration — knowing the difference between a conclusion your evidence supports and one you want. Most of my early losses were the second kind wearing the first kind's clothes. You only fix that by being wrong on the record, repeatedly, with something at stake.
 
-At TABOOST, I'm the founding AI engineer. The routing system I built handles 200-plus emails a day across 16 inboxes; the architecture decisions it required — privilege separation, routing logic, failure modes — are the same decisions that appear at the infrastructure level in any production system handling sensitive information.
+I'd like to do that work where the stakes aren't a P&L.
 
-Anyway, the academic and technical background converges on a single long-term research goal. At 19, I spent part of an afternoon at my uncle's radiation oncology clinic in North Dakota drawing tumor boundaries on MRI scans. Forty-plus slices, mouse cursor, by hand — the kind of task that, if the software were better, would not require a person at all. Computational oncology is the problem that emerged from that afternoon: AI-proposed boundaries, physician-verified, faster and more consistent than the current method. The intelligence community's interest in AI for analytical and medical applications runs parallel to the research I want to do.
+The reason it's medicine-adjacent for me is a room in North Dakota. I was sixteen, at my uncle's radiation oncology clinic, and he let me outline a tumor on an MRI — cursor around a gray smudge, eleven minutes a slice, forty more to go, and the boundary I drew was where a beam would be aimed on Thursday. Ambiguous data, high consequence, and a person at the end of the analysis rather than a number. That's the version of this work I care about, and it's what the biology degree is for.
 
-I have finished long, difficult things before: black belt at 11 after 6 years, Eagle Scout at 13 (top 4%), fourth at Georgia state wrestling junior year. The CIA undergraduate scholarship program offers the kind of rigorous commitment I recognize — national service in exchange for the education that makes the service meaningful. That trade is one I am prepared to make.
+Analysis is analysis. Whether the input is a data feed, an inbox at scale, or a grayscale slice of somebody's brain, the discipline is the same: assume you're being fooled, build the check before the conclusion, and never let confidence run ahead of evidence.
+
+I've been practicing on markets because markets will take your money for getting it wrong, which is a fast teacher and a cheap one.
+
+I'd rather practice where being right matters more than that.

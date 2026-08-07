@@ -1,15 +1,19 @@
-# Thermo Fisher Scientific Antibody Scholarship
+# Thermo Fisher Scientific Antibody Scholarship Program
 
-The tumor boundaries I outlined at my uncle's radiation oncology clinic in North Dakota were drawn by hand — mouse cursor, slice after slice, across forty-plus MRI images per scan. The software in the treatment planning workstation was sophisticated by most measures, but the segmentation step — identifying exactly where the tumor ended — still required a human to trace it. I was 19 and the human was me.
+Where a tumor ends is a molecular question. I answered it, at sixteen, with a mouse.
 
-I have been thinking about that step ever since, and the more biology I take, the more dimensions the problem reveals. Radiation oncology targets the tumor you can see on imaging. What cancer immunotherapy targets is more distributed — the relationship between a tumor and the immune microenvironment that either attacks it or fails to. The imaging and the molecular biology are not separate problems; they are two layers of a system that has to work together.
+My uncle runs a radiation oncology clinic in North Dakota, and one afternoon he sat me at the treatment planning workstation and let me outline a tumor on an MRI. You drag the cursor around a gray region that fades into the tissue beside it, slice by slice, deciding where malignant stops and healthy starts. It took eleven minutes to do one slice. There were forty more. On Thursday a machine would deliver dose down the line I drew.
 
-I am a Cellular and Molecular Biology major at the University of Michigan-Flint, with optional CS / computational support courses, 3.92 GPA with Dean's List standing. Finishing prerequisites at Mott Community College (3.7) now, returning to UM-Flint Fall 2027. Nine AP exams, AP Scholar with Distinction twice, 32 transfer credits in.
+What I understand now that I didn't then is that the fuzziness on that screen isn't a limitation of the imaging. It's real. The boundary of a tumor is a gradient of cellular behavior — margins where invasion is happening at a scale no scan resolves — and what I was doing with a cursor was making a coarse guess at a molecular fact.
 
-The computational work runs alongside: Alta Investments is a live quant trading system (Sharpe 1.08, bust probability 0%) I built at 18 and maintain today. At TABOOST I'm the founding AI engineer, building and running production infrastructure for real users — 200-plus emails a day across 16 inboxes. Both systems require that I solve biological-scale signal-to-noise problems — market data and email classification look random until they don't — under conditions where being wrong has real consequences.
+That's why I'm doing the biology degree rather than only the computer science, which would be the faster route to the same job title.
 
-Anyway, I have been finishing long things since before the code. Black belt at 11 after 6 years. Eagle Scout at 13 — top 4% of all scouts. Fourth in Georgia state wrestling, junior year, 4.1 GPA. The pattern is the same: pick the hard scientific problem, stay inside it long enough to find the shape of the answer, don't stop.
+You can't build a model that finds a boundary you don't understand. If the target is defined by what the cells are doing — receptor expression, the markers that separate one tissue from its neighbor, everything an antibody is designed to interrogate — then the person building the segmentation software had better know what the pixels are standing in for. Otherwise you've automated a guess and shipped it with a confidence score.
 
-FAFSA SAI of negative 1500 — maximum Pell. The funding gap is a variable, not a verdict. Mott is the cost-efficient path to the same biology credits; UM-Flint is where the upper-division coursework and the research labs are.
+I can already do the engineering half at production grade. I'm the founding AI engineer at TABOOST — the largest social media agency in the United States, five million in profit last year — where the system I built reads and routes over two hundred emails a day across sixteen inboxes. I built Alta Investments alone at eighteen; it trades live on a Sharpe of 1.25 with probability of ruin held at zero. Both are exercises in the same discipline: extracting a defensible decision from data that's mostly noise, under conditions where being confidently wrong costs somebody something.
 
-The Thermo Fisher Antibody Scholarship goes to students building toward serious work in life sciences. I am building toward computational oncology: software that automates the step I traced by hand at 19, so that treatment targeting is consistent rather than dependent on whoever happens to be at the workstation. The biology at every layer of that system — including the molecular and immunological layer — is foundational. That is why I am here.
+The missing half is molecular, and it's the half I'm going back for. Cellular and molecular biology at UM-Flint, then imaging, then the work.
+
+The eventual software proposes the boundary and the physician verifies it, instead of tracing it at eleven minutes a slice.
+
+Getting that line right is a question about cells. I'd like to be able to answer it as one.

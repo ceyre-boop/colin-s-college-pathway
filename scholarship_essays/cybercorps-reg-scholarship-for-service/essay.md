@@ -1,15 +1,19 @@
-# CyberCorps: Scholarship For Service
+# CyberCorps: Scholarship for Service
 
-Alta Investments processes live trades on real capital. The moment I fully understood what "live" meant — real money, real positions, no safety net — I stopped writing code the way I had written it before. Every input became a potential attack surface. Every external dependency became a failure point. I started thinking about what a determined adversary could do to the system, not because someone threatened it, but because in production you build as if they already have.
+A compromised treatment planning system is not a data breach. It's a dosing error.
 
-That shift in thinking is the one I want to bring to federal service.
+I didn't understand that distinction until I'd been inside one. When I was sixteen my uncle, a radiation oncologist in North Dakota, sat me down at a planning workstation and let me outline a tumor on a real MRI — dragging a cursor around a gray smudge, eleven minutes for one slice, forty more slices before the plan was finished. That contour is not a document. It's an instruction. Downstream of it, a linear accelerator points at a specific volume of a specific person's head on Thursday morning and delivers a dose calculated from the line I drew.
 
-I'm studying Cellular and Molecular Biology at the University of Michigan-Flint with optional CS / computational support courses, and I have a 3.92 GPA with Dean's List standing. The CS side is production-grade. Alta, which I built solo starting at 18, runs a Sharpe ratio of 1.08 with a risk model holding bust probability at zero — a live quantitative system I designed, deployed, and maintain. At TABOOST, the AI inbox system I built routes 200-plus emails a day across 16 inboxes for real users; the security of that pipeline — authentication, routing logic, privilege boundaries — is my daily concern. I know how these systems break because I have watched them nearly break.
+Change the line and you haven't leaked anything. You've irradiated healthy tissue and spared the tumor, and the failure looks like ordinary bad luck for months.
 
-CyberCorps asks for a commitment to federal service after graduation, and I take that seriously. Critical infrastructure protection — financial systems, medical devices, power grids, government networks — is exactly the problem space I already think about. The medical angle is personal: at 19, I outlined tumors on MRI scans at my uncle's radiation oncology clinic in North Dakota. Those systems — treatment planning software, radiation delivery hardware, hospital networks — are targets. The FDA, CISA, and DHS all have active programs on medical device cybersecurity because the stakes are not abstract. A compromised treatment planning system is not a data breach; it is a dosing error.
+That's the class of problem I want to work on, and it's why federal service is the version of this career I actually want rather than the one I'm settling for. The people who defend that machine don't get equity. They get a room where the consequence of being sloppy is somebody's treatment.
 
-Anyway, I have been building toward this kind of work without knowing it had a name. Nine AP exams, Eagle Scout at 13, varsity wrestling — the pattern is always the same: identify the hard thing, learn it deeply enough to be trustworthy with it, and stay. The federal service commitment in CyberCorps is not an obstacle. It is the kind of high-stakes sustained engagement I have been training for.
+I've been building the skills on systems where I own the consequences. Alta Investments is a live quantitative trading system I built alone at eighteen; it runs on real capital every day with probability of ruin held at zero, because the first thing I wrote was the component that decides when the system isn't allowed to act. At TABOOST — the largest social media agency in the United States, five million in profit last year — I'm the founding AI engineer, and what I built reads and routes over two hundred emails a day across sixteen inboxes. Authentication, routing logic, who is allowed to see what: that's my daily surface area, and I know how it breaks because I've watched it come close.
 
-What I'm building long-term is computational oncology: AI that reads the tumor boundary on a scan so a physician verifies rather than draws. Achieving that requires that medical AI systems are secure. That is not a separate career — it is the same one. The CyberCorps path through government service and the research path through medical AI are, at the level of the actual problem, one road.
+The thing that transfers isn't any particular technology. It's the habit of asking what happens when this component is wrong and nobody notices for six weeks.
 
-I want to walk that road with the skills and credentials this program provides.
+Medical devices, hospital networks, and treatment planning software all sit in that category — heavily regulated, quietly under-defended, and staffed by people whose expertise is oncology rather than adversaries. FDA and CISA both have programs on this now, which tells you the gap is real and acknowledged.
+
+I'd like to spend the obligated years there, and probably the ones after.
+
+Somebody has to be the person who thinks about that room while the doctor is thinking about the patient.

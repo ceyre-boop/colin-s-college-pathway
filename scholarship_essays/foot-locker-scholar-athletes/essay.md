@@ -1,17 +1,21 @@
-# Foot Locker Scholar Athletes
+# Foot Locker Scholar Athletes Program
 
-By the time you are 11 years old, six years feels like most of your life. I started training at five. By the time I earned my black belt, the discipline had been present in every year I could actually remember — not as a schedule item but as a constant: you show up, you drill the same technique hundreds of times, and eventually the thing you could not do becomes the thing you no longer have to think about.
+I started martial arts at five and got my black belt at eleven. Six years. I want to be precise about that number because it's the only impressive thing about it.
 
-That pattern has repeated, without modification, across every domain I've entered since.
+Nothing happened in those six years. That's the point I'd make if I could only make one. There was no breakthrough, no montage, no afternoon where it clicked. There were roughly three hundred Tuesdays of drilling the same movement in the same room, most of them unremarkable, a lot of them boring, and at the end of the accumulated boredom I was a different person than the kid who walked in. The belt is just a receipt.
 
-Eagle Scout at 13, which puts me in the top 4% of all scouts. State wrestling was fourth in Georgia my junior year — while holding a 4.1 GPA. Those are the athletic lines, but what they represent is a longer record: I pick long, difficult things and I finish them. Not quickly. Not because they came easily. Because the work is the point, not the result, and the result is just the proof that the work happened.
+Wrestling worked the same way. Fourth in the state of Georgia my junior year, carrying a 4.1, and the season was won in a weight room in October when nobody was watching and it did not feel like anything.
 
-The same thing is true of my code. I founded Alta Investments at 18 — a live quantitative trading system I built entirely myself. It runs on real capital with a Sharpe ratio of 1.08 and a risk model that holds bust probability at 0%. I am the strategy researcher, the infrastructure engineer, and the risk department. Nobody assigned me the project; I read until I understood the field, built until the system worked, and then let it trade. What the wrestling records prove about finishing physical things, Alta proves about finishing computational ones.
+I teach kids now, at Legacy MMA — five- and six-year-olds, roughly where I started. And the thing I've learned coaching them is that every single one of them wants the belt and almost none of them want the Tuesdays. My whole job is making the Tuesdays survivable long enough for them to find out that the Tuesdays *are* the thing.
 
-At TABOOST, I'm the founding AI engineer. The system I built routes 200-plus emails a day across 16 inboxes for real users. Both of these are production — meaning they fail in public if I fail to maintain them. That is the version of athletic accountability that transferred.
+That's the pattern I keep pointing at everything.
 
-The academic record fits the same shape. Nine AP exams, AP Scholar with Distinction twice. Now at Mott Community College carrying a 3.7 while completing prerequisites; returning to the University of Michigan-Flint, where my GPA is 3.92 with Dean's List standing, in Fall 2027 for a BS in Cellular and Molecular Biology with optional CS / computational support courses.
+I built Alta Investments alone at eighteen — a quantitative trading system that runs on real capital with a Sharpe of 1.25 and a risk model that holds probability of ruin at zero. Nobody assigned it. I read until I understood the field, built until it worked, and turned it on. It took months of the same unglamorous evenings that a wrestling season takes. The mat taught me the schedule; the code just happened to be what I put in it.
 
-The degree is a component in a longer project that started at 19, sitting in my uncle's radiation oncology clinic in North Dakota, outlining tumors on MRI scans with a mouse cursor. Slice after slice, the cursor traced a boundary that decided where radiation would go. My goal is to automate that boundary — computational oncology, software that reads the scan and proposes the margin so the physician checks rather than draws.
+So here's what I'm actually applying with. Not talent. A demonstrated tolerance for long boring middles, which is the only thing that's ever separated the people I've watched finish from the people I've watched quit at month four.
 
-That is the long thing I'm finishing now. The black belt, the Eagle, the state wrestling, the live trading system — they are not separate stories. They are practice.
+The longest one is still open. When I was sixteen I outlined a tumor on an MRI at my uncle's radiation oncology clinic — eleven minutes for a single slice, forty more waiting, a person on the other end of every line. I want to build the software that draws it. Biology degree, computational work, probably fifteen years.
+
+I've done six-year projects before. I know what month eleven feels like.
+
+I'll be there for it.

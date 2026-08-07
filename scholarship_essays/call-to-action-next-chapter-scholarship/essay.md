@@ -1,15 +1,21 @@
 # Call to Action Next Chapter Scholarship
 
-The day I filed the FAFSA with a negative-1500 SAI was also the day I made a spreadsheet. Not for the expected reason — I know how to calculate expected value from doing it all day on equity signals — but because I needed to run the numbers on my own situation with the same discipline I run on everything else. And the numbers said: prerequisites at Mott Community College, then back to the University of Michigan-Flint for the biology and CS degree, tuition-to-outcome ratio optimized and on schedule.
+My FAFSA SAI is negative fifteen hundred, which is the number the federal government uses to say a family has nothing to contribute. It's on the first page of everything I file. I'd rather get it out of the way than build an essay around it.
 
-The "next chapter" in my case is a transfer, not a return. I'm 19, I've been at this for years, and the path I'm on is non-standard in all the ways that don't show up on a transcript but explain the transcript that does exist.
+The interesting thing isn't the number. It's what it does to how you plan.
 
-Alta Investments — the live quantitative trading system I built solo starting at 18 — runs a Sharpe ratio of 1.08 with bust probability at zero. That system has been running on real capital since before I transferred to Mott. At TABOOST, I'm the founding AI engineer: 200-plus emails routed per day across 16 inboxes. These are not extracurriculars. They are production systems I built and maintain alongside the coursework, because the path I described above only works if I keep the lights on while I walk it.
+When money is not a constraint you choose the path you want. When it is, you start reading everything as a system with substitutable parts, and you find out fast which parts of a degree are load-bearing and which parts are just where people usually go. Organic chemistry is load-bearing. The building it's taught in is not. So I'm at Mott Community College finishing prerequisites at a fraction of the cost, and I transfer back to UM-Flint in Fall 2027 to finish the biology degree in the labs that actually matter for what I want to do.
 
-The academic record bears out: 3.7 at Mott, 3.92 at UM-Flint with Dean's List standing, AP Scholar with Distinction twice across nine AP exams. This is not someone who stumbled sideways into college; it is someone who optimized around a funding constraint and kept the trajectory intact.
+People hear "community college" and hear a step down. I ran the arithmetic and heard the same credits at a discount, which is a different sentence entirely.
 
-Anyway, the reason any of this matters beyond my own finances: at 19 I sat in my uncle's radiation oncology clinic in North Dakota outlining tumors on MRI scans. Slice after slice, mouse cursor, boundary by hand. Somewhere in that hour I decided that the most important software I will ever build is the software that automates that process — computational oncology, AI-proposed boundaries, physician-verified instead of physician-drawn. That end goal has not moved since. Everything on the spreadsheet is in service of it.
+I mention this because "next chapter" makes it sound like something ended. Nothing ended. I've been building the whole time, in the gaps around the coursework, on the theory that nobody is going to hand me a starting line and I should probably just start.
 
-The Call to Action scholarship is, for me, exactly what the name implies: the next chapter is UM-Flint, Fall 2027, and the research lab where the biology and the code meet. Funding that transition directly buys back the bandwidth I currently spend managing the gap between what education costs and what Pell covers.
+The clearest version of that: I'm the founding AI engineer at TABOOST, the largest social media agency in the country, five million in profit last year. The system I built reads and routes over two hundred emails a day across sixteen inboxes. I got that job by being able to do the thing, which is the only credential that has ever worked for me.
 
-The chapter after this one is building the software that retires a mouse cursor that is, at this moment, still someone's job.
+Anyway. The reason any of this is pointed anywhere.
+
+When I was sixteen I sat in my uncle's radiation oncology clinic and outlined a tumor on an MRI scan — a mouse cursor dragged around a gray smudge, eleven minutes for one slice, forty more waiting, and at the end of the line I was drawing was a person with an appointment on Thursday. I want to build the software that draws it. Biology degree on one side, the computational work I'm already doing on the other, and that room in North Dakota at the end.
+
+It's a fifteen-year project, probably. I'm nineteen and I've been at it for three.
+
+The gap between what I have and what it costs is just a variable. Variables get solved. This one's most of the way there.

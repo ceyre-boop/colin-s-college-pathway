@@ -10,7 +10,7 @@
   "effort": "med",
   "expected_value": 6000,
   "angle_used": "stem_mri",
-  "angle_summary": "MRI moment → computational oncology → Alta/TABOOST as proof he builds",
+  "angle_summary": "MRI moment \u2192 computational oncology \u2192 Alta/TABOOST as proof he builds",
   "source": "careeronestop",
   "selected_at": "2026-06-12",
   "revisions": [
@@ -18,6 +18,11 @@
       "date": "2026-06-12",
       "by": "draft",
       "note": "Initial AI draft from voice_profile.md + facts bank; not yet reviewed by Colin."
+    },
+    {
+      "date": "2026-08-07",
+      "by": "draft",
+      "note": "Batch rewrite under the narrative doctrine + storytelling engine: distinct spine per essay, fact count cut to <=5, TABOOST described at true scale (largest US social media agency, $5M profit), no ask, ends on an image."
     }
   ],
   "formMeta": {
@@ -40,7 +45,7 @@
     ],
     "notes": [
       "single external host svcf.org (homepage, not the form)",
-      "resolution confidence medium → Chrome (human navigates to the real form)"
+      "resolution confidence medium \u2192 Chrome (human navigates to the real form)"
     ],
     "autoSubmitEligible": false,
     "route": "chrome"

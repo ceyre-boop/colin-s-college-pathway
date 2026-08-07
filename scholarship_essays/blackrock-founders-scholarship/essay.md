@@ -1,15 +1,19 @@
 # BlackRock Founders Scholarship
 
-The first morning Alta Investments ran live, I was watching a terminal instead of sleeping. Not from anxiety — from the specific kind of alertness that comes when something you've been building in simulation is suddenly running in the world and there is no undo button.
+The morning Alta went live I watched the terminal the way you watch a pot that absolutely cannot boil over.
 
-I built Alta at 18. It's a quantitative trading system I designed, backtested, and deployed without a co-founder, a boss, or a course. The number it produces that I care most about: Sharpe ratio 1.08. The number that matters second: bust probability, which the risk model I wrote holds at zero. It runs every trading day, on live data, against real capital. I am the entire team.
+My code. Real market. Real money. Nobody above me to escalate to, which I had thought of as freedom right up until about nine-thirty that morning, when it reorganized itself into the understanding that if this thing did something stupid, there was no one to tell.
 
-That process — reading until I understood the domain, building until the system worked, then maintaining it under live conditions — taught me more about building serious things than any classroom I have been in. But it also taught me something about where I actually want to work. Quantitative finance is not the destination. The destination is computational oncology, and Alta is the proof of concept.
+I was eighteen. I'd built the whole system alone — the research, the signals, the execution, the infrastructure it runs on, and the risk model that holds probability of ruin at zero. It trades on a Sharpe of 1.25. I am still the entire team: the strategy department, the engineering department, and the guy who gets paged.
 
-I am a Cellular and Molecular Biology major at the University of Michigan-Flint, with optional CS / computational support courses, carrying a 3.92 GPA with Dean's List standing. Finishing prerequisites at Mott Community College now (3.7); returning to UM-Flint in Fall 2027 on a 9-AP-exam, 32-credit head start. FAFSA SAI negative 1500 — maximum Pell — which I handled by treating the funding gap as an engineering problem. Mott is the cost-efficient path to the same transfer credits. The gap is just a variable.
+What I actually learned that morning wasn't about markets. It was that being a founder is mostly a relationship with your own worst-case scenario. Everybody can describe the upside of their idea. The founder is the one who has already sat with the version where it fails badly and decided to proceed anyway, having spent real time making that version less likely and having accepted that they own it either way.
 
-At TABOOST, I'm the founding AI engineer. The system I built routes 200-plus emails a day across 16 inboxes for real users — creators who could not build the infrastructure themselves. These two systems together — Alta and TABOOST — are the current output of a discipline that started when I was 19, sitting in my uncle's radiation oncology clinic in North Dakota, dragging a mouse cursor around tumor boundaries, slice by slice, on scans used to plan radiation delivery.
+I know it generalizes because I got to watch it work somewhere much bigger than my own account. I'm the founding AI engineer at TABOOST, the largest social media agency in the United States — five million in profit last year. The system I built there reads and routes over two hundred emails a day across sixteen inboxes for a business where a dropped message is somebody's client relationship. Same discipline, different blast radius. Design for the failure case, instrument everything, and never ship a component you couldn't explain to the person it would hurt.
 
-The cursor. The boundary. The forty-plus slices. That was the moment the career became specific: I want to build software that reads the tumor so the physician verifies instead of draws. Faster planning, tighter margins, less that depends on whoever happens to be holding the mouse.
+Neither of those is what I'm actually building toward. They're where I learned the trade.
 
-Alta proves I can build systems that perform under real conditions. TABOOST proves I can build systems other people rely on. The biology degree supplies the domain knowledge. The BlackRock Founders Scholarship would fund the bridge between a community college transcript and the research lab where those three things meet.
+When I was sixteen my uncle let me sit at a workstation in his radiation oncology clinic and outline a tumor on an MRI — cursor, gray smudge, eleven minutes, and thirty-nine more slices in the stack. Every one of those minutes was a judgment call that ended up pointed at a person. The software should be proposing that boundary and letting the physician verify it, and it doesn't, and that gap has not moved in the years I've been watching it.
+
+That's the company I want to have built by the end of this. Not because it's a good market — though it is — but because I've seen the room where the problem lives and I know exactly what it sounds like when the mouse clicks.
+
+It's very quiet in there.

@@ -1,13 +1,21 @@
 # NANOG Scholarship Program
 
-The TABOOST email routing system handles 200-plus emails a day across 16 inboxes. The architecture decision that took the most time was not the AI model — it was the delivery graph: what hops information, what copies it, what drops it if a recipient is unavailable, and how the system recovers when a provider goes down in the middle of a batch. The interesting problems were all network problems.
+The workstation took a couple of seconds to load each slice, and a person waited.
 
-I am a Cellular and Molecular Biology major at the University of Michigan-Flint, with optional CS / computational support courses, 3.92 GPA, Dean's List. The production infrastructure I build and maintain runs two systems: Alta Investments, a live quantitative trading system (Sharpe 1.08, bust probability 0%), and the TABOOST AI inbox system described above. Both run every day. Both fail publicly if the infrastructure fails. The discipline that requires is the same discipline NANOG's scholarship program is trying to identify: people who build things that have to stay up.
+I was sixteen, at my uncle's radiation oncology clinic in North Dakota, outlining a tumor on an MRI so the radiation plan would know where to aim. Drag the cursor around the gray smudge, commit the contour, click to the next slice — and wait. Two seconds, maybe three. Then again. Forty-some times, plus every time you go back to fix one.
 
-The network operator's skill set — designing for failure, understanding the actual path data takes between nodes, building observable systems that can be diagnosed from outside — is not separate from the computational biology I'm studying. Hospital networks are hospital infrastructure. The systems that carry MRI data between scanners and treatment planning workstations, the networks that route dosimetry computations to radiation delivery hardware, the protocols that protect that traffic — those are networking problems, and they determine whether the software layer above them can be trusted.
+Nobody in that building would have called that a latency problem. It was just how long the thing took. But sit in it for an afternoon and the arithmetic gets loud: a few seconds of load, times forty slices, times the number of times a tired human re-does a contour, is a real fraction of the attention available for a treatment plan. The infrastructure wasn't failing. It was slow, quietly, into a workflow where attention is the actual scarce resource.
 
-I know this concretely because I spent an afternoon at 19 at my uncle's radiation oncology clinic in North Dakota outlining tumors on MRI scans. The planning workstation took a few seconds to load each slice. The person drawing the boundaries waited. The latency was not abstract; it was part of the clinical workflow, and faster would have meant tighter margins on a real patient's treatment.
+That's the day I got interested in the layer underneath things.
 
-Computational oncology is the research direction I'm building toward: AI-proposed boundaries so physicians verify rather than draw. Getting there requires the biology, the CS, and an understanding of the infrastructure layer that connects both. Mott Community College prerequisites now (3.7), UM-Flint Fall 2027 to finish the degree. FAFSA SAI negative 1500 — maximum Pell. I'm engineering the cost structure the same way I engineer everything else: find the efficient path, execute it.
+Because that's what I keep finding. The impressive part of a system is rarely where the outcome is decided — the outcome is decided by whether the boring layer stayed up and stayed fast on a normal Tuesday. I'm the founding AI engineer at TABOOST, the largest social media agency in the United States, five million in profit last year, and what I built there ingests, classifies, and routes over two hundred emails a day across sixteen inboxes. Nobody has ever complimented it. They'd notice within about four minutes if it stopped.
 
-The NANOG scholarship would accelerate the transition from prerequisite coursework to the research lab where the network layer and the biology meet. That is the next hop I'm trying to reach.
+I also run Alta Investments, a live quantitative trading system I built alone at eighteen. It moves real capital off a live data feed every trading day. When something upstream hiccups, there's no queue to catch it and no colleague to page — the system either handles the degraded case correctly or it does something expensive.
+
+Both taught me the same lesson, which is the one I'd bring to this: you don't get credit for uptime, and you shouldn't. Uptime is the floor. The interesting engineering is all in the failure modes nobody will ever see.
+
+The degree is biology, and the long project is software that proposes the tumor boundary so the oncologist verifies instead of traces. That's a model problem on the surface. Underneath it's a systems problem — clinical data, hospitals, latency budgets, and a machine that fires on Thursday regardless.
+
+Somebody has to care about the seconds.
+
+I already do. I counted them.

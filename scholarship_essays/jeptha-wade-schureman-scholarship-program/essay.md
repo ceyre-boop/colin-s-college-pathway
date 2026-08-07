@@ -1,13 +1,21 @@
 # Jeptha Wade Schureman Scholarship Program
 
-At 19, I sat in my uncle's radiation oncology clinic in North Dakota and outlined tumors on MRI scans — moving a mouse cursor around the boundary of a tumor, slice by slice, knowing the line I drew would become part of a real person's radiation plan. The clinic ran on software that still needed a human hand to trace that line. That afternoon is why I'm studying what I'm studying.
+My FAFSA SAI is negative fifteen hundred. In Genesee County that isn't a hardship story, it's a Tuesday, and everybody reading this already knows that.
 
-I'm finishing prerequisites at Mott Community College, carrying a 3.7, before returning to the University of Michigan-Flint in Fall 2027 for a BS in Cellular and Molecular Biology with optional CS / computational support courses. My cumulative GPA at UM-Flint is 3.92, Dean's List. I chose this path through Southeast Michigan deliberately: Mott is the cost-efficient route to the prerequisite credits, and UM-Flint has the biology coursework I need without the expense of relocating to a research university. My FAFSA SAI is negative 1500 — maximum Pell — so the cost structure isn't a detail. It's the reason the path looks the way it does.
+So I'll skip the part where I explain what it's like and go to the part that's actually mine, which is what I decided to do about it.
 
-I came to Flint for school rather than grew up here, but a student is a resident, and I'd rather build something useful in the community I'm actually living and studying in than treat it as a place I'm passing through. UM-Flint is a serious university sitting in a city with concrete, unsolved problems. That's a feature, not a drawback — it's exactly where applied technical work has somewhere to go.
+I'm at Mott Community College finishing prerequisites and I transfer back to UM-Flint in Fall 2027 for the biology degree. That wasn't a fallback. It was arithmetic — same credits, a fraction of the cost, and the labs I actually need are at the end of it either way. I've noticed that people from outside here hear "Mott, then Flint" and hear a story about limits. People from here hear a plan.
 
-The work I do alongside the coursework is already production-grade. Alta Investments is a live quantitative trading system I founded at 18, running a Sharpe ratio of 1.08 with bust probability held at zero. At TABOOST, I'm the founding AI engineer; the routing system I built handles 200-plus emails a day across 16 inboxes for real users. Neither is a class project — they run every day and fail in public if I let them.
+The thing the plan is for started in a room a long way from Michigan.
 
-Anyway, the finish-what-you-start record predates the code: black belt at 11 after six years, Eagle Scout at 13 (top 4%), fourth at Georgia state wrestling on a 4.1. The pattern is always the same — pick the long, hard thing and stay until it's done.
+When I was sixteen my uncle, a radiation oncologist in North Dakota, let me sit at his treatment planning workstation and outline a tumor on an MRI. You drag a cursor around a gray smudge that doesn't have a clean edge, one slice at a time, deciding by eye where cancer stops and a person starts. Eleven minutes for the first slice. Forty more in the stack. On Thursday a machine would aim down the line I drew.
 
-The long, hard thing now is computational oncology: software that reads the tumor boundary on a scan so a physician verifies instead of draws. Faster planning, consistent margins, and the removal of the exact bottleneck I sat inside at 19. The Schureman scholarship, awarded to Southeast Michigan students building something serious, would close part of the financial distance between the path I'm on now and the research lab where that work begins.
+That's still how it works, in most places. The scanner cost millions and the last decision is made by whoever is available and awake.
+
+I want to build the software that proposes that boundary so the physician verifies instead of traces, and I'm not waiting on the degree to be ready for it. I'm the founding AI engineer at TABOOST, the largest social media agency in the United States — five million in profit last year — and the system I built there reads and routes over two hundred emails a day across sixteen inboxes. It runs whether or not I'm having a good week. That's the standard the medical version has to clear, times a thousand.
+
+Southeast Michigan is a place that knows exactly what happens when the useful thing gets built somewhere else and shipped back in at a markup. I'd like to be part of the version where it gets built here.
+
+Fall 2027, UM-Flint, and then wherever the research lab is.
+
+Then back to a room like my uncle's, with the line already drawn.
