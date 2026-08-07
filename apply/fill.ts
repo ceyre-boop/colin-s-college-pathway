@@ -23,7 +23,8 @@
 
 import { homedir } from "os";
 import { join } from "path";
-import { existsSync, mkdirSync, readFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { createHash } from "crypto";
 import type { Applicant } from "./types";
 import { mapField, pathForLabel, type MapResult } from "./field-map";
 import { loadEssayLibrary, matchEssay } from "../scout/essay-match";
@@ -31,6 +32,8 @@ import { append as logEvent } from "../state/log";
 import { scholarshipId } from "../src/lib/ids.js";
 import { loadVault } from "../identity/vault";
 import { grantForLabels, open } from "../identity/broker";
+import { raise } from "../state/queue";
+import { begin, complete, fail } from "../state/operations";
 
 const HOME = homedir();
 const ROOT = join(import.meta.dir, "..");
@@ -175,15 +178,40 @@ async function run() {
       await page.goto(t.applyUrl, { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(2500);
 
+      // The page is an untrusted interface we observe and act through — never authoritative state.
+      // Everything below reads it, decides, and records the decision in the log.
+
+      // Bot challenge? Raise and STOP. Nothing here attempts to solve or evade one.
+      const captcha = await page.locator(
+        'iframe[src*="recaptcha"], iframe[src*="hcaptcha"], iframe[title*="challenge" i], .g-recaptcha, .h-captcha, [data-sitekey], #cf-challenge-running',
+      ).count();
+      if (captcha) {
+        raise({ type: "CAPTCHA_REQUIRED", applicationId: appId, context: { slug: t.slug, url: t.applyUrl } });
+        r.outcome = "needs_human"; r.reasons.push("bot challenge present — never worked around");
+        results.push(r); console.log(`  🤖 ${t.slug}: CAPTCHA → checkpoint`); continue;
+      }
+
+      // MFA is distinguishable from an ordinary login wall and is a different human action.
+      const bodyForGates = await page.locator("body").innerText({ timeout: 3000 }).catch(() => "");
+      if (/\b(two[- ]factor|2fa|verification code|one[- ]time (code|passcode)|authenticator app)\b/i.test(bodyForGates)) {
+        raise({ type: "MFA_REQUIRED", applicationId: appId, context: { slug: t.slug, url: t.applyUrl } });
+        r.outcome = "needs_human"; r.reasons.push("two-factor prompt — code is on the user's device");
+        results.push(r); console.log(`  🔑 ${t.slug}: MFA → checkpoint`); continue;
+      }
+
       // login wall? (CB/OAuth or a password field)
       const url = page.url();
       const hasPassword = await page.locator('input[type="password"]').count();
       if (/login|signin|sign-in|oauth|authorize/i.test(url) || hasPassword) {
-        r.outcome = "needs_human"; r.reasons.push("login/account wall — human must sign in"); results.push(r); console.log(`  🔒 ${t.slug}: login wall → queued`); continue;
+        raise({ type: "ACCOUNT_REQUIRED", applicationId: appId, context: { slug: t.slug, url: t.applyUrl } });
+        r.outcome = "needs_human"; r.reasons.push("login/account wall — human must sign in"); results.push(r); console.log(`  🔒 ${t.slug}: login wall → checkpoint`); continue;
       }
 
       const fields = await page.evaluate(liveFormExtractor);
-      if (!fields.length) { r.outcome = "needs_human"; r.reasons.push("no fillable form detected (JS-rendered / PDF / email apply)"); results.push(r); console.log(`  📄 ${t.slug}: no form → queued`); continue; }
+      if (!fields.length) {
+        raise({ type: "PORTAL_MALFUNCTION", applicationId: appId, context: { slug: t.slug }, evidenceRefs: { error_detail: "no fillable form detected (JS-rendered / PDF / email apply)" } });
+        r.outcome = "needs_human"; r.reasons.push("no fillable form detected (JS-rendered / PDF / email apply)"); results.push(r); console.log(`  📄 ${t.slug}: no form → checkpoint`); continue;
+      }
 
       // Capture the REAL essay prompts. scout/probe-form.ts writes a placeholder string because a
       // static fetch cannot see JS-rendered questions; here we are in a live browser with the
@@ -220,7 +248,10 @@ async function run() {
       try {
         const bodyText = await page.locator("body").innerText({ timeout: 3000 });
         feeDetected = /application\s+fee|processing\s+fee|entry\s+fee|pay\s+to\s+apply|credit\s+card\s+required/i.test(bodyText);
-        if (feeDetected) r.blocked.push("application/processing fee language detected on page");
+        if (feeDetected) {
+          r.blocked.push("application/processing fee language detected on page");
+          raise({ type: "APPLICATION_FEE", applicationId: appId, context: { slug: t.slug }, evidenceRefs: { fee_evidence: t.applyUrl } });
+        }
       } catch { /* page may be transitioning; remain conservative below */ }
       for (const f of fields) {
         const label = f.label || f.name;
@@ -229,7 +260,12 @@ async function run() {
           labelTier: f.labelTier,
           freshness: path ? broker.freshnessOf(path) : 1.0,
         });
-        if (m.kind === "block") { r.blocked.push(`${label} (${m.reason})`); hardBlocked = true; continue; }
+        if (m.kind === "block") {
+          r.blocked.push(`${label} (${m.reason})`);
+          hardBlocked = true;
+          raise({ type: "BLOCKED_FIELD_PRESENT", applicationId: appId, context: { slug: t.slug, fieldLabel: label, reason: m.reason }, evidenceRefs: { field_label: label } });
+          continue;
+        }
         if (f.isEssay) {
           hasEssayField = true;
           const em = matchEssay(label, null, essayLib);
@@ -247,6 +283,14 @@ async function run() {
             r.declined.push(`${label} → ${m.path} is policy-blocked from autofill`);
             if (f.required) r.unmapped.push(`${label} — policy requires a human to enter this`);
             lowConfidence.push({ label, path: m.path, confidence: c, reason: "policy" });
+            // Financial paths get their own checkpoint type — a different question with a
+            // different answer shape than "is this mapping right".
+            raise({
+              type: m.path.startsWith("financial.") ? "FINANCIAL_FIELD_REVIEW" : "FIELD_MAPPING_UNCERTAIN",
+              applicationId: appId,
+              context: { slug: t.slug, fieldLabel: label, path: m.path, reason: "policy" },
+              evidenceRefs: { field_label: label, confidence: String(c) },
+            });
             continue;
           }
           if (c < ASK_THRESHOLD) {
@@ -256,6 +300,12 @@ async function run() {
             r.unmapped.push(`${label} — mapping uncertain (${m.path} @ ${c.toFixed(2)})`);
             lowConfidence.push({ label, path: m.path, confidence: c, reason: "below-ask-threshold" });
             logEvent("field_skipped", { label, path: m.path, confidence: m.confidence }, { applicationId: appId });
+            raise({
+              type: "FIELD_MAPPING_UNCERTAIN",
+              applicationId: appId,
+              context: { slug: t.slug, fieldLabel: label, path: m.path, competingRules: m.confidence.competingRules },
+              evidenceRefs: { field_label: label, confidence: c.toFixed(3) },
+            });
             continue;
           }
           const didFill = DRY_would_skip() ? true : await fillOne(page, f.name, m.value, f.type, f.value);
@@ -301,27 +351,95 @@ async function run() {
       const denials = broker.denied();
       if (denials.length) r.reasons.push(`${denials.length} identity path(s) requested outside the grant — see capability_denied events`);
 
+      // Evidence for an irreversible action: exactly what was rendered into the form. The full
+      // values go to the gitignored artifact; the EVENT carries only the digest and a reference,
+      // so the log stays free of duplicated PII while remaining verifiable against the artifact.
+      const rendered = r.filled.map((x) => ({ label: x.label, path: x.path, confidence: x.confidence }));
+      const renderedDigest = createHash("sha256").update(JSON.stringify(rendered)).digest("hex").slice(0, 16);
+      const renderedPath = join(shotDir, `rendered-${renderedDigest}.json`);
+      writeFileSync(renderedPath, JSON.stringify({ slug: t.slug, applicationId: appId, digest: renderedDigest, fields: rendered }, null, 2));
+
       // real submission — only safe class, only with --submit, only under the cap
       if (safeClass && !DRY && submits < MAX_SUBMIT) {
-        const btn = page.locator('button[type="submit"], input[type="submit"], button:has-text("Submit"), button:has-text("Apply")').first();
-        if (await btn.count()) {
-          await btn.click();
-          await page.waitForTimeout(3000);
-          await page.screenshot({ path: join(shotDir, "confirmation.png"), fullPage: true });
-          const confirmationText = await page.locator("body").innerText().catch(() => "");
-          const confirmed = /thank you|application (received|submitted)|submission (complete|confirmed)|successfully submitted/i.test(confirmationText) || /thank|confirmation|success/i.test(page.url());
-          if (confirmed) {
-            r.outcome = "auto_submitted"; r.submittedAt = new Date().toISOString();
-            submitted[t.slug] = r.submittedAt; submits++;
-            r.reasons.push("safe class — submission confirmation detected");
+        // Idempotency: a crash between click and confirmation must NEVER produce a second attempt.
+        const op = begin("submit_application", appId, { digest: renderedDigest, url: t.applyUrl });
+        if (!op.proceed && op.reason === "already_completed") {
+          r.outcome = "skipped_dedupe"; r.reasons.push("this exact submission already completed");
+        } else if (!op.proceed) {
+          // Started but never confirmed — genuinely unknown whether it went through. Ask.
+          raise({
+            type: "SUBMIT_APPROVAL",
+            applicationId: appId,
+            context: { slug: t.slug, situation: "a previous run clicked submit but never recorded a confirmation" },
+            evidenceRefs: { filled_screenshot: shot, rendered_digest: renderedDigest },
+          });
+          r.outcome = "needs_human"; r.reasons.push("previous submission attempt is in doubt — verify before retrying");
+        } else {
+          const btn = page.locator('button[type="submit"], input[type="submit"], button:has-text("Submit"), button:has-text("Apply")').first();
+          // Several forms render more than one submit control (a real one plus a newsletter
+          // signup). Ambiguity about WHICH button submits is not something to resolve by guessing.
+          const btnCount = await page.locator('button[type="submit"], input[type="submit"]').count();
+          if (btnCount > 1) {
+            fail(op.id, appId, "multiple submit controls");
+            raise({
+              type: "SUBMIT_APPROVAL",
+              applicationId: appId,
+              context: { slug: t.slug, situation: `${btnCount} submit controls on the page — which one is the application?` },
+              evidenceRefs: { filled_screenshot: shot, rendered_digest: renderedDigest },
+            });
+            r.outcome = "needs_human"; r.reasons.push(`${btnCount} submit controls — ambiguous, queued`);
+          } else if (await btn.count()) {
+            await btn.click();
+            await page.waitForTimeout(3000);
+            await page.screenshot({ path: join(shotDir, "confirmation.png"), fullPage: true });
+            const confirmationText = await page.locator("body").innerText().catch(() => "");
+            const confirmed = /thank you|application (received|submitted)|submission (complete|confirmed)|successfully submitted/i.test(confirmationText) || /thank|confirmation|success/i.test(page.url());
+            if (confirmed) {
+              r.outcome = "auto_submitted"; r.submittedAt = new Date().toISOString();
+              submitted[t.slug] = r.submittedAt; submits++;
+              r.reasons.push("safe class — submission confirmation detected");
+              complete(op.id, appId, { confirmationShot: join(shotDir, "confirmation.png") });
+              logEvent("submitted", {
+                slug: t.slug, operationId: op.id, renderedDigest, renderedRef: renderedPath,
+                confirmationShot: join(shotDir, "confirmation.png"),
+                actor: "agent", policy: `autoconfidence>=${AUTOFILL_THRESHOLD}, allowlist:${platform}`,
+              }, { applicationId: appId });
+              logEvent("state_changed", { to: "SUBMITTED", by: "agent" }, { applicationId: appId });
+            } else {
+              // Clicked, but the page never confirmed. Leave the operation OPEN so the next run
+              // treats it as in-doubt rather than silently trying again.
+              r.outcome = "needs_human";
+              r.reasons.push("submit control was clicked but no confirmation was detected — verify manually");
+              logEvent("submission_unconfirmed", { slug: t.slug, operationId: op.id, renderedDigest }, { applicationId: appId });
+              raise({
+                type: "SUBMIT_APPROVAL",
+                applicationId: appId,
+                context: { slug: t.slug, situation: "submit was clicked but no confirmation appeared" },
+                evidenceRefs: { filled_screenshot: shot, rendered_digest: renderedDigest },
+              });
+            }
           } else {
-            r.outcome = "needs_human";
-            r.reasons.push("submit control was clicked but no confirmation was detected — verify manually");
+            fail(op.id, appId, "no submit control found");
           }
         }
       } else if (safeClass && DRY) {
         r.reasons.push("safe class — WOULD auto-submit (dry run)");
+      } else if (!DRY && !safeClass) {
+        // Not auto-submittable, but filled and screenshotted: ask for approval rather than
+        // dropping it into a results file nobody re-reads.
+        raise({
+          type: "SUBMIT_APPROVAL",
+          applicationId: appId,
+          context: { slug: t.slug, situation: r.reasons[0] ?? "not in the auto-submit class" },
+          evidenceRefs: { filled_screenshot: shot, rendered_digest: renderedDigest },
+        });
       }
+
+      logEvent("form_filled", {
+        slug: t.slug, outcome: r.outcome, filled: r.filled.length,
+        unmapped: r.unmapped.length, blocked: r.blocked.length,
+        flagged: flagged.length, renderedDigest,
+      }, { applicationId: appId });
 
       const icon = { auto_submitted: "✅", filled_ready: "🟡", needs_human: "🔒", needs_essay: "📝", skipped_dedupe: "⏭", error: "⚠" }[r.outcome];
       console.log(`  ${icon} ${t.slug}: ${r.outcome} — filled ${r.filled.length}, unmapped ${r.unmapped.length}, blocked ${r.blocked.length}${r.essay ? `, essay:${r.essay.bucket}` : ""}`);

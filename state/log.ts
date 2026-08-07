@@ -51,8 +51,13 @@ export type EventType =
   | "field_read"
   | "capability_denied"
   // human loop
-  | "interrupt_raised"
-  | "interrupt_resolved"
+  | "checkpoint_raised"
+  | "checkpoint_resolved"
+  | "attestation_recorded"
+  | "recommendation_requested"
+  // idempotency
+  | "operation_started"
+  | "operation_completed"
   // artifacts
   | "artifact_added";
 

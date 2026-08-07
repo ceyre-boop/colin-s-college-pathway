@@ -77,6 +77,18 @@ Bun.serve({
   async fetch(request) {
     const url = new URL(request.url);
 
+    // Read the open checkpoint queue. Same bearer gate as everything else under /api/.
+    if (url.pathname === "/api/queue" && request.method === "GET") {
+      if (!APP_TOKEN) return json({ error: "APP_TOKEN is not set on the server." }, 500);
+      if (request.headers.get("authorization") !== `Bearer ${APP_TOKEN}`) return json({ error: "Unauthorized." }, 401);
+      try {
+        const { buildQueue } = await import("./state/emit-queue");
+        return json({ queue: buildQueue() });
+      } catch (e) {
+        return json({ error: e instanceof Error ? e.message : String(e) }, 500);
+      }
+    }
+
     if (url.pathname.startsWith("/api/") && request.method === "POST") {
       if (!ANTHROPIC_API_KEY) return json({ error: "ANTHROPIC_API_KEY is not set on the server." }, 500);
       // Auth before anything else. The rate limit below keys on x-forwarded-for, which the client
@@ -95,6 +107,34 @@ Bun.serve({
       } catch {
         return json({ error: "Invalid JSON body." }, 400);
       }
+      // Checkpoint resolution — the queue's write path. This is why the queue cannot live in
+      // localStorage: a Bun process has to read the human's answer back out of the event log.
+      const resolveMatch = url.pathname.match(/^\/api\/queue\/([^/]+)\/resolve$/);
+      if (resolveMatch) {
+        // Attribution is never defaulted. Substituting a generic name here would satisfy the
+        // queue's resolvedBy check while destroying the property it exists to guarantee: that an
+        // irreversible decision can be traced to the person who made it.
+        if (typeof body.resolvedBy !== "string" || !body.resolvedBy.trim()) {
+          return json({ error: "resolvedBy is required — resolutions must be attributable to a person." }, 400);
+        }
+        try {
+          const { resolve } = await import("./state/queue");
+          resolve({
+            checkpointId: decodeURIComponent(resolveMatch[1]),
+            resolution: body.resolution,
+            resolvedBy: body.resolvedBy,
+            role: "human",
+            note: body.note,
+            evidenceRefs: body.evidenceRefs,
+          });
+          return json({ ok: true });
+        } catch (e) {
+          // Contract violations (illegal resolution, missing evidence, no attribution) are 400s —
+          // the request was understood and deliberately refused.
+          return json({ error: e instanceof Error ? e.message : String(e) }, 400);
+        }
+      }
+
       const profile: string = body.profile;
       if (!profile) return json({ error: "profile is required." }, 400);
       if (typeof profile !== "string" || profile.length > MAX_PROFILE_CHARS) return json({ error: "profile is too large." }, 413);

@@ -96,6 +96,17 @@ function institutionAliases(name: string): string[] {
 
 const STATE_NAME_BY_ABBR: Record<string, string> = { mi: "michigan", ga: "georgia" };
 
+/** Pull institution names out of free prose, e.g. an enrollment note. */
+export function extractInstitutions(text: string): string[] {
+  const out = new Set<string>();
+  const patterns = [
+    /\bUniversity of [A-Z][A-Za-z]+(?:[- ][A-Z][A-Za-z]+)?/g,
+    /\b[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*\s+(?:Community College|College|University|Institute)\b/g,
+  ];
+  for (const re of patterns) for (const m of text.matchAll(re)) out.add(m[0].trim());
+  return [...out];
+}
+
 /**
  * Build the eligibility profile from the applicant record (which resolves out of the vault),
  * combined with the screening policy above. One identity source, not three.
@@ -115,12 +126,16 @@ export function buildEligibilityProfile(a: {
   ];
 
   return {
-    stateNames,
-    stateAbbrs,
-    institutions: [
+    stateNames: [...new Set(stateNames)],
+    stateAbbrs: [...new Set(stateAbbrs)],
+    institutions: [...new Set([
       ...institutionAliases(a.academic?.currentSchool || ""),
-      ...institutionAliases(a.academic?.enrollmentInstitution || ""),
-    ],
+      // A transfer student has two home institutions; the second usually only appears in the
+      // enrollment note ("...home institution University of Michigan-Flint (returning)"). Missing
+      // it would make the student's own destination school read as a foreign scope and DQ them.
+      ...(a.academic?.enrollmentInstitution ? institutionAliases(a.academic.enrollmentInstitution) : []),
+      ...extractInstitutions(a.academic?.enrollmentNote || "").flatMap(institutionAliases),
+    ])],
     allowedFields: SCREENING_POLICY.allowedFields,
     disallowedFields: SCREENING_POLICY.disallowedFields,
     allowedLevels: SCREENING_POLICY.allowedLevels,

@@ -4,7 +4,7 @@ import { scholarshipId, normalizeName, sameScholarship, slugOf } from "../src/li
 import { canAdvance, advance, toCanonical, TERMINAL } from "../src/lib/machine.js";
 import { parseDeadline, toApplication } from "./schema.js";
 import { fold } from "./rebuild";
-import { INTERRUPTS, HUMAN_ONLY, isInterruptType } from "./interrupts.js";
+import { isCheckpointType } from "./checkpoints.js";
 
 describe("stable identity", () => {
   test("a renamed listing keeps its id (trailing year stripped)", () => {
@@ -137,17 +137,20 @@ describe("normalized application", () => {
 describe("projection fold", () => {
   const ev = (seq, type, data, applicationId) => ({ seq, at: `2026-08-07T00:00:0${seq}Z`, type, applicationId, actor: "agent", data, prevHash: null });
 
-  test("folds discovery + state change + interrupt lifecycle", () => {
+  test("folds discovery + state change + checkpoint lifecycle", () => {
     const id = scholarshipId("Foo", "https://x.org");
     const p = fold([
       ev(1, "discovered", { name: "Foo", url: "https://x.org" }, id),
       ev(2, "state_changed", { to: "REVIEW_REQUIRED" }, id),
-      ev(3, "interrupt_raised", { id: "i1", type: "CAPTCHA", context: {} }, id),
-      ev(4, "interrupt_resolved", { id: "i1" }, id),
-      ev(5, "interrupt_raised", { id: "i2", type: "FEE", context: {} }, id),
+      ev(3, "checkpoint_raised", { id: "i1", type: "CAPTCHA_REQUIRED", blocking: true, context: {} }, id),
+      ev(4, "checkpoint_resolved", { id: "i1", type: "CAPTCHA_REQUIRED", resolution: "solved", resolvedBy: "colin" }, id),
+      ev(5, "checkpoint_raised", { id: "i2", type: "APPLICATION_FEE", blocking: true, context: {} }, id),
     ]);
     expect(p.applications[id].workflowState).toBe("REVIEW_REQUIRED");
-    expect(Object.keys(p.interrupts)).toEqual(["i2"]);
+    expect(Object.keys(p.checkpoints)).toEqual(["i2"]);
+    // Resolved checkpoints leave the open queue but are never discarded.
+    expect(p.resolved).toHaveLength(1);
+    expect(p.resolved[0].resolvedBy).toBe("colin");
     expect(p.lastSeq).toBe(5);
   });
 
@@ -167,23 +170,21 @@ describe("projection fold", () => {
   });
 });
 
-describe("interrupt taxonomy", () => {
-  test("the seven gates promoted from apply/pipeline.ts survive", () => {
-    for (const t of ["ACCOUNT_NEEDED", "AUTOMATION_UNVERIFIED", "ATTESTATION", "SIGNATURE", "RECOMMENDATION", "SENSITIVE_DOCUMENT", "FEE"]) {
-      expect(isInterruptType(t)).toBe(true);
-    }
-  });
-
-  test("nothing a machine may auto-resolve is marked human-only by accident", () => {
-    for (const t of HUMAN_ONLY) expect(isInterruptType(t)).toBe(true);
-    expect(HUMAN_ONLY.has("CAPTCHA")).toBe(true);
-    expect(HUMAN_ONLY.has("SIGNATURE")).toBe(true);
-  });
-
-  test("every interrupt has a label and a blurb", () => {
-    for (const [k, v] of Object.entries(INTERRUPTS)) {
-      expect(v.label, `${k} label`).toBeTruthy();
-      expect(v.blurb, `${k} blurb`).toBeTruthy();
+describe("checkpoint taxonomy", () => {
+  // The seven human gates promoted out of the deleted apply/pipeline.ts must still exist, under
+  // the reason-code naming the queue standardised on. Full contract coverage lives in
+  // state/adversarial.test.ts.
+  test("the seven gates promoted from apply/pipeline.ts survive the rename", () => {
+    for (const t of [
+      "ACCOUNT_REQUIRED",        // was: login
+      "LEGAL_ATTESTATION_REQUIRED", // was: attestation
+      "SIGNATURE_REQUIRED",      // was: signature
+      "RECOMMENDATION_REQUIRED", // was: recommendation
+      "DOCUMENT_UPLOAD_REQUIRED",// was: sensitive document
+      "APPLICATION_FEE",         // was: fee
+      "PORTAL_MALFUNCTION",
+    ]) {
+      expect(isCheckpointType(t), t).toBe(true);
     }
   });
 });

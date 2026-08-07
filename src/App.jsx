@@ -8,6 +8,7 @@ import { REQUIREMENTS, ACTION_ITEMS, KEY_CONTACTS, VERIFIED_CREDITS } from "./da
 import { DEFAULT_SCHOLARSHIPS, STATUS_OPTIONS } from "./data/defaults";
 import { SCOUT_SCHOLARSHIPS, SCOUT_GENERATED_AT } from "./data/scoutFound";
 import { APPLY_KITS } from "./data/essays";
+import { INTERVENTIONS, INTERVENTIONS_GENERATED_AT } from "./data/interventions";
 import { fullProfile, fieldsBlock } from "./data/profile";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
 import { WORKFLOW_STATES, WORKFLOW_LABELS, EVIDENCE_STATUS, normalizeScholarship, expectedBenefit, advance, prioritize } from "./lib/scholarshipWorkflow";
@@ -45,6 +46,40 @@ export default function CollegePathway() {
     DEFAULT_SCHOLARSHIPS.map(normalizeScholarship),
     { fromKey: "ccp_scholarships_v2", convert: (rows) => (Array.isArray(rows) ? rows.map(normalizeScholarship) : rows) },
   );
+  // The checkpoint queue is NOT localStorage state. It is a projection of the event log, which a
+  // Bun process must be able to read back — the agent needs the human's answer. The generated
+  // module is the static fallback; when server.ts is reachable we prefer the live endpoint.
+  const [openCheckpoints, setOpenCheckpoints] = useState(INTERVENTIONS);
+  const [queueLive, setQueueLive] = useState(false);
+  const [queueBusy, setQueueBusy] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/queue", { headers: apiHeaders() })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("no backend"))))
+      .then((d) => { if (!cancelled && Array.isArray(d.queue)) { setOpenCheckpoints(d.queue); setQueueLive(true); } })
+      .catch(() => { /* static build — the generated file already loaded */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  async function resolveCheckpoint(cp, resolution) {
+    if (!queueLive) return;
+    setQueueBusy(cp.checkpointId);
+    try {
+      const res = await fetch(`/api/queue/${encodeURIComponent(cp.checkpointId)}/resolve`, {
+        method: "POST",
+        headers: apiHeaders(),
+        body: JSON.stringify({ resolution, resolvedBy: "colin" }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || "resolve failed");
+      setOpenCheckpoints((prev) => prev.filter((x) => x.checkpointId !== cp.checkpointId));
+    } catch (e) {
+      alert(`Could not resolve: ${e instanceof Error ? e.message : e}`);
+    }
+    setQueueBusy("");
+  }
+
   const [timeline, setTimeline] = useLocalStorage("ccp_timeline_v3", INIT_TIMELINE);
   const [pathway, setPathway] = useLocalStorage("ccp_pathway_v4", PATHWAY_DATA);
   const [schFilter, setSchFilter] = useState("all");
@@ -208,7 +243,7 @@ export default function CollegePathway() {
     setNewEvent({ year: 2026, month: "", title: "", desc: "", cat: "academic", icon: "⭐", essay: "" });
   }
 
-  const TABS = [["dashboard", "DASHBOARD"], ["pathway", "PATHWAY"], ["requirements", "REQUIREMENTS"], ["timeline", "TIMELINE"], ["scholarships", "SCHOLARSHIPS"], ["essay", "AI ESSAYS"], ["queue", "APPLY QUEUE"]];
+  const TABS = [["dashboard", "DASHBOARD"], ["pathway", "PATHWAY"], ["requirements", "REQUIREMENTS"], ["timeline", "TIMELINE"], ["scholarships", "SCHOLARSHIPS"], ["essay", "AI ESSAYS"], ["queue", "APPLY QUEUE"], ["interventions", `NEEDS YOU${openCheckpoints.length ? ` (${openCheckpoints.length})` : ""}`]];
 
   const REQ_COLOR = { done: "green", partial: "yellow", gap: "red" };
   const REQ_MARK = { done: "✅", partial: "🟡", gap: "❌" };
@@ -756,6 +791,58 @@ export default function CollegePathway() {
                 is automatically included. Add events on the Timeline tab to expand it.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* INTERVENTIONS TAB — the human checkpoint queue */}
+        {tab === "interventions" && (
+          <div className="page">
+            <div className="card" style={{ borderLeft: "4px solid var(--amber, #d97706)", marginBottom: 16 }}>
+              <div className="card-label">Needs you</div>
+              <p style={{ fontSize: "0.88rem", color: "var(--text-muted)", marginTop: 8, lineHeight: 1.5 }}>
+                {openCheckpoints.length === 0
+                  ? "Nothing is waiting on you."
+                  : `${openCheckpoints.filter((c) => c.blocking).length} blocking, ${openCheckpoints.filter((c) => !c.blocking).length} non-blocking.`}
+                {" "}Each item is a decision the system deliberately refused to make for you.
+              </p>
+              {!queueLive && (
+                <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 6 }}>
+                  Read-only snapshot{INTERVENTIONS_GENERATED_AT ? ` from ${new Date(INTERVENTIONS_GENERATED_AT).toLocaleString()}` : ""}.
+                  Run <code>bun run start</code> to resolve items here.
+                </p>
+              )}
+            </div>
+
+            {openCheckpoints.map((cp) => (
+              <div key={cp.checkpointId} className="card" style={{ marginBottom: 12, borderLeft: `4px solid ${cp.blocking ? "var(--red, #dc2626)" : "var(--text-muted)"}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                  <div className="card-label">{cp.type}{cp.blocking ? " · BLOCKING" : ""}</div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{new Date(cp.createdAt).toLocaleString()}</span>
+                </div>
+                <p style={{ fontSize: "0.95rem", marginTop: 8, marginBottom: 6 }}>{cp.question}</p>
+                {cp.context?.slug && <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{cp.context.name || cp.context.slug}</div>}
+                {cp.context?.fieldLabel && <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Field: “{cp.context.fieldLabel}” → {cp.context.path}</div>}
+                {cp.context?.situation && <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{cp.context.situation}</div>}
+                {cp.rationale && <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: 6, fontStyle: "italic" }}>{cp.rationale}</p>}
+                {cp.missingEvidence?.length > 0 && (
+                  <div style={{ fontSize: "0.78rem", color: "var(--red, #dc2626)", marginTop: 6 }}>
+                    Missing evidence: {cp.missingEvidence.join(", ")} — cannot be resolved until attached.
+                  </div>
+                )}
+                <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+                  {cp.allowedResolutions.map((res) => (
+                    <button
+                      key={res}
+                      onClick={() => resolveCheckpoint(cp, res)}
+                      disabled={!queueLive || queueBusy === cp.checkpointId || cp.missingEvidence?.length > 0}
+                      style={{ fontSize: "0.8rem", padding: "6px 12px", cursor: queueLive ? "pointer" : "not-allowed", opacity: queueLive ? 1 : 0.5 }}
+                    >
+                      {res.replace(/_/g, " ")}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
