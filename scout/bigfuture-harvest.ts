@@ -13,7 +13,9 @@
 //   harvestBigFuture() reads that file (no network) and maps it into scored Candidates.
 //   The file is local + gitignored; if absent, scout.ts just skips the source honestly.
 //
-// AUTH: reads CB_USERNAME / CB_PASSWORD from .env (Bun auto-loads .env). Login is bot-
+// AUTH: reads the College Board login from the macOS Keychain via identity/secrets.ts
+//   (services ccp_cb_username / ccp_cb_password; falls back to the old .env vars with a
+//   warning). Only the username is ever displayed, as a sign-in hint. Login is bot-
 //   protected, so we use a PERSISTENT browser profile (USER_DATA_DIR): you log in once in
 //   the opened window, the session cookie persists, and every later run reuses it headlessly.
 //
@@ -28,6 +30,7 @@
 
 import { homedir } from "os";
 import { join } from "path";
+import { collegeBoardCredentials } from "../identity/secrets";
 
 const HOME = homedir();
 const OUT_PATH = join(HOME, ".claude", "memory", "bigfuture_raw.json");
@@ -142,7 +145,7 @@ async function main() {
     if (HEADLESS) {
       console.error(
         "Not logged in and running headless. Run once WITHOUT --headless, sign in with your\n" +
-          "College Board account (CB_USERNAME / CB_PASSWORD from .env) in the opened window,\n" +
+          "College Board account in the opened window,\n" +
           "then re-run. The persistent profile keeps the session for headless runs after that.",
       );
       await ctx.close();
@@ -150,7 +153,7 @@ async function main() {
     }
     console.log(
       `\nPlease sign in to College Board in the opened window` +
-        (process.env.CB_USERNAME ? ` (${process.env.CB_USERNAME})` : "") +
+        (collegeBoardCredentials().username ? ` (${collegeBoardCredentials().username})` : "") +
         `.\nWaiting up to 3 minutes for the "Hi, <name>" header…`,
     );
     await page.waitForSelector("text=/Hi,\\s*\\w/", { timeout: 180_000 });

@@ -33,3 +33,12 @@ dist-ssr
 applicant.local.json
 apply/results/
 apply/.userdata/
+
+# Event log + derived projection. The log records values typed into forms, so it is PII —
+# tamper-evidence comes from the hash chain in state/log.ts, not from git.
+state/events.jsonl
+state/projection.json
+state/queue.json
+
+# Identity vault (per-field metadata over the applicant profile).
+identity/vault.json

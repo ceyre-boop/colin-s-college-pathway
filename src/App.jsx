@@ -17,6 +17,14 @@ const usd = (n) => (n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}K
 const fullUsd = (n) => `$${Math.round(n).toLocaleString()}`;
 const slugOf = (name) => (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48);
 
+// /api/* is bearer-gated server-side (server.ts). The token is a shared secret for a single-user
+// deploy, not a per-user credential — it stops a stranger who finds the URL from spending the
+// Anthropic budget. Build-time env, so it ships in the bundle; keep the deploy private.
+const apiHeaders = () => ({
+  "content-type": "application/json",
+  ...(import.meta.env.VITE_APP_TOKEN ? { authorization: `Bearer ${import.meta.env.VITE_APP_TOKEN}` } : {}),
+});
+
 const STATUS_META = Object.fromEntries(STATUS_OPTIONS.map((s) => [s.value, s]));
 const PURSUING = ["apply", "research", "applied"];
 
@@ -29,7 +37,14 @@ const monthRank = (m) => (m ? MONTH_RANK[m] ?? 0 : -1);
 export default function CollegePathway() {
   const [tab, setTab] = useState("dashboard");
   const [inState, setInState] = useState(true);
-  const [scholarships, setScholarships] = useLocalStorage("ccp_scholarships_v2", DEFAULT_SCHOLARSHIPS.map(normalizeScholarship));
+  // v3 adds `canonicalState` alongside the legacy `workflowState`. normalizeScholarship derives it
+  // from whichever vocabulary a record already speaks, so the v2 blob upconverts losslessly and
+  // the v2 key is left untouched in case the migration needs undoing by hand.
+  const [scholarships, setScholarships] = useLocalStorage(
+    "ccp_scholarships_v3",
+    DEFAULT_SCHOLARSHIPS.map(normalizeScholarship),
+    { fromKey: "ccp_scholarships_v2", convert: (rows) => (Array.isArray(rows) ? rows.map(normalizeScholarship) : rows) },
+  );
   const [timeline, setTimeline] = useLocalStorage("ccp_timeline_v3", INIT_TIMELINE);
   const [pathway, setPathway] = useLocalStorage("ccp_pathway_v4", PATHWAY_DATA);
   const [schFilter, setSchFilter] = useState("all");
@@ -110,7 +125,7 @@ export default function CollegePathway() {
     try {
       const res = await fetch("/api/draft", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: apiHeaders(),
         body: JSON.stringify({ scholarship: sc, profile: fullProfile(timeline), context: essayPrompt }),
       });
       const ct = res.headers.get("content-type") ?? "";
@@ -128,7 +143,7 @@ export default function CollegePathway() {
     try {
       const res = await fetch("/api/batch", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: apiHeaders(),
         body: JSON.stringify({ scholarships: pursuing, profile: fullProfile(timeline) }),
       });
       const ct = res.headers.get("content-type") ?? "";

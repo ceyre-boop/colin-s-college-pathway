@@ -68,7 +68,7 @@ STEP 2 — MY PROFILE (ground every field and every essay claim in these facts; 
 - Honors: AP Scholar with Distinction x2 (9 AP exams, 32 transfer credits)
 - Financial: FAFSA SAI -1500 — maximum Pell eligibility, high need, Michigan resident
 - Work: Founding AI Engineer @ TABOOST (production AI inbox manager, 200+ emails/day);
-  Founder @ Alta Investments (live quant trading system built at 18, Sharpe 1.08)
+  Founder @ Alta Investments (live quant trading system built at 18, Sharpe 1.25)
 - Character: Eagle Scout at 13 (top 4%), black belt at 11, 4th place state wrestling (GA, junior yr)
   while holding a 4.1 HS GPA; President of Lunch Bunch (reverse-inclusion program for special-needs
   and socially isolated students)

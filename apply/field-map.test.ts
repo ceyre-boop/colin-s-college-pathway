@@ -1,14 +1,20 @@
 // bun test apply/field-map.test.ts
+//
+// Fixture is SYNTHETIC on purpose. These tests exercise the label→path mapping, not the profile
+// data, so real PII (DOB, phone, street address) has no business here — it was previously
+// hardcoded in this file, which is git-tracked and therefore defeated the applicant.local.json
+// gitignore entirely. Assert on `path` (the mapping decision) and only on values that are
+// obviously fake sentinels.
 import { expect, test, describe } from "bun:test";
 import { mapField } from "./field-map";
 import type { Applicant } from "./types";
 
 const A: Applicant = {
-  identity: { legalFirstName: "Colin", legalLastName: "Eyre", preferredName: "Colin", dateOfBirth: "2006-12-19", gender: "", ethnicity: "", citizenship: "US citizen" },
-  contact: { email: "colineyre222@gmail.com", phone: "(470) 573-8908", address: { street: "4295 Van Vleet Rd", city: "Swartz Creek", state: "MI", zip: "48473", country: "United States" } },
-  academic: { currentSchool: "Mott Community College", enrollmentNote: "", major: "Cellular and Molecular Biology", minor: "Computer Science", classLevel: "Sophomore", gpa: "3.92", gpaScale: "4.0", gpaContext: "", priorGpa: "", sat: "1260", act: "", expectedGraduation: "2028", highSchool: "North Gwinnett High School" },
-  financial: { fafsaSAI: "-1500", pellEligible: true, financialNeed: "high", residency: "Michigan" },
-  honors: [], activities: [], work: [], intendedField: "computational oncology", careerGoal: "AI drug discovery",
+  identity: { legalFirstName: "Testy", legalLastName: "McFixture", preferredName: "Testy", dateOfBirth: "1999-01-02", gender: "", ethnicity: "", citizenship: "US citizen" },
+  contact: { email: "you@example.com", phone: "+1 (555) 555-5555", address: { street: "123 Main St", city: "Springfield", state: "ST", zip: "00000", country: "United States" } },
+  academic: { currentSchool: "Example Community College", enrollmentNote: "", major: "Example Major", minor: "Example Minor", classLevel: "Sophomore", gpa: "3.50", gpaScale: "4.0", gpaContext: "", priorGpa: "", sat: "1200", act: "", expectedGraduation: "Spring 2028", highSchool: "Example High School" },
+  financial: { fafsaSAI: "0", pellEligible: true, financialNeed: "high", residency: "ST" },
+  honors: [], activities: [], work: [], intendedField: "example field", careerGoal: "One sentence.",
   documents: { resumePdf: "", transcriptPdf: "" }, doNotClaim: ["first-generation college student"],
 };
 
@@ -32,29 +38,41 @@ describe("decline-to-state defaults", () => {
   test("ethnicity/race declined", () => expect(mapField("Race/Ethnicity", A).kind).toBe("decline"));
 });
 
-describe("maps common fields", () => {
+describe("maps common fields to the right profile path", () => {
   const cases: [string, string][] = [
-    ["First Name", "Colin"],
-    ["Last Name", "Eyre"],
-    ["Email Address", "colineyre222@gmail.com"],
-    ["Phone Number", "(470) 573-8908"],
-    ["Home Address 1", "4295 Van Vleet Rd"],
-    ["City", "Swartz Creek"],
-    ["State", "MI"],
-    ["Zip Code", "48473"],
-    ["Date of Birth", "2006-12-19"],
-    ["Current GPA", "3.92"],
-    ["Intended Major", "Cellular and Molecular Biology"],
-    ["High School", "North Gwinnett High School"],
-    ["Citizenship", "US citizen"],
+    ["First Name", "identity.legalFirstName"],
+    ["Last Name", "identity.legalLastName"],
+    ["Email Address", "contact.email"],
+    ["Phone Number", "contact.phone"],
+    ["Home Address 1", "contact.address.street"],
+    ["City", "contact.address.city"],
+    ["State", "contact.address.state"],
+    ["Zip Code", "contact.address.zip"],
+    ["Date of Birth", "identity.dateOfBirth"],
+    ["Current GPA", "academic.gpa"],
+    ["Intended Major", "academic.major"],
+    ["High School", "academic.highSchool"],
+    ["Citizenship", "identity.citizenship"],
   ];
-  for (const [label, expected] of cases) {
-    test(`"${label}" → "${expected}"`, () => {
+  for (const [label, path] of cases) {
+    test(`"${label}" → ${path}`, () => {
       const r = mapField(label, A);
       expect(r.kind).toBe("fill");
-      if (r.kind === "fill") expect(r.value).toBe(expected);
+      if (r.kind === "fill") expect(r.path).toBe(path);
     });
   }
+});
+
+describe("resolves the value off the profile it was given", () => {
+  // One spot-check that the getter actually reads the profile rather than a constant.
+  test("First Name resolves from identity.legalFirstName", () => {
+    const r = mapField("First Name", A);
+    if (r.kind === "fill") expect(r.value).toBe("Testy");
+  });
+  test("empty value on file → decline, never a blank fill", () => {
+    const blank = { ...A, academic: { ...A.academic, act: "" } };
+    expect(mapField("ACT Score", blank).kind).toBe("decline");
+  });
 });
 
 describe("unmapped", () => {

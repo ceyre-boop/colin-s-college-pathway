@@ -27,6 +27,8 @@ import { existsSync, mkdirSync, readFileSync } from "fs";
 import type { Applicant } from "./types";
 import { mapField, type MapResult } from "./field-map";
 import { loadEssayLibrary, matchEssay } from "../scout/essay-match";
+import { append as logEvent } from "../state/log";
+import { scholarshipId } from "../src/lib/ids.js";
 
 const HOME = homedir();
 const ROOT = join(import.meta.dir, "..");
@@ -60,30 +62,59 @@ interface Result {
 
 // --- live form extraction (platform-aware label resolution) ---------------------------------
 // Returns {name, label, type, required, isEssay} for every visible, fillable field.
+// labelTier records HOW a label was resolved, because "Date of Birth" read off a real <label> and
+// "field_2" read off the input's name attribute are not equally trustworthy — and until now the
+// audit record could not tell them apart. Feeds the confidence calculation in field-map.ts.
 function liveFormExtractor() {
-  function labelFor(el: Element): string {
+  function labelFor(el: Element): { text: string; tier: number } {
     const inp = el as HTMLInputElement;
-    if (inp.labels && inp.labels[0]) return inp.labels[0].textContent || "";
+    if (inp.labels && inp.labels[0]) return { text: inp.labels[0].textContent || "", tier: 1.0 };
     // Formidable: label inside the .frm_form_field wrapper
     const frm = el.closest(".frm_form_field");
-    if (frm) { const lb = frm.querySelector(".frm_primary_label, label"); if (lb) return lb.textContent || ""; }
+    if (frm) { const lb = frm.querySelector(".frm_primary_label, label"); if (lb) return { text: lb.textContent || "", tier: 0.95 }; }
     // Google Forms: question heading on the enclosing listitem
     const li = el.closest('[role="listitem"]');
-    if (li) { const h = li.querySelector('[role="heading"], .M7eMe'); if (h) return h.textContent || ""; }
-    // aria-label / placeholder fallback
-    return inp.getAttribute("aria-label") || inp.getAttribute("placeholder") || inp.name || "";
+    if (li) { const h = li.querySelector('[role="heading"], .M7eMe'); if (h) return { text: h.textContent || "", tier: 0.95 }; }
+    const aria = inp.getAttribute("aria-label");
+    if (aria) return { text: aria, tier: 0.9 };
+    const ph = inp.getAttribute("placeholder");
+    if (ph) return { text: ph, tier: 0.8 };
+    // Bare `name` is a machine identifier, not a label. Low tier on purpose.
+    return { text: inp.name || "", tier: 0.5 };
   }
-  const out: { name: string; label: string; type: string; required: boolean; isEssay: boolean; tag: string; value: string; checked: boolean }[] = [];
+  // Word limits are stated in the question text far more often than they are enforced by
+  // maxlength, so read both and prefer the explicit one.
+  function wordLimitFor(el: Element, label: string): number | null {
+    const m = label.match(/(?:in|max(?:imum)?|up to|no more than|under|within)\s+(\d{2,5})\s*(?:-|\s)?\s*words?/i)
+      || label.match(/(\d{2,5})\s*words?\s*(?:max|maximum|or less|limit)/i);
+    if (m) return Number(m[1]);
+    const ml = (el as HTMLTextAreaElement).maxLength;
+    if (ml && ml > 0 && ml < 1e6) return Math.round(ml / 6); // ~6 chars per word, incl. the space
+    return null;
+  }
+  const out: { name: string; label: string; labelTier: number; type: string; required: boolean; isEssay: boolean; wordLimit: number | null; tag: string; value: string; checked: boolean }[] = [];
   const els = document.querySelectorAll("input, textarea, select");
   els.forEach((el) => {
     const inp = el as HTMLInputElement;
     const type = (inp.type || inp.tagName).toLowerCase();
     if (["hidden", "submit", "button", "image", "reset", "file"].includes(type)) return;
     if ((el as HTMLElement).offsetParent === null && type !== "radio" && type !== "checkbox") return; // not visible
-    const label = (labelFor(el) || "").replace(/\s+/g, " ").trim();
+    const resolved = labelFor(el);
+    const label = (resolved.text || "").replace(/\s+/g, " ").trim();
     const required = inp.required || /frm_required|required/.test((el.closest(".frm_form_field") || {}).className || "") || (el.closest('[role="listitem"]')?.querySelector('[aria-label*="Required"]') != null);
     const isEssay = el.tagName === "TEXTAREA" || /describe|why |explain|tell us|essay|personal statement|in \d{2,4} words|short answer|how (have|do|will) you|what (are|do)/i.test(label);
-    out.push({ name: inp.name || inp.id || "", label, type, required, isEssay, tag: el.tagName, value: inp.value || "", checked: inp.checked });
+    out.push({
+      name: inp.name || inp.id || "",
+      label,
+      labelTier: label ? resolved.tier : 0.5,
+      type,
+      required,
+      isEssay,
+      wordLimit: isEssay ? wordLimitFor(el, label) : null,
+      tag: el.tagName,
+      value: inp.value || "",
+      checked: inp.checked,
+    });
   });
   return out;
 }
@@ -128,6 +159,21 @@ async function run() {
 
       const fields = await page.evaluate(liveFormExtractor);
       if (!fields.length) { r.outcome = "needs_human"; r.reasons.push("no fillable form detected (JS-rendered / PDF / email apply)"); results.push(r); console.log(`  📄 ${t.slug}: no form → queued`); continue; }
+
+      // Capture the REAL essay prompts. scout/probe-form.ts writes a placeholder string because a
+      // static fetch cannot see JS-rendered questions; here we are in a live browser with the
+      // resolved label for every textarea, so the actual prompt is right there. Everything
+      // downstream (essay matching, reuse decisions) has been running against that placeholder.
+      const essayPrompts = fields
+        .filter((f) => f.isEssay && f.label)
+        .map((f) => ({ prompt: f.label, wordLimit: f.wordLimit }));
+      logEvent("form_mapped", {
+        slug: t.slug,
+        url: t.applyUrl,
+        platform: t.platform ?? null,
+        fieldCount: fields.length,
+        essayPrompts,
+      }, { applicationId: scholarshipId(t.name, t.applyUrl) });
 
       let hardBlocked = false;
       let hasEssayField = false;

@@ -29,7 +29,7 @@ The ONLY paid operation is Claude eligibility adjudication. Make overspend struc
 
 ### BUILD SESSION 1 — "The applying machine" (the payoff piece; $0 to run)
 Goal: watch the *system* fill and submit a real form end-to-end, safely. No scale yet — prove the engine on a handful of known-good targets.
-- **`applicant.local.json`** — populate once from Colin's Obsidian identity node (DOB, phone, 4295 Van Vleet Rd, US citizen); gitignored, never committed. Shape = `Applicant` in `apply/types.ts`.
+- **`applicant.local.json`** — populate once from Colin's Obsidian identity node (DOB, phone, street address, citizenship); gitignored, never committed. Shape = `Applicant` in `apply/types.ts`.
 - **`apply/fill.ts`** — Playwright engine using `launchPersistentContext(apply/.userdata/)`: open applyUrl → re-classify the LIVE form → map fields via `mapField()` → fill → attach reused essay if any → apply the gate (`computeAutoSubmitEligible`). Safety enforced in code: **`--dry` default-ON** (fills + screenshots, submits nothing), `--submit` required for real, `--max-submit N` (default 3), dedupe via `apply/results/submitted.json`, hard-abort on any `mapField` "block" (SSN/fee/login), artifacts to gitignored `apply/results/`.
 - **`apply/field-map.ts`** platform adapters — Formidable (`item_meta[id]` by label) and Google Forms (`entry.id` by aria-label).
 - **Seed target list** — a few hand-picked eligible open forms (starting with the verified Shape Plus Formidable form) so the engine is provable without the full crawl.
@@ -67,7 +67,7 @@ Goal: feed the engine thousands of screened targets, cheaply, with the whole fun
 
 ## Applicant PII
 
-Read from gitignored `applicant.local.json` (shape = `Applicant` in `apply/types.ts`). At setup I'll populate it once from Colin's Obsidian identity node (`~/Obsidian/.../Colin-Identity-Profile.md`) — DOB 12/19/2006, phone, 4295 Van Vleet Rd Swartz Creek MI 48473, US citizen — but **never commit it** (respecting his Obsidian-only PII rule). SSN never stored.
+Read from gitignored `applicant.local.json` (shape = `Applicant` in `apply/types.ts`). At setup I'll populate it once from Colin's Obsidian identity node (`~/Obsidian/.../Colin-Identity-Profile.md`) — DOB, phone, street address, citizenship — but **never commit it** (respecting his Obsidian-only PII rule). SSN never stored. The actual values live only in Obsidian and in the gitignored file; they are never restated in a tracked document, including this one.
 
 ## Files
 - **New:** `scout/eligibility.ts` (+`.test.ts`), `scout/adjudicate.ts`, `scout/essay-match.ts`, `apply/fill.ts`, `apply/field-map.ts` (+`.test.ts`), `scout/emit-queue.ts`, `scout/apply-all.ts`, `src/data/applyQueue.js` (generated), `applicant.local.json` (gitignored)

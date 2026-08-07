@@ -6,6 +6,9 @@ import { pickModel, costUsd, DEFAULT_MODEL } from "./src/lib/essayCost.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+// Shared bearer token gating /api/*. Set it in the Render dashboard and in the client's
+// VITE_APP_TOKEN. Without it the endpoints refuse to serve rather than falling open.
+const APP_TOKEN = process.env.APP_TOKEN;
 const DIST = `${import.meta.dir}/dist`;
 const MAX_BATCH = 100;
 const MAX_PROFILE_CHARS = 24_000;
@@ -76,6 +79,11 @@ Bun.serve({
 
     if (url.pathname.startsWith("/api/") && request.method === "POST") {
       if (!ANTHROPIC_API_KEY) return json({ error: "ANTHROPIC_API_KEY is not set on the server." }, 500);
+      // Auth before anything else. The rate limit below keys on x-forwarded-for, which the client
+      // controls and can rotate freely — it is a politeness measure, never an access control. Without
+      // this check anyone who finds the deployed URL can spend the Anthropic budget.
+      if (!APP_TOKEN) return json({ error: "APP_TOKEN is not set on the server." }, 500);
+      if (request.headers.get("authorization") !== `Bearer ${APP_TOKEN}`) return json({ error: "Unauthorized." }, 401);
       const client = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
       const now = Date.now();
       const bucket = requestCounts.get(client);
