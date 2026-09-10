@@ -23,28 +23,50 @@ interface Scholarship {
   notes?: string;
 }
 
-function buildPrompt(s: Scholarship, profile: string, context?: string): string {
-  const amount = s.amount ? ` ($${Number(s.amount).toLocaleString()})` : "";
-  return [
-    `Write a scholarship application essay of 400-500 words for "${s.name}"${amount}.`,
-    s.notes ? `What it rewards: ${s.notes}` : "",
-    "",
-    "Applicant profile (ground every claim in these real facts — do not invent):",
-    profile,
-    context ? `\nExtra context for this essay:\n${context}` : "",
-    "",
-    "First person, specific, concrete; tie the story to what this scholarship rewards; no clichés",
-    "or fabrication. Return only the essay text — no preamble, no title.",
-  ]
-    .filter(Boolean)
-    .join("\n");
+// Which prompt arm to run. "v2" is the conditioned arm (voice_profile.md + register contract +
+// register-matched exemplars + retrieved facts). "v1" is the original six-line prompt, kept
+// runnable so eval/ always has a control to compare against — a conditioning result without a
+// control is not a result.
+type Arm = "v1" | "v2";
+const VOICE_PROMPT = (process.env.VOICE_PROMPT ?? "v2") as Arm;
+
+/** Build the messages for one essay under the given arm. */
+async function promptFor(
+  arm: Arm,
+  s: Scholarship,
+  profile: string,
+  context: string | undefined,
+  register: string,
+): Promise<{ system?: string; user: string; provenance?: unknown }> {
+  const { buildVoicePrompt } = await import("./voice/build-prompt.ts");
+  const { buildLegacyPrompt } = await import("./src/lib/legacyPrompt.js");
+  if (arm === "v1") return { user: buildLegacyPrompt(s, profile, context) };
+
+  const { contractFor } = await import("./voice/registers.ts");
+  const reg = register as Parameters<typeof contractFor>[0];
+  const built = await buildVoicePrompt({
+    scholarship: s,
+    seed: context ?? "",
+    register: reg,
+    context,
+    contract: contractFor(reg),
+  });
+  return { system: built.system, user: built.user, provenance: built.provenance };
 }
 
-async function draftEssay(s: Scholarship, profile: string, context: string | undefined, modelOverride?: string) {
+async function draftEssay(
+  s: Scholarship,
+  profile: string,
+  context: string | undefined,
+  modelOverride?: string,
+  arm: Arm = VOICE_PROMPT,
+  register = "narrative",
+) {
   // Derived from PRICING, never restated. A hand-written allowlist drifted out of sync with the
   // pricing table once already, so every client override silently fell through to pickModel().
   const requestedModel = modelOverride && Object.keys(PRICING).includes(modelOverride) ? modelOverride : undefined;
   const model = requestedModel || pickModel(s);
+  const { system, user, provenance } = await promptFor(arm, s, profile, context, register);
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -55,7 +77,8 @@ async function draftEssay(s: Scholarship, profile: string, context: string | und
     body: JSON.stringify({
       model,
       max_tokens: 1200,
-      messages: [{ role: "user", content: buildPrompt(s, profile, context) }],
+      ...(system ? { system } : {}),
+      messages: [{ role: "user", content: user }],
     }),
   });
   if (!res.ok) throw new Error(`Anthropic ${res.status}: ${await res.text()}`);
@@ -65,7 +88,24 @@ async function draftEssay(s: Scholarship, profile: string, context: string | und
   };
   const essay = data.content.filter((b) => b.type === "text").map((b) => b.text ?? "").join("").trim();
   if (!essay) throw new Error("Anthropic returned no text");
-  return { essay, model, words: essay.split(/\s+/).length, costUsd: costUsd(data.usage, model) };
+
+  // Report the register verdict alongside the draft. Silently shipping text that missed its own
+  // contract would make the register claim unfalsifiable — the failures are the finding.
+  let registerCheck: unknown = null;
+  if (arm === "v2") {
+    const { validate } = await import("./voice/registers.ts");
+    registerCheck = validate(essay, register as Parameters<typeof validate>[1]);
+  }
+
+  return {
+    essay,
+    model,
+    arm,
+    words: essay.split(/\s+/).length,
+    costUsd: costUsd(data.usage, model),
+    registerCheck,
+    provenance,
+  };
 }
 
 function json(body: unknown, status = 200): Response {
@@ -146,7 +186,7 @@ Bun.serve({
         if (url.pathname === "/api/draft") {
           if (!body.scholarship?.name) return json({ error: "scholarship.name required." }, 400);
           if (typeof body.context === "string" && body.context.length > MAX_CONTEXT_CHARS) return json({ error: "context is too large." }, 413);
-          const r = await draftEssay(body.scholarship, profile, body.context, body.model);
+          const r = await draftEssay(body.scholarship, profile, body.context, body.model, body.arm ?? VOICE_PROMPT, body.register ?? "narrative");
           return json({ id: body.scholarship.id, ...r });
         }
         // Many essays — sequential to stay gentle on rate limits.
@@ -157,7 +197,7 @@ Bun.serve({
           const results = [];
           for (const s of list) {
             try {
-              const r = await draftEssay(s, profile, undefined, body.model);
+              const r = await draftEssay(s, profile, undefined, body.model, body.arm ?? VOICE_PROMPT, body.register ?? "narrative");
               results.push({ id: s.id, ok: true, ...r });
             } catch (err) {
               results.push({ id: s.id, ok: false, error: err instanceof Error ? err.message : "failed" });
@@ -184,4 +224,4 @@ Bun.serve({
   },
 });
 
-console.log(`Colin's College Pathway running on http://localhost:${PORT} (default model: ${DEFAULT_MODEL})`);
+console.log(`Colin's College Pathway running on http://localhost:${PORT} (default model: ${DEFAULT_MODEL}, prompt arm: ${VOICE_PROMPT})`);

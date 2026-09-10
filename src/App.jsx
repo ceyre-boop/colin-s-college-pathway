@@ -10,6 +10,7 @@ import { SCOUT_SCHOLARSHIPS, SCOUT_GENERATED_AT } from "./data/scoutFound";
 import { APPLY_KITS } from "./data/essays";
 import { INTERVENTIONS, INTERVENTIONS_GENERATED_AT } from "./data/interventions";
 import { fullProfile, fieldsBlock } from "./data/profile";
+import { buildLegacyPrompt } from "./lib/legacyPrompt";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
 import { WORKFLOW_STATES, WORKFLOW_LABELS, EVIDENCE_STATUS, normalizeScholarship, expectedBenefit, advance, prioritize } from "./lib/scholarshipWorkflow";
 import "./index.css";
@@ -136,24 +137,6 @@ export default function CollegePathway() {
   const pursuing = scholarships.filter((s) => ["prepared", "needs-review"].includes(s.workflowState) || PURSUING.includes(s.status));
 
   // ── actions ──
-  function buildPrompt(s, profile, context) {
-    if (!s) return "";
-    const amount = s.amount ? ` ($${Number(s.amount).toLocaleString()})` : "";
-    return [
-      `Write a scholarship application essay of 400-500 words for "${s.name}"${amount}.`,
-      s.notes ? `What it rewards: ${s.notes}` : "",
-      "",
-      "Applicant profile (ground every claim in these real facts — do not invent):",
-      profile,
-      context ? `\nExtra context for this essay:\n${context}` : "",
-      "",
-      "First person, specific, concrete; tie the story to what this scholarship rewards; no clichés",
-      "or fabrication. Return only the essay text — no preamble, no title.",
-    ]
-      .filter(Boolean)
-      .join("\n");
-  }
-
   async function generateEssay() {
     setEssayLoading(true); setEssayOut("");
     const sc = scholarships.find((s) => s.id === essaySch);
@@ -745,7 +728,7 @@ export default function CollegePathway() {
                     style={{ padding: "8px 20px" }}
                     onClick={() => {
                       const sc = scholarships.find((s) => s.id === essaySch);
-                      const p = buildPrompt(sc, fullProfile(timeline), essayPrompt);
+                      const p = buildLegacyPrompt(sc, fullProfile(timeline), essayPrompt);
                       navigator.clipboard.writeText(p);
                       setCopiedPrompt(true);
                       setTimeout(() => setCopiedPrompt(false), 1500);
@@ -768,7 +751,7 @@ export default function CollegePathway() {
                       readOnly 
                       className="input" 
                       style={{ height: 160, fontFamily: "monospace", fontSize: "0.8rem", whiteSpace: "pre-wrap" }} 
-                      value={buildPrompt(scholarships.find((s) => s.id === essaySch), fullProfile(timeline), essayPrompt)} 
+                      value={buildLegacyPrompt(scholarships.find((s) => s.id === essaySch), fullProfile(timeline), essayPrompt)} 
                       onClick={(e) => e.target.select()}
                     />
                   </div>

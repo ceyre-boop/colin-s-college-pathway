@@ -40,7 +40,10 @@ export function scanForInjection(text: string): InjectionScan {
 }
 
 /** Strip characters used to smuggle instructions past a human reviewer's eyes. */
-function defang(text: string): string {
+/** Strip zero-width and bidi characters and neutralise fence escapes. Exported for voice/exemplars.ts,
+ * which shows Colin his own prose as a style model and needs the sanitising without the
+ * "distrust this scraped text" framing wrapUntrusted adds. */
+export function defang(text: string): string {
   return text
     // zero-width and bidi controls — invisible to a reader, visible to a tokenizer
     .replace(/[​-‏‪-‮⁠-⁯﻿]/g, "")
