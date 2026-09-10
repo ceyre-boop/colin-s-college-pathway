@@ -59,7 +59,14 @@ export type EventType =
   | "operation_started"
   | "operation_completed"
   // artifacts
-  | "artifact_added";
+  | "artifact_added"
+  // voice corpus (Colin-AI)
+  | "corpus_doc_verified"
+  | "corpus_doc_rejected"
+  | "corpus_split_frozen"
+  | "eval_preregistered"
+  | "eval_run_completed"
+  | "voice_edit_recorded";
 
 export interface LogEvent {
   /** Monotonic per-file sequence, starting at 1. */

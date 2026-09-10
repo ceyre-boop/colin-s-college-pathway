@@ -8,11 +8,13 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "bun run server.ts",
+    "test": "bun test",
     "lint": "eslint .",
     "predeploy": "bun run build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "pdf-lib": "^1.17.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "recharts": "^2.15.4"

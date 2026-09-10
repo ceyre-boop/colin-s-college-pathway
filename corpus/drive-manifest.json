@@ -1,0 +1,28 @@
+{
+  "_note": "The academic-register candidate list. This file is the deterministic pipeline's interface to Google Drive: a Claude session drops each doc to corpus/data/gdocs/<fileId>.md via the Drive connector, and corpus/harvest-drive.ts reads the manifest plus those files. Keeping MCP out of the pipeline makes the build replayable and testable offline.",
+  "_authorship": "`authorship` is set ONLY by Colin, through the CORPUS_AUTHORSHIP_UNVERIFIED checkpoint. No heuristic may promote a document. `unverified` and `unsure` both stay quarantined; only `colin_wrote_it` enters the corpus.",
+  "_triageHint": "`hint` is advisory only — a fast read of whether the text looks hand-written or LLM-generated. It orders the triage queue; it never decides it.",
+  "docs": [
+    {
+      "fileId": "1gqAlhyaRUrjeyZMrMIcUfnZ6VL4CNbl-bpWgxsl0WZM",
+      "title": "Voluntary Euthinasia",
+      "claimedRegister": "persuasive",
+      "authorship": "unverified",
+      "hint": "school-essay",
+      "notes": "Rachels vs Steinbock bioethics paper. Carries the marker cluster this project measures: 'Euthinasia' misspelled in the title, 'totaly', 'diffrently', 'as of they are', 'moral bounty' for boundary (x2), doubled periods, en-dash-as-hyphen, bold mid-paragraph, and the water-freezing analogy."
+    },
+    { "fileId": "155diP_gfrmic3YOjK0PChy0TqpjMfMn032OjQA--tNY", "title": "A Unified Species Concept: A Coherent Definition for All Life Forms", "claimedRegister": "persuasive", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1Ef1d_GfGAZXBmUU9UaOMqTCBMIP4rdXGbSePxyqVAKY", "title": "Essay 3", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1KowDU1GFB0iA3I6i8p_C7NMSfYW79FCC7pywDcpJ0_I", "title": "Midterm Reflection", "claimedRegister": "narrative", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1DooxNTdffSRJh3rdTT9h7sVczfH4YB5ororw_KfqPFg", "title": "Star", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1VWiHQHdvhs5sk8MUu40nIjY3ICOzJRIJk3pYHCpXM18", "title": "brain dump", "claimedRegister": "raw", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "12ukNo7mukIJIm19Pjv5fmnjGx3SJ--QYuVh_WSNAMqM", "title": "Untitled document (Dec 2025)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1tto_KotTV6nlRz_IBJwOgZpAbWsh6hlYEAv4b-Yaqgw", "title": "Untitled document (Nov 2025)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1l1DwRzZLl43gE9J8XlUsN1hHe5BFJo1Hn6MKTGo5-4Q", "title": "Untitled document (Nov 2025)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1PKlSQRFKYoaE1QNrkQRtJZIPUmIfsspAttOKUeS_cqQ", "title": "Untitled document (Sep 2025)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1_DI2QqOGreWvKdS6pnAmemFb-SHKE4DjjQjjVHqVm68", "title": "Untitled document (Sep 2025)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1MCp1PbbfVUA3vB3K1vzVmv6WAYakuUrNMyysStpTpms", "title": "Untitled document (Feb 2026)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1da0bbnpFNEA8O6bFDSTkjn4QZqeYewSkBMpLsGBjH1M", "title": "Untitled document (Apr 2026)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" },
+    { "fileId": "1Or7V__ooL9OL7Zr-6uJBtxVMmTt3NerzZnNn_JaO-GA", "title": "Untitled document (Jan 2026)", "claimedRegister": "academic", "authorship": "unverified", "hint": "unclear", "notes": "" }
+  ]
+}

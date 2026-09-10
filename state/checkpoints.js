@@ -172,6 +172,19 @@ export const CHECKPOINTS = {
       "Scholarship scams overwhelmingly arrive as unsolicited 'you won' mail. WON is gated on a verified artifact at the machine layer; this is the only path that can produce one. 'Finalist' is not a win.",
   },
 
+  PDF_DRAFT_REVIEW: {
+    question: "A draft PDF was filled from your profile. Review every field, then sign/attach and submit by hand.",
+    blocking: true,
+    requiredEvidence: ["draft_pdf_path"],
+    allowedResolutions: ["reviewed", "abandoned"],
+    resolverRoles: ["human"],
+    emitsOnResolve: null,
+    rationale:
+      "A PDF adapter fills what mapField() maps and nothing else — same hard-block/decline rules as the " +
+      "web-form path. Signature, attachments, and the actual mail/email/portal submission stay a human " +
+      "step, same as SUBMIT_APPROVAL.",
+  },
+
   PORTAL_MALFUNCTION: {
     question: "The portal errored, timed out, or changed shape mid-run. Look at it?",
     blocking: true,
@@ -200,6 +213,48 @@ export const CHECKPOINTS = {
     resolverRoles: ["human"],
     emitsOnResolve: null,
     rationale: "The page is an untrusted interface, never authoritative. Content that tries to instruct the agent is a signal about the listing, not a command.",
+  },
+
+  // ---- voice corpus (Colin-AI) ----------------------------------------------
+
+  CORPUS_AUTHORSHIP_UNVERIFIED: {
+    question: "Did you personally write this document, with no LLM drafting or rewriting?",
+    blocking: true,
+    requiredEvidence: ["sourceId", "excerpt", "wordCount"],
+    allowedResolutions: ["colin_wrote_it", "llm_assisted", "not_mine", "unsure"],
+    resolverRoles: ["human"],
+    emitsOnResolve: "corpus_doc_verified",
+    rationale: "No classifier can tell whether Colin pasted his own text or an LLM's — the surface features that would give it away are exactly what a voice-conditioned model reproduces. Only he knows. A voice model trained on LLM output is a voice model of the LLM, and it would score well while being worthless.",
+  },
+
+  EVAL_PREREGISTRATION_REVIEW: {
+    question: "These are the success bands and falsification rules. Sign them before any result exists?",
+    blocking: true,
+    requiredEvidence: ["prereg_sha256", "bands", "primary_endpoint"],
+    allowedResolutions: ["signed", "revised", "abandoned"],
+    resolverRoles: ["human"],
+    emitsOnResolve: "eval_preregistered",
+    rationale: "A band chosen after seeing the result is not a band. Signing happens once, before the first run, and the hash is chained into the log so a later edit is detectable rather than silent.",
+  },
+
+  VOICE_REGISTER_DRIFT: {
+    question: "Generated text does not match the requested register after one retry. Ship, regenerate, or drop?",
+    blocking: false,
+    requiredEvidence: ["requested_register", "nearest_register", "violated_features"],
+    allowedResolutions: ["ship_anyway", "regenerate", "dropped"],
+    resolverRoles: ["human"],
+    emitsOnResolve: null,
+    rationale: "Register control is the research claim. Silently shipping text that failed its own contract would make the claim unfalsifiable — the failures are the finding.",
+  },
+
+  CORPUS_SKELETON_LEAK: {
+    question: "A generated seed still leaks phrasing from its source piece after one retry. Review it.",
+    blocking: false,
+    requiredEvidence: ["sourceId", "violation", "skeleton"],
+    allowedResolutions: ["accepted", "rewritten", "dropped"],
+    resolverRoles: ["human"],
+    emitsOnResolve: null,
+    rationale: "A seed carrying the target's own phrasing turns the eval into a copying test the model cannot fail. Leak checks run in code; this is where the ones code cannot settle go.",
   },
 };
 

@@ -16,7 +16,7 @@ Work / building:
 - Founding AI Engineer at TABOOST — built a production AI inbox manager handling 200+ emails/day across
   16 talent inboxes, replacing a full human team. One person, professional-grade infrastructure, at 19.
 - Founder of Alta Investments — a sovereign quantitative trading system built from scratch at 18.
-  Live forex, Sharpe 1.08, 0% bust probability across 100K simulations.
+  Live forex, Sharpe 1.25, 0% bust probability across 100K simulations.
 
 Origin story (THE moment — real, specific):
 - At his uncle's radiation oncology clinic in North Dakota, Colin outlined actual tumors on MRI scans that

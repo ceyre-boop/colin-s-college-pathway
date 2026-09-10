@@ -43,3 +43,9 @@ state/queue.json
 # Identity vault (per-field metadata over the applicant profile).
 identity/vault.json
 identity/backups/
+
+# Voice corpus — PII-dense (raw transcripts, personal essays). Never commit.
+corpus/data/
+finetune/data/
+finetune/adapters/
+eval/data/

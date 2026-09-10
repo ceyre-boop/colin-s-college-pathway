@@ -2,7 +2,7 @@
 // Anthropic Messages API. The API key lives here, server-side, never shipped to the browser.
 // Token-minimal: Haiku by default, Sonnet only for high-value scholarships (see pickModel).
 
-import { pickModel, costUsd, DEFAULT_MODEL } from "./src/lib/essayCost.js";
+import { pickModel, costUsd, DEFAULT_MODEL, PRICING } from "./src/lib/essayCost.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
@@ -41,7 +41,9 @@ function buildPrompt(s: Scholarship, profile: string, context?: string): string 
 }
 
 async function draftEssay(s: Scholarship, profile: string, context: string | undefined, modelOverride?: string) {
-  const requestedModel = modelOverride && ["claude-3-5-haiku-latest", "claude-3-7-sonnet-latest"].includes(modelOverride) ? modelOverride : undefined;
+  // Derived from PRICING, never restated. A hand-written allowlist drifted out of sync with the
+  // pricing table once already, so every client override silently fell through to pickModel().
+  const requestedModel = modelOverride && Object.keys(PRICING).includes(modelOverride) ? modelOverride : undefined;
   const model = requestedModel || pickModel(s);
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
