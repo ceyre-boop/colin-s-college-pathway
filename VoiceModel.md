@@ -110,6 +110,38 @@ polished work. A submitted philosophy paper misspells its own subject in the tit
 
 ---
 
+## First run — and why its headline number must not be quoted
+
+`eval/reports/run_2026-09-11T18-23-50-526Z.md` (v1) and `…18-30-48-085Z.md` (v2), narrative
+register, n=4, k=3.
+
+| arm | panel accuracy | 95% CI | Delta (band [0.226, 0.335]) | contract passed |
+|---|---|---|---|---|
+| v1 — original 6-line prompt | 1.000 | [1.000, 1.000] | 0.920 — **outside** | n/a |
+| v2 — voice-conditioned | 0.750 | [0.000, 1.000] | 0.969 — **outside** | 1/4, all 4 retried |
+
+**The harness marks v2 "indistinguishable" and that label is wrong here.** The CI spans
+[0.000, 1.000] because n=4 across 3 clusters — an interval that contains everything contains 0.50
+by default. This was a smoke run at n=4 with k=3, below the preregistered k=5. It demonstrates the
+pipeline end to end; it does not test the claim. The preregistration fixes n in advance precisely
+so a number like this cannot be quoted as a result.
+
+What *is* readable at this size:
+
+- **The control behaves like a control.** v1 was caught every time, at Delta 0.920. The
+  unconditioned prompt does not reproduce Colin, which is what makes it a usable baseline.
+- **Conditioning did not move stylometric distance.** v2's Delta (0.969) is no better than v1's.
+  Whatever the conditioning is doing, at this n it is not moving function-word distribution.
+- **The register validator is mostly failing: 1/4 passed, 4/4 retried.** That is a genuine Phase 5
+  signal and the most actionable thing in the run.
+- **Delta and General Imposters disagree, informatively.** GI scored 1.000 — the output is always
+  nearer Colin than the 20 LLM-generated essays — while Delta says it is far outside his own
+  variance. Both are true: more Colin-like than a polished LLM essay, still not Colin.
+
+The likeliest cause of the Delta figures is the limitation below: the "narrative" baseline is
+technical chat, while both arms produce polished prose. They are being measured against the wrong
+thing, and fixing that needs the academic register.
+
 ## Known limitations, recorded rather than discovered later
 
 - **The academic register is blocked.** The Google Drive connector's token expired mid-session; one
