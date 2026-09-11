@@ -50,6 +50,9 @@ async function main() {
   const registers = arg("registers", "narrative").split(",").filter(Boolean) as Register[];
   const n = Number(arg("n", "20"));
   const orthography = process.argv.includes("--orthography");
+  // Judge samples per pair. k=5 is the preregistered default; lower it only for a smoke run, and
+  // say so in the report, because fewer samples means a noisier majority vote.
+  const k = Number(arg("k", "5"));
   const runId = `run_${new Date().toISOString().replace(/[:.]/g, "-")}`;
 
   const allPairs = await readJsonl<SeedPair>(PATHS.pairs);
@@ -78,7 +81,7 @@ async function main() {
   mkdirSync(REPORTS, { recursive: true });
   mkdirSync(DATA, { recursive: true });
 
-  const lines: string[] = [`# Eval ${runId}`, ``, `- Preregistration: \`${prereg.sha256}\` committed ${prereg.at}`, `- Arms: ${arms.join(", ")}`, `- n: ${holdout.length} held-out prompts`, `- Orthography layer: ${orthography ? "ON" : "off"}`, ``];
+  const lines: string[] = [`# Eval ${runId}`, ``, `- Preregistration: \`${prereg.sha256}\` committed ${prereg.at}`, `- Arms: ${arms.join(", ")}`, `- n: ${holdout.length} held-out prompts`, `- Orthography layer: ${orthography ? "ON" : "off"}`, `- LLM judge samples per pair: k=${k}${k < 5 ? " (below the preregistered k=5 — noisier majority vote)" : ""}`, ``];
 
   const impostors = await impostorSet();
   const results: Record<string, { generations: Generation[]; judgements: Judgement[] }> = {};
@@ -93,10 +96,10 @@ async function main() {
     const modelPassages: Passage[] = gens.map((g) => ({ text: g.text, documentId: g.sourceId, register: g.register }));
     const pairs = buildPairs({ colin: colinPassages, model: modelPassages, seed: 11 });
 
-    console.log(`  judging ${pairs.length} pairs (LLM, k=5)…`);
+    console.log(`  judging ${pairs.length} pairs (LLM, k=${k})…`);
     const judgements: Judgement[] = [];
     for (const [i, p] of pairs.entries()) {
-      judgements.push(await judgeLlm(p, 5));
+      judgements.push(await judgeLlm(p, k));
       if ((i + 1) % 5 === 0) console.log(`    ${i + 1}/${pairs.length}`);
     }
     await Bun.write(join(DATA, `${runId}-${armName}-panel.jsonl`), judgements.map((j) => JSON.stringify(j)).join("\n") + "\n");
