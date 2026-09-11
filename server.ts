@@ -177,6 +177,24 @@ Bun.serve({
         }
       }
 
+      // The continuous loop. Recorded before the profile check, because an edit carries no profile
+      // — it is Colin correcting output, which is the one input that needs no grounding.
+      if (url.pathname === "/api/voice/edit") {
+        try {
+          const { recordEdit } = await import("./voice/edits.ts");
+          const pair = await recordEdit({
+            before: String(body.before ?? ""),
+            after: String(body.after ?? ""),
+            register: body.register ?? "narrative",
+            essayId: body.essayId,
+            sourceId: body.sourceId,
+          });
+          return json({ ok: true, heldOut: pair.heldOut });
+        } catch (e) {
+          return json({ error: e instanceof Error ? e.message : String(e) }, 400);
+        }
+      }
+
       const profile: string = body.profile;
       if (!profile) return json({ error: "profile is required." }, 400);
       if (typeof profile !== "string" || profile.length > MAX_PROFILE_CHARS) return json({ error: "profile is too large." }, 413);

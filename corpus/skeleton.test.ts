@@ -62,7 +62,7 @@ describe("assertNoLeak", () => {
   test("rejects a skeleton longer than the allowed fraction of the piece", () => {
     const r = assertNoLeak(seed(), "short piece of text here indeed, only a handful of words long");
     expect(r.ok).toBe(false);
-    expect(r.violation).toMatch(/Compress it/);
+    expect(r.violation).toMatch(/must be at most/);
   });
 
   test("rejects a move that paraphrases a whole sentence of the piece", () => {
@@ -71,7 +71,7 @@ describe("assertNoLeak", () => {
   });
 
   test("the fraction cap is a real constraint, not a formality", () => {
-    expect(MAX_SEED_FRACTION).toBeLessThan(0.25);
+    expect(MAX_SEED_FRACTION).toBeLessThanOrEqual(0.2);
   });
 });
 

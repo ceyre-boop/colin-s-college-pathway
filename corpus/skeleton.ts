@@ -23,11 +23,11 @@ import { PATHS, readJsonl, writeJsonl, type CorpusRecord, type Register } from "
 export interface SeedSkeleton {
   register: Register;
   targetWords: number;
-  /** As a teacher would set it. <=35 words. */
+  /** As a teacher would set it. <=25 words. */
   assignmentPrompt: string;
-  /** <=25 words, and none of the piece's phrasing. */
+  /** <=18 words, and none of the piece's phrasing. */
   thesisAbstract: string;
-  /** <=6 rhetorical moves, <=10 words each. */
+  /** <=4 rhetorical moves, <=8 words each. */
   moves: string[];
   /** The LABEL of the concrete anchor, never the anchor itself. */
   concreteAnchorLabel: string;
@@ -51,14 +51,15 @@ function userPrompt(text: string, register: Register, targetWords: number): stri
 
 Return exactly this JSON shape:
 {
-  "assignmentPrompt": "<=35 words, phrased as a teacher setting the task",
-  "thesisAbstract": "<=25 words stating the position, in YOUR words not the author's",
-  "moves": ["<=6 items, <=10 words each, e.g. 'concede the opposing view, then dismantle it'"],
+  "assignmentPrompt": "<=25 words, phrased as a teacher setting the task",
+  "thesisAbstract": "<=18 words stating the position, in YOUR words not the author's",
+  "moves": ["<=4 items, <=8 words each, e.g. 'concede the opposing view, then dismantle it'"],
   "concreteAnchorLabel": "a GENERIC label for the piece's central concrete image, e.g. 'an everyday physical analogy' or 'a workplace anecdote'. NEVER name the actual image, object, or subject.",
   "sourcesReferenced": ["author names or works cited, if any"]
 }
 
 Hard rules:
+- The WHOLE brief must be under 70 words. It is a few sentences, not a summary.
 - Reuse NO distinctive phrase from the piece. Not four words in a row.
 - Do not name the piece's concrete image, metaphor, or analogy. Label its TYPE only.
 - Describe the shape of the argument, never its sentences.
@@ -83,7 +84,18 @@ function ngramSet(tokens: string[], n: number): Set<string> {
 }
 
 export const LEAK_NGRAM = 4;
-export const MAX_SEED_FRACTION = 0.12;
+
+/**
+ * A seed is "a few sentences", which is an ABSOLUTE size, not a proportion. An earlier 12%
+ * fraction-only cap contradicted this file's own schema — the schema permits ~125 words while 12%
+ * of a 400-word piece is 48 — so every seed was rejected on length before any leak check ran.
+ *
+ * Both limits apply: a seed may not be a detailed summary of a short piece, and may not be long in
+ * absolute terms however long the piece is. The real leak guards are the n-gram and sentence-overlap
+ * checks below; these two are the crude outer bound.
+ */
+export const MAX_SEED_WORDS = 80;
+export const MAX_SEED_FRACTION = 0.2;
 export const MAX_SENTENCE_OVERLAP = 0.4;
 
 export function seedText(s: SeedSkeleton): string {
@@ -103,8 +115,12 @@ export function assertNoLeak(seed: SeedSkeleton, piece: string, rareNouns?: Set<
   const sTokens = norm(seedText(seed));
   const pTokens = norm(piece);
 
-  if (sTokens.length > pTokens.length * MAX_SEED_FRACTION) {
-    return { ok: false, violation: `seed is ${sTokens.length} words against a ${pTokens.length}-word piece — over ${Math.round(MAX_SEED_FRACTION * 100)}%. Compress it.` };
+  const cap = Math.min(MAX_SEED_WORDS, Math.round(pTokens.length * MAX_SEED_FRACTION));
+  if (sTokens.length > cap) {
+    return {
+      ok: false,
+      violation: `the brief is ${sTokens.length} words and must be at most ${cap} for a ${pTokens.length}-word piece. Cut it to the bone: shorter assignmentPrompt, fewer moves, terser wording.`,
+    };
   }
 
   const pieceNgrams = ngramSet(pTokens, LEAK_NGRAM);
@@ -181,7 +197,7 @@ export async function skeletonFor(
       targetWords,
       assignmentPrompt: String(parsed.assignmentPrompt ?? "").trim(),
       thesisAbstract: String(parsed.thesisAbstract ?? "").trim(),
-      moves: Array.isArray(parsed.moves) ? parsed.moves.map(String).slice(0, 6) : [],
+      moves: Array.isArray(parsed.moves) ? parsed.moves.map(String).slice(0, 4) : [],
       concreteAnchorLabel: String(parsed.concreteAnchorLabel ?? "").trim(),
       sourcesReferenced: Array.isArray(parsed.sourcesReferenced) ? parsed.sourcesReferenced.map(String) : [],
     };
@@ -198,10 +214,12 @@ let lastViolation = "";
 
 if (import.meta.main) {
   const only = process.argv.find((a) => a.startsWith("--register="))?.split("=")[1] as Register | undefined;
+  const split = process.argv.find((a) => a.startsWith("--split="))?.split("=")[1] as CorpusRecord["split"] | undefined;
   const limit = Number(process.argv.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? 0);
 
   const rows = (await readJsonl<CorpusRecord>(PATHS.verified))
     .filter((r) => (only ? r.register === only : ["narrative", "academic", "persuasive"].includes(r.register)))
+    .filter((r) => (split ? r.split === split : true))
     .filter((r) => r.wordCount >= 150);
 
   const targets = limit ? rows.slice(0, limit) : rows;
@@ -210,7 +228,10 @@ if (import.meta.main) {
     process.exit(1);
   }
 
-  const rare = rareNouns(rows.map((r) => r.text));
+  // Rarity must be judged against the WHOLE corpus, not the filtered subset. Computed over ~25
+  // documents almost every word looks rare, so the anchor check fired on ordinary domain nouns
+  // ("database", "records") and rejected seeds that had leaked nothing.
+  const rare = rareNouns((await readJsonl<CorpusRecord>(PATHS.verified)).map((r) => r.text));
   const pairs: Pair[] = [];
   let failed = 0;
 
