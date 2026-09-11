@@ -331,7 +331,25 @@ export function percentile(xs: number[], p: number): number {
   return lo === hi ? s[lo] : s[lo] + (s[hi] - s[lo]) * (i - lo);
 }
 
+// Feature extraction is the hot path: the split-half band calls it across every document, and the
+// spell check generates up to 54 candidate strings per unknown word. Identical texts are measured
+// repeatedly (the same document appears in thousands of bootstrap iterations), so results are
+// memoised. Bounded, because a long eval run would otherwise hold every passage it has ever seen.
+const FEATURE_CACHE_MAX = 512;
+const featureCache = new Map<string, FeatureVector>();
+
 export function features(text: string): FeatureVector {
+  const cached = featureCache.get(text);
+  if (cached) return cached;
+  const computed = computeFeatures(text);
+  if (featureCache.size >= FEATURE_CACHE_MAX) {
+    featureCache.delete(featureCache.keys().next().value as string);
+  }
+  featureCache.set(text, computed);
+  return computed;
+}
+
+function computeFeatures(text: string): FeatureVector {
   const t = tokens(text);
   const n = t.length || 1;
   const sents = sentences(text);
