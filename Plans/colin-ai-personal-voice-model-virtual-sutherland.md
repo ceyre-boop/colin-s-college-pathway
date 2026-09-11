@@ -307,6 +307,59 @@ Full 3×3 crossed design over `{academic, narrative, raw}`: requested register R
 
 ---
 
+## Build log — what changed against the plan
+
+Recorded during implementation. Where the plan was wrong, the correction and its evidence are here
+rather than quietly applied.
+
+**Corpus sizing in this plan was wrong.** The stated "51,788 typed messages / 778K words, avg 15
+words" counted jq output LINES, not messages, so multi-line messages were multiply counted and the
+15-word average was meaningless. Actual: **3,130 messages / 618,589 words, avg ~198 words**, and
+after cleaning **2,296 records / 433,764 words** (raw 348K, narrative 75K, directive 11K). The
+corpus is far richer in substantive prose than the plan assumed.
+
+**Finding #3 is confirmed and sharper, but still n=1.** Measured misspelling rates: directive 1.05,
+raw 0.87, narrative 0.78, academic **6.60** per 1,000 words. The academic register carries ~7x the
+rate of the chat registers — a stronger inversion of the original brief than stated. It rests on one
+document until the Drive connector is reconnected.
+
+**Misspelling detection needed two corrections before it measured anything.** Counting
+out-of-dictionary tokens reported ~90/1k in every register while flagging "taboost", "repo",
+"don't", "reacting" — it measured vocabulary, not spelling. Working definition now: a misspelling is
+a NEAR-MISS of a real word (within one edit), excluding proper nouns, tokens short enough that one
+edit reaches something by combinatorics, and words recurring across >=3 documents, since nobody
+misspells the same word 208 times.
+
+**Burrows's Delta had a degenerate-reference bug.** Building the z-score reference from the two
+samples being compared forces |z_a - z_b| = sqrt(2) for every feature; the first bands came out as
+[1.414, 1.414] for every register. Delta is defined against a corpus. Real bands: raw [0.087,
+0.118] over 258 documents, narrative [0.226, 0.335] over 37.
+
+**The split is incremental, not one-shot.** The plan's freeze would have reshuffled everything when
+the academic documents finally land, potentially moving a held-out record into the exemplar pool
+after results existed. Assignments now carry through untouched and the script refuses if any
+document would change sides.
+
+**The seed generator's own limits contradicted each other.** A 12% fraction cap against a schema
+permitting ~125 words rejected every seed on length before a leak check ran. A seed is "a few
+sentences" — an absolute size. Rarity was also computed over the filtered subset, where nearly every
+word looks rare, so the anchor check fired on ordinary domain nouns. Yield went 0/8 to 6/14.
+
+**wrapUntrusted() was the wrong primitive for exemplars.** Its wording declares the block "scraped
+from a third-party website" and instructs the model to distrust it — actively counterproductive when
+the text is Colin's own prose and the task is to imitate it. `defang()` is now exported and used
+with imitate-the-style-not-the-content framing.
+
+**The Sharpe conflict resolved to 1.25**, confirmed against `~/quant/NEXT.md:1251` (a 2026-06-07
+re-measure from 1.08). `profile.js` and `timeline.js` were stale; the essays were right.
+
+**Blocked, and only Colin can unblock it:** the Google Drive connector's OAuth token expired
+mid-session. One academic document is on disk; thirteen are not. Every academic-register and
+persuasive-register claim is unavailable until it is reconnected and authorship is triaged.
+
+**Not built, by design:** Phase 2 (MLX LoRA). Its gate requires >=12 verified academic documents and
+>=800 training pairs. At one document, LoRA would learn a subject, not a voice.
+
 ## Verification
 
 Each phase has a runnable pass/fail signal — no phase is "done" on inspection.
