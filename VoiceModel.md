@@ -110,37 +110,55 @@ polished work. A submitted philosophy paper misspells its own subject in the tit
 
 ---
 
-## First run — and why its headline number must not be quoted
+## First results — four runs, narrative register
 
-`eval/reports/run_2026-09-11T18-23-50-526Z.md` (v1) and `…18-30-48-085Z.md` (v2), narrative
-register, n=4, k=3.
+Reports in `eval/reports/`. n=4–6 held-out prompts per run; k=5 (preregistered) on the first, k=3
+on the rest.
 
-| arm | panel accuracy | 95% CI | Delta (band [0.226, 0.335]) | contract passed |
-|---|---|---|---|---|
-| v1 — original 6-line prompt | 1.000 | [1.000, 1.000] | 0.920 — **outside** | n/a |
-| v2 — voice-conditioned | 0.750 | [0.000, 1.000] | 0.969 — **outside** | 1/4, all 4 retried |
+### The panel is pure noise at this n — do not quote it
 
-**The harness marks v2 "indistinguishable" and that label is wrong here.** The CI spans
-[0.000, 1.000] because n=4 across 3 clusters — an interval that contains everything contains 0.50
-by default. This was a smoke run at n=4 with k=3, below the preregistered k=5. It demonstrates the
-pipeline end to end; it does not test the claim. The preregistration fixes n in advance precisely
-so a number like this cannot be quoted as a result.
+| run | v1 accuracy | v2 accuracy |
+|---|---|---|
+| n=6, k=5 | 0.333 | 0.200 |
+| n=6, k=3 | 0.500 | 0.500 |
+| n=4, k=3 | 1.000 | 0.750 |
 
-What *is* readable at this size:
+**The same arm scores anywhere from 0.333 to 1.000 across runs.** Every CI spans essentially the
+whole interval, so the harness dutifully labels each one "indistinguishable" — an interval
+containing everything contains 0.50 by default. That label is meaningless here. No conclusion about
+the primary endpoint is available until n is large enough to separate signal from sampling noise,
+which is exactly why the preregistration fixes n in advance.
 
-- **The control behaves like a control.** v1 was caught every time, at Delta 0.920. The
-  unconditioned prompt does not reproduce Colin, which is what makes it a usable baseline.
-- **Conditioning did not move stylometric distance.** v2's Delta (0.969) is no better than v1's.
-  Whatever the conditioning is doing, at this n it is not moving function-word distribution.
-- **The register validator is mostly failing: 1/4 passed, 4/4 retried.** That is a genuine Phase 5
-  signal and the most actionable thing in the run.
-- **Delta and General Imposters disagree, informatively.** GI scored 1.000 — the output is always
-  nearer Colin than the 20 LLM-generated essays — while Delta says it is far outside his own
-  variance. Both are true: more Colin-like than a polished LLM essay, still not Colin.
+A single run of this would have looked like a result. Four make it obvious it is not.
 
-The likeliest cause of the Delta figures is the limitation below: the "narrative" baseline is
-technical chat, while both arms produce polished prose. They are being measured against the wrong
-thing, and fixing that needs the academic register.
+### Delta is stable across runs, and says something reproducible
+
+| arm | Delta across runs | band |
+|---|---|---|
+| v1 — original 6-line prompt | 0.747, 0.779, 0.920 | [0.226, 0.335] |
+| v2 — voice-conditioned | 0.951, 0.969, 0.971 | [0.226, 0.335] |
+
+**Both arms are far outside Colin's own variance, and v2 is consistently WORSE than v1** — three
+independent runs, no overlap between the two arms' ranges. The voice conditioning moves output
+*further* from his function-word distribution, not closer. Delta is far more stable than the panel
+here, so this is the finding worth acting on.
+
+That is not the expected direction, and there are two candidate explanations worth separating before
+anything is concluded:
+
+1. The "narrative" baseline is technical chat (see limitations), while both arms produce polished
+   prose. Both may be measured against the wrong target, with v2's heavier conditioning pushing it
+   further toward essay prose and therefore further from chat.
+2. The conditioning genuinely over-steers. The bleed experiment supports this: the model's registers
+   come out nearly five times further apart than Colin's own.
+
+### Corroborating signals
+
+- **Register contract compliance is ~20%** (1/5 and 1/4, with a retry on nearly every generation),
+  measured independently of the bleed run, which found the same thing from a different direction.
+- **General Imposters: v1 1.000, v2 0.927–0.980.** Output is nearer Colin than the 20 LLM-generated
+  essays — but Delta says it is still far outside his variance. Both true, and not a contradiction:
+  more Colin-like than a polished LLM essay, still not Colin.
 
 ## Register control — the first real Phase 5 result
 
