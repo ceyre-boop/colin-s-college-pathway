@@ -142,6 +142,37 @@ The likeliest cause of the Delta figures is the limitation below: the "narrative
 technical chat, while both arms produce polished prose. They are being measured against the wrong
 thing, and fixing that needs the academic register.
 
+## Register control — the first real Phase 5 result
+
+`eval/reports/bleed_2026-09-11T18-42-14-665Z.md`, 2×2 crossed design, n=2 per cell.
+
+| requested | exemplars | holds requested | bleeds to exemplar |
+|---|---|---|---|
+| narrative | narrative | 0% | 0% |
+| narrative | **raw** | 50% | **50% — FAIL** |
+| raw | narrative | 100% | 0% |
+| raw | raw | 100% | 0% |
+
+**Register control fails in the direction the experiment was built to catch.** Ask for narrative
+while supplying raw exemplars and half the output reads as raw: the exemplars are driving the
+register, which is what "a blend wearing a dial's label" looks like. The asymmetry is informative —
+`raw` holds under mismatch, `narrative` does not. And the diagonal cell is worse than the
+off-diagonal: requested-narrative with *matching* exemplars held 0% of the time, so the system
+cannot reliably produce narrative register at all. That matches the 1/4 contract pass rate in the
+main run, from a completely separate measurement.
+
+**Separation is a caricature, not a blend.** Colin's own narrative↔raw distance is 0.220; the
+model's is 1.027 — nearly five times too far apart. The registers are not collapsing together; they
+are being over-played. That is the opposite of the failure mode anticipated in the plan, and it
+suggests the numeric contracts are being followed too literally.
+
+**Named per-marker leaks**, which is what makes this actionable:
+
+- requested `narrative`: `contractionRate` 2.84–2.96 against a 1.00 baseline (z≈1.9)
+- requested `raw`: `commaRate` 9.49 against a 3.65 baseline (z=1.61)
+
+n=2 per cell is small; the direction is clear, the magnitudes are not yet trustworthy.
+
 ## Known limitations, recorded rather than discovered later
 
 - **The academic register is blocked.** The Google Drive connector's token expired mid-session; one
