@@ -74,7 +74,18 @@ function scoreAngles(prompt: string): [string, number][] {
 
 const MATCH_THRESHOLD = 2; // need at least this many keyword hits to claim an angle fits
 
-export function matchEssay(prompt: string, wordLimit: number | null, library: EssayLibraryEntry[]): EssayMatch {
+export function matchEssay(
+  prompt: string,
+  wordLimit: number | null,
+  library: EssayLibraryEntry[],
+  aiPolicy?: "allowed" | "prohibited" | "unknown",
+): EssayMatch {
+  // A sponsor that explicitly forbids AI-written essays disqualifies on the *content*, not the
+  // prompt — reusing/tailoring a drafted essay is exactly the thing that's prohibited, so this
+  // check runs before any angle-matching and always defers to a fully human-written essay.
+  if (aiPolicy === "prohibited") {
+    return { bucket: "needs_new_essay", angle: null, score: 0, essayPath: null, essayWords: null, reason: "sponsor prohibits AI-written essays — write by hand" };
+  }
   if (!prompt || tokens(prompt).length < 3) {
     return { bucket: "needs_new_essay", angle: null, score: 0, essayPath: null, essayWords: null, reason: "no usable essay prompt" };
   }

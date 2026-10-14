@@ -28,6 +28,10 @@ import { homedir } from "os";
 import { join } from "path";
 import { PRICING, costUsd } from "../src/lib/essayCost.js";
 import { scanForInjection, wrapUntrusted } from "../llm/untrusted";
+import { scrapePropublica990 } from "./propublica-990";
+import { readFileSync, existsSync } from "fs";
+import { PROJECTION_PATH } from "../state/rebuild";
+import { computeOutcomeBuckets, realizedWinRate, type OutcomeBucket } from "../state/outcomes";
 
 const HOME = homedir();
 const PROFILE_PATH = join(HOME, ".claude", "memory", "scholarship_profile.json");
@@ -40,7 +44,7 @@ const MODEL = "claude-haiku-4-5";
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
-interface Candidate {
+export interface Candidate {
   name: string;
   org: string | null;
   amount: number | null; // null = "Varies" / unknown
@@ -49,6 +53,10 @@ interface Candidate {
   url: string;
   description: string | null;
   source: string;
+  // true for sources that name a scholarship-granting entity, not a live scholarship listing
+  // (e.g. a 990-derived foundation) — never treat these as pre-verified the way a curated
+  // source like BigFuture is.
+  needsResearch?: boolean;
   // filled by scoring
   match?: number;
   effort?: "low" | "med" | "high";
@@ -57,7 +65,7 @@ interface Candidate {
   amountEstimated?: boolean;
 }
 
-interface SourceStatus {
+export interface SourceStatus {
   source: string;
   status: "ok" | "blocked" | "error" | "empty";
   count: number;
@@ -481,7 +489,10 @@ function scoringPrompt(profile: any, batch: Candidate[]): { system: string; user
     "  the student has no connection to, graduate-only, teacher-only, etc.) score under 20.",
     '- "effort": "low" (no essay / short form), "med" (one essay), "high" (multiple essays, recommendations, portfolios).',
     '- "flags": array of strings, empty if legitimate. Use "application_fee", "paid_service", "missing_org",',
-    '  or "suspicious" if the entry smells like lead-gen or a scam.',
+    '  or "suspicious" if the entry smells like lead-gen or a scam. Use "ai_prohibited" if the listing text',
+    '  explicitly forbids AI-assisted or AI-written essays, and "third_party_prohibited" if it explicitly',
+    "  forbids third-party or automated submission (both are additive info flags, not scam signals — do",
+    "  not also flag these as suspicious just because of this).",
     'Note: a category "first generation college student (verify)" is UNVERIFIED — never count it toward a match.',
     'Respond with ONLY a JSON array: [{"i":0,"match":85,"effort":"low","flags":[]},...] — one entry per scholarship, same order.',
   ].join("\n");
@@ -584,10 +595,27 @@ async function scoreAll(profile: any, candidates: Candidate[]): Promise<{ scored
 
 const FALLBACK_AMOUNT = 1500; // conservative stand-in when the listing says "Varies"
 
+// Realized win-rate by (source, effort), from actually-resolved AWARD_NOTICE_REVIEW checkpoints
+// (state/outcomes.ts). Loaded once per run; buckets below MIN_SAMPLE are excluded by
+// realizedWinRate() itself, so an empty/missing projection just means "no signal yet" — the
+// match%-only estimate below is the correct fallback, not an error.
+let outcomeBuckets: OutcomeBucket[] = [];
+if (existsSync(PROJECTION_PATH)) {
+  try {
+    outcomeBuckets = computeOutcomeBuckets(JSON.parse(readFileSync(PROJECTION_PATH, "utf8")));
+  } catch { /* projection unreadable — proceed with no realized-rate signal */ }
+}
+
 function rank(c: Candidate): Candidate {
   const amt = c.amount ?? FALLBACK_AMOUNT;
   c.amountEstimated = c.amount === null;
-  c.expectedValue = Math.round(amt * ((c.match ?? 50) / 100));
+  // P(win) proxy: prefer a realized win-rate for this (source, effort) once ≥5 outcomes have
+  // resolved for it — a measured rate beats match% as a P(win) stand-in, since match% answers
+  // "does this student qualify," not "how often do students like this actually win." Below that
+  // sample size, match% remains the estimate (unchanged behavior).
+  const realized = realizedWinRate(outcomeBuckets, c.source, c.effort ?? "med");
+  const pWin = realized ?? (c.match ?? 50) / 100;
+  c.expectedValue = Math.round(amt * pWin);
   return c;
 }
 
@@ -691,11 +719,12 @@ async function main() {
 
   const statuses: SourceStatus[] = [];
   console.log("\nFetching sources…");
-  const [cos, s360, unigo, bigfuture, ...probes] = await Promise.all([
+  const [cos, s360, unigo, bigfuture, propublica990, ...probes] = await Promise.all([
     scrapeCareerOneStop(statuses),
     scrapeScholarships360(statuses),
     scrapeUnigo(statuses),
     harvestBigFuture(statuses),
+    scrapePropublica990(statuses),
     scrapePetersons(statuses),
     scrapeRaiseMe(statuses),
     scrapeAppily(statuses),
@@ -710,11 +739,15 @@ async function main() {
   // Cross-source dedupe by normalized name.
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
   const byName = new Map<string, Candidate>();
-  // BigFuture first: it's the curated/vetted source, so on a name collision its
-  // entry wins over the raw-directory duplicates.
-  for (const c of [...bigfuture, ...cos, ...s360, ...unigo, ...probed]) if (!byName.has(norm(c.name))) byName.set(norm(c.name), c);
+  // BigFuture first: it's the curated/vetted source, so on a name collision its entry wins
+  // over the raw-directory duplicates. propublica990 goes last — it's a research lead (a
+  // foundation, not a verified listing), so any verified source's entry should win on collision.
+  for (const c of [...bigfuture, ...cos, ...s360, ...unigo, ...probed, ...propublica990]) if (!byName.has(norm(c.name))) byName.set(norm(c.name), c);
   let candidates = [...byName.values()];
-  console.log(`${candidates.length} unique candidates (${bigfuture.length} BigFuture, ${cos.length} CareerOneStop, ${s360.length} Scholarships360, ${unigo.length} Unigo, ${probed.length} probes)`);
+  console.log(
+    `${candidates.length} unique candidates (${bigfuture.length} BigFuture, ${cos.length} CareerOneStop, ${s360.length} Scholarships360, ` +
+      `${unigo.length} Unigo, ${propublica990.length} ProPublica990, ${probed.length} probes)`,
+  );
 
   if (candidates.length > SCORE_LIMIT) {
     // Cap fairly: round-robin across sources, each source's list sorted by amount

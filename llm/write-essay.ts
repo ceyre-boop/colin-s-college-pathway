@@ -11,6 +11,7 @@
 //      strongest signature against AI. Writing a scholarship essay to that profile would submit
 //      150 lowercase words with typos. The default here is the `philosophy` voice: 8 samples of
 //      his real school essays, 573 words mean, 17.8-word sentences, proper capitalization.
+//      That voice has since been superseded by "scholarship" (15 samples, see below).
 //
 // The loop: voiceprint `voice prompt` → Inference.ts (subscription) → voiceprint `voice check` →
 // revise against the exact misses → repeat. If the gate never passes, this writes NOTHING and
@@ -43,8 +44,12 @@ const SLUG = val("--slug");
 const ARCHETYPE = val("--archetype");
 const WORDS = Number(val("--words", "500"));
 // Essay register, not chat register. See the header note on colin/chat.
-const VOICE = val("--voice", "philosophy")!;
-const ATTEMPTS = Number(val("--attempts", "4"));
+// "scholarship" r1 = 15 of Colin's own school essays, each one verified under 5% on
+// zerogpt before it was allowed to train the voice. It rejects 8/8 of the AI control
+// (the old 8-sample "philosophy" voice let 2 through) and passes 6/15 of his own
+// writing, so the gate is real but strict — hence the higher attempt budget.
+const VOICE = val("--voice", "scholarship")!;
+const ATTEMPTS = Number(val("--attempts", "6"));
 const DRY = has("--dry");
 const OUT = val("--out");
 
