@@ -117,6 +117,29 @@ async function loadAllPages(page: any): Promise<number> {
   return page.locator('div[class*="StyledCardContainer"] a[href*="/scholarships/"]').count();
 }
 
+// BigFuture is a React app that sometimes self-navigates while `goto` is still in flight, which
+// surfaces as net::ERR_ABORTED even though the page goes on to load correctly. Retry, and treat
+// "we ended up on the search page with cards rendered" as success regardless of what goto threw.
+async function gotoSearch(page: any, url: string, attempts = 3): Promise<void> {
+  let lastErr: unknown = null;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45_000 });
+      await page.waitForTimeout(2000);
+      return;
+    } catch (err) {
+      lastErr = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!/ERR_ABORTED|Navigation|timeout/i.test(msg)) throw err;
+      // Did it actually land despite the abort?
+      await page.waitForTimeout(2500);
+      if (page.url().includes("scholarship-search")) return;
+      console.log(`  nav retry ${i}/${attempts} (${msg.split("\n")[0]})`);
+    }
+  }
+  throw lastErr;
+}
+
 async function main() {
   let chromium: any;
   try {
@@ -136,7 +159,7 @@ async function main() {
   });
   const page = ctx.pages()[0] ?? (await ctx.newPage());
 
-  await page.goto(SEARCH_URL, { waitUntil: "domcontentloaded" });
+  await gotoSearch(page, SEARCH_URL);
   await page.waitForTimeout(2500);
 
   // Login check: the header greets "Hi, <name>" when authenticated.
@@ -160,22 +183,35 @@ async function main() {
     console.log("Signed in — continuing.");
   }
 
+  // Everything past the login must run inside try/finally: the persistent profile only flushes
+  // its cookies on ctx.close(), so an exception that skipped the close threw away the sign-in
+  // the user had just done by hand — which is exactly what happened on the first run.
   const bySlug = new Map<string, BigFutureRaw>();
+  try {
   for (const kw of KEYWORDS) {
     // Drive the keyword filter through the URL — BigFuture reads ?keyword= on load and
     // filters the in-memory set client-side (verified). Fresh nav resets the pager.
     const u = `${SEARCH_URL}?sort=award-amount-high-to-low&keyword=${encodeURIComponent(kw)}`;
-    await page.goto(u, { waitUntil: "domcontentloaded" });
-    await page.waitForTimeout(2000);
+    await gotoSearch(page, u);
     await loadAllPages(page);
     const recs = (await page.evaluate(pageExtractor)) as BigFutureRaw[];
     for (const r of recs) if (r.slug && !bySlug.has(r.slug)) bySlug.set(r.slug, r);
     console.log(`  "${kw}": ${recs.length} cards (running total ${bySlug.size})`);
   }
-
-  await ctx.close();
+  } catch (err) {
+    // A keyword that blows up should not cost us the keywords that already worked, nor the login.
+    console.error(`  harvest interrupted: ${err instanceof Error ? err.message : err}`);
+    console.error(`  keeping the ${bySlug.size} cards collected so far.`);
+  } finally {
+    await ctx.close();
+  }
 
   const all = [...bySlug.values()];
+  if (!all.length) {
+    console.error("No cards harvested — leaving the existing cache untouched rather than");
+    console.error("overwriting a good harvest with an empty one.");
+    process.exit(1);
+  }
   await Bun.write(OUT_PATH, JSON.stringify(all, null, 1));
   console.log(`\nWrote ${all.length} BigFuture scholarships → ${OUT_PATH}`);
   console.log(`Next: bun scout/scout.ts --emit-app --limit 400`);
