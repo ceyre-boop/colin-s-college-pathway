@@ -27,6 +27,43 @@ with real scores.
 Or just run `/scout` in a Claude Code session — it does the full run, regenerates the
 app data, commits, and pushes (Render autodeploys).
 
+## Automated daily run
+
+`scout/daily.ts` is the whole chain in one command, scheduled by launchd at **6:00 AM daily**:
+
+1. `bigfuture-harvest.ts --headless` — refresh the curated cache (needs a profile already
+   signed in; failure here is non-fatal and reported as an empty source)
+2. `scout.ts --limit 5000 --emit-app` — harvest + score the whole thing (**fatal** if it fails:
+   everything downstream would just republish stale data)
+3. `scout.ts --rescore-failed --emit-app` — chase timed-out batches, which otherwise sit at a
+   fake 50% match and pollute the ranking
+4. `topic-bank.ts` — regenerate the essay topic bank
+5. `emit-essays.ts` — rebundle essay kits for the dashboard
+6. `state/deadlines.ts --days 45` — what's due soon
+7. commit + push **only** the four generated files, then speak the result via the PAI notify daemon
+
+Every step's real stderr goes to `~/.claude/memory/scholarship-scout/daily-<date>.log`, and the
+run writes `scholarship_essays/LAST_RUN.md` — a table of what ran, what failed, and why. A
+lockfile stops two runs from interleaving writes to `~/scholarships_found.json`; a stale lock
+from a crashed run is reclaimed, never left to disable every later run.
+
+```bash
+bun scout/daily.ts                # the full chain
+bun scout/daily.ts --dry          # print the plan, run nothing
+bun scout/daily.ts --no-push      # everything but the push
+bun scout/daily.ts --limit 1200   # smaller scoring budget
+
+# schedule control
+cp scout/launchd/com.colin.scholarship-scout.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.colin.scholarship-scout.plist
+launchctl kickstart -k gui/$(id -u)/com.colin.scholarship-scout   # run it now
+launchctl bootout   gui/$(id -u)/com.colin.scholarship-scout      # turn it off
+```
+
+**What it will never do:** submit an application. Providers require a personal account and
+signed attestations, and it is Colin's own rule that he clicks every submit. The automation
+ends at a ranked list, a topic bank, and a deadline digest.
+
 ## The topic bank
 
 `scout/topic-bank.ts` answers "what essays do I actually owe anyone?" It reads the last run's

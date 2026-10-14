@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Daily scholarship run. launchd cannot expand environment variables in paths, so the
+  absolute paths here are deliberate and are the one place in this repo they appear.
+  Install:   cp scout/launchd/com.colin.scholarship-scout.plist ~/Library/LaunchAgents/
+             launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.colin.scholarship-scout.plist
+  Run now:   launchctl kickstart -k gui/$(id -u)/com.colin.scholarship-scout
+  Stop:      launchctl bootout gui/$(id -u)/com.colin.scholarship-scout
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.colin.scholarship-scout</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/taboost/.bun/bin/bun</string>
+    <string>scout/daily.ts</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/colin-s-college-pathway</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <!-- launchd gives a bare PATH; bun, git, curl and the Claude CLI must all be findable. -->
+    <key>PATH</key>
+    <string>/Users/taboost/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>HOME</key>
+    <string>/Users/taboost</string>
+  </dict>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>6</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+
+  <!-- A missed window (laptop asleep at 6am) runs as soon as it wakes. -->
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/.claude/memory/scholarship-scout/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/.claude/memory/scholarship-scout/launchd.err.log</string>
+
+  <!-- Scoring the whole harvest is long and single-threaded; keep it off the foreground. -->
+  <key>Nice</key>
+  <integer>5</integer>
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>
