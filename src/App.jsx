@@ -11,6 +11,7 @@ import { APPLY_KITS } from "./data/essays";
 import { INTERVENTIONS, INTERVENTIONS_GENERATED_AT } from "./data/interventions";
 import { fullProfile, fieldsBlock } from "./data/profile";
 import { buildLegacyPrompt } from "./lib/legacyPrompt";
+import { brainDump, dumpAsText } from "./lib/brainDump";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
 import { WORKFLOW_STATES, WORKFLOW_LABELS, EVIDENCE_STATUS, normalizeScholarship, expectedBenefit, advance, prioritize } from "./lib/scholarshipWorkflow";
 import "./index.css";
@@ -94,6 +95,8 @@ export default function CollegePathway() {
   const [batchLoading, setBatchLoading] = useState(false);
   const [batchMsg, setBatchMsg] = useState("");
   const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [copiedDump, setCopiedDump] = useState("");
+  const [dumpFilter, setDumpFilter] = useState("all");
 
   // Merge scout finds (src/data/scoutFound.js) into the localStorage-backed list.
   // Scout ids are stable slugs, so re-runs only add genuinely new scholarships and
@@ -112,6 +115,16 @@ export default function CollegePathway() {
   const pellSch = scholarships.find((s) => s.id === "sc_pell");
   const pellLocked = !!pellSch && !["apply", "research"].includes(pellSch.status);
   const fin = useMemo(() => semesterFinancials(inState, wonAmt), [inState, wonAmt]);
+
+  // Every scholarship still needing words, with its prompt and the timeline events to build it
+  // from. Recomputed from the live list + timeline, so adding an event shows up immediately.
+  const dump = useMemo(() => brainDump(scholarships, timeline), [scholarships, timeline]);
+  const dumpRows = useMemo(
+    () => (dumpFilter === "sorted" ? dump.filter((d) => d.archetype)
+        : dumpFilter === "unsorted" ? dump.filter((d) => !d.archetype)
+        : dump),
+    [dump, dumpFilter],
+  );
   const { rows: semData, totalCost, totalPell, totalOther, totalFunded, gap } = fin;
 
   // ALREADY_HAVE (56) already includes the "Done" block (AP + Fall '25). Only count newly
@@ -226,7 +239,7 @@ export default function CollegePathway() {
     setNewEvent({ year: 2026, month: "", title: "", desc: "", cat: "academic", icon: "⭐", essay: "" });
   }
 
-  const TABS = [["dashboard", "DASHBOARD"], ["pathway", "PATHWAY"], ["requirements", "REQUIREMENTS"], ["timeline", "TIMELINE"], ["scholarships", "SCHOLARSHIPS"], ["essay", "AI ESSAYS"], ["queue", "APPLY QUEUE"], ["interventions", `NEEDS YOU${openCheckpoints.length ? ` (${openCheckpoints.length})` : ""}`]];
+  const TABS = [["dashboard", "DASHBOARD"], ["pathway", "PATHWAY"], ["requirements", "REQUIREMENTS"], ["timeline", "TIMELINE"], ["scholarships", "SCHOLARSHIPS"], ["braindump", `BRAIN DUMP${dump.length ? ` (${dump.length})` : ""}`], ["essay", "AI ESSAYS"], ["queue", "APPLY QUEUE"], ["interventions", `NEEDS YOU${openCheckpoints.length ? ` (${openCheckpoints.length})` : ""}`]];
 
   const REQ_COLOR = { done: "green", partial: "yellow", gap: "red" };
   const REQ_MARK = { done: "✅", partial: "🟡", gap: "❌" };
@@ -698,6 +711,88 @@ export default function CollegePathway() {
         )}
 
         {/* AI ESSAYS TAB */}
+
+        {/* BRAIN DUMP TAB — the topic and the raw material, so writing starts at the first
+            sentence instead of at "what do I even say". Nothing here writes prose. */}
+        {tab === "braindump" && (
+          <div className="page">
+            <div className="card" style={{ borderLeft: "4px solid var(--blue)", marginBottom: 16 }}>
+              <div className="card-label">Brain Dump — what to write, and what to write it from</div>
+              <p style={{ fontSize: "0.88rem", color: "var(--text-muted)", marginTop: 8, marginBottom: 12, lineHeight: 1.5 }}>
+                Every scholarship still waiting on words, soonest deadline first. Each one shows the prompt
+                it's asking for and the events off your own timeline you could build it out of — with the
+                angle you already wrote for that event. Copy one and write it yourself.
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {[["all", `ALL (${dump.length})`], ["sorted", `PROMPT KNOWN (${dump.filter((d) => d.archetype).length})`], ["unsorted", `NEEDS A LOOK (${dump.filter((d) => !d.archetype).length})`]].map(([id, label]) => (
+                  <button key={id} className={`btn btn-sm ${dumpFilter === id ? "btn-primary" : ""}`} onClick={() => setDumpFilter(id)}>{label}</button>
+                ))}
+              </div>
+            </div>
+
+            {dumpRows.length === 0 ? (
+              <div className="card empty-state">
+                Nothing waiting on an essay. Run <code>bun scout/scout.ts --emit-app</code> to pull fresh finds.
+              </div>
+            ) : dumpRows.slice(0, 60).map((d) => (
+              <div key={d.id} className="card" style={{ borderLeft: `4px solid ${d.daysLeft != null && d.daysLeft < 30 ? "var(--red)" : d.archetype ? "var(--blue)" : "var(--border)"}`, marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+                  <span style={{ fontSize: "0.95rem", fontWeight: "bold", color: "var(--text)" }}>{d.name}</span>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                    {d.amount ? usd(d.amount) : "—"}
+                    {d.deadline && <> · due {d.deadline}</>}
+                    {d.daysLeft != null && <span className={d.daysLeft < 30 ? "red" : ""}> · {d.daysLeft} days</span>}
+                    {" · "}{d.wordLimit ? `~${d.wordLimit} words` : "length: check URL"}
+                  </span>
+                </div>
+
+                <div style={{ marginTop: 10, marginBottom: 10 }}>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", letterSpacing: 1, marginBottom: 4 }}>
+                    {d.archetype ? `PROMPT — ${d.archetype.title.toUpperCase()}` : "PROMPT"}
+                  </div>
+                  <div style={{ fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.5 }}>
+                    {d.prompt || <span style={{ color: "var(--text-muted)" }}>The listing never says. Open the URL and read the real prompt.</span>}
+                  </div>
+                </div>
+
+                {d.ideas.length > 0 && (
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", letterSpacing: 1, marginBottom: 6 }}>YOUR MATERIAL</div>
+                    {d.ideas.map((e) => (
+                      <div key={e.id} style={{ borderLeft: `2px solid ${CAT_META[e.cat]?.color || "var(--border)"}`, paddingLeft: 10, marginBottom: 8 }}>
+                        <div style={{ fontSize: "0.86rem", color: "var(--text)" }}>
+                          <span style={{ marginRight: 6 }}>{e.icon}</span>
+                          <strong>{e.title}</strong> <span style={{ color: "var(--text-muted)" }}>({e.year})</span>
+                        </div>
+                        {e.essay && e.essay.trim()
+                          ? <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.45, marginTop: 2 }}>{e.essay}</div>
+                          : <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.45, marginTop: 2 }}>{e.desc}</div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => { navigator.clipboard.writeText(dumpAsText(d)); setCopiedDump(d.id); setTimeout(() => setCopiedDump(""), 1500); }}
+                  >
+                    {copiedDump === d.id ? "COPIED ✓" : "COPY BRAIN DUMP"}
+                  </button>
+                  {d.url && <a className="btn btn-sm" href={d.url} target="_blank" rel="noreferrer">OPEN LISTING →</a>}
+                  <button className="btn btn-sm" onClick={() => { setEssaySch(d.id); setTab("essay"); }}>DRAFT →</button>
+                </div>
+              </div>
+            ))}
+
+            {dumpRows.length > 60 && (
+              <div className="card empty-state">
+                Showing the 60 soonest of {dumpRows.length}. The rest are in <code>scholarship_essays/TOPIC_BANK.md</code>.
+              </div>
+            )}
+          </div>
+        )}
+
         {tab === "essay" && (
           <div className="page" style={{ maxWidth: 720 }}>
             <div className="card">
