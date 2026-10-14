@@ -17,6 +17,14 @@
 // revise against the exact misses → repeat. If the gate never passes, this writes NOTHING and
 // says so. A draft that fails the voice gate is worse than no draft.
 //
+// MEASURED LIMIT — read this before trusting any output. Passing the voice gate does NOT mean
+// the text passes an AI detector. They measure different things: the voice gate asks "does this
+// match Colin's style bands?", a detector asks "does this look machine-generated?". Tested
+// 2026-10-14: a why-business draft passed the "scholarship" gate on attempt 2 and then scored
+// 29.2% on zerogpt — far above Colin's 5% bar. For comparison, his own hand-written essays score
+// 0-4% there. So output from this tool is a STARTING DRAFT to rewrite in his own words, never
+// something to submit. Treat the printed warning as part of the contract, not boilerplate.
+//
 // Usage:
 //   bun llm/write-essay.ts --slug nase-future-entrepreneur-award --words 500
 //   bun llm/write-essay.ts --archetype why-business --words 500 --out /tmp/draft.md
@@ -155,7 +163,12 @@ function main() {
       const dest = OUT ?? (SLUG ? join(ROOT, "scholarship_essays", SLUG, "essay.md") : join(tmpDir, `${ARCHETYPE}.md`));
       writeFileSync(dest, draft + "\n");
       console.error(`\nwrote ${dest.replace(ROOT + "/", "")} — ${draft.split(/\s+/).length} words, voice "${VOICE}", passed on attempt ${attempt}.`);
-      console.error(`Read it and make it yours before it goes anywhere. Nothing here submits.`);
+      console.error(``);
+      console.error(`  ⚠ THIS IS A DRAFT, NOT A SUBMISSION. Passing the voice gate is not the same`);
+      console.error(`    as passing an AI detector — a measured draft cleared this same gate and`);
+      console.error(`    still scored 29.2% on zerogpt, against Colin's own essays at 0-4%.`);
+      console.error(`    Rewrite it in your own words, then check it yourself at zerogpt.com`);
+      console.error(`    before it goes near an application. Nothing here submits.`);
       console.log(draft);
       return;
     }
