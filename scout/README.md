@@ -16,6 +16,7 @@ bun scout/scout.ts --rescore-failed # re-score only score_failed entries from ca
 bun scout/scout.ts --limit 3000    # score the whole harvest (default 120, round-robin per source)
 bun scout/scout.ts --top 30        # longer console summary (default 20)
 bun scout/select.ts [--dry]        # pick top 20 for essays → scholarship_essays/ metadata + queue
+bun scout/topic-bank.ts             # regenerate scholarship_essays/TOPIC_BANK.md from the last run
 ```
 
 A full-harvest run (`--limit 3000`) scores ~3,000 candidates — batches of 15 through
@@ -25,6 +26,26 @@ with real scores.
 
 Or just run `/scout` in a Claude Code session — it does the full run, regenerates the
 app data, commits, and pushes (Render autodeploys).
+
+## The topic bank
+
+`scout/topic-bank.ts` answers "what essays do I actually owe anyone?" It reads the last run's
+`ranked` list, drops every no-essay award (money, not a topic) and everything under 50% match,
+runs each remaining listing through `essay-match.ts`, and writes **`scholarship_essays/TOPIC_BANK.md`**:
+
+- **The archetypes** — the ~7 prompts that cover most scholarship essays (personal statement,
+  why-you-deserve-it, career goals, adversity, leadership, community service, why-business), each
+  with a 500-word target and whether a draft exists for it yet. Write the long version once, cut down per application.
+- **Per archetype** — the scholarships waiting on that topic, with amount, deadline, word limit, match %.
+- **Unsorted** — essay-requiring listings whose blurb doesn't reveal the prompt. These need the URL
+  opened; the harvest can't infer a prompt it was never given.
+- **Already covered** — finds that an existing essay already answers (send as-is, or trim).
+
+Regeneration is idempotent and preserves everything below the `COLIN'S OWN TOPICS` marker, so
+hand-added topics are never clobbered. Run it after every scout run.
+
+Flags: `--found <path>` (default `~/scholarships_found.json`), `--top N` (default 150),
+`--min-match N` (default 50).
 
 ## Scoring backend (pick one, automatic)
 
