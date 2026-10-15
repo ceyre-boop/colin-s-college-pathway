@@ -116,6 +116,26 @@ function pageExtractor(): Record<string, unknown>[] {
 }
 
 /**
+ * May this pass replace the cache outright, or is it a fragment to be merged into it?
+ *
+ * `reason` is null when the pass is a trustworthy full snapshot — only then do retired
+ * listings actually leave the cache. Anything else is treated as partial, because the two
+ * ways this has gone wrong both reported success: a run killed by the chain's timeout wrote
+ * its 1,811 cards over 6,852, and a run whose pager gave up after one page wrote 2,231 over
+ * 6,919.
+ */
+export function cacheVerdict(
+  r: { interrupted: boolean; shortfall: boolean; existing: number; fresh: number },
+): { reason: string | null } {
+  if (r.interrupted) return { reason: "interrupted" };
+  if (r.shortfall) return { reason: "a keyword came back short" };
+  // Below two thirds of what is already known is a pass that stopped early, not a catalogue
+  // that shrank overnight. The floor keeps a first run (nothing cached) from tripping it.
+  if (r.existing > 100 && r.fresh < r.existing * 0.7) return { reason: "far smaller than the cache" };
+  return { reason: null };
+}
+
+/**
  * A fragment of a harvest folded into what is already cached: every known listing is kept, and
  * this run's record wins for anything it did reach. Exported for the test — the rule it encodes
  * is that an interrupted run must never shrink the cache.
@@ -127,16 +147,53 @@ export function mergeHarvest(existing: BigFutureRaw[], fresh: BigFutureRaw[]): B
   return [...merged.values()];
 }
 
-// Clicks "Show More Scholarships" until it's gone (all client-side pages revealed).
+const CARD_SELECTOR = 'div[class*="StyledCardContainer"] a[href*="/scholarships/"]';
+
+/**
+ * Clicks "Show More Scholarships" until it is genuinely gone.
+ *
+ * A flat 500ms wait after each click was a bet on the page keeping up: when it did not, the
+ * next pass found no button yet, called the pager exhausted and returned the first page. That
+ * is how a "successful" run brought back 450 cards for a keyword that has 4,634, and then
+ * overwrote the cache with them. So: wait for the card count to actually grow, and when the
+ * button disappears give the app a second chance to render it before believing the end.
+ */
 async function loadAllPages(page: any): Promise<number> {
+  const cards = () => page.locator(CARD_SELECTOR).count();
+  let seen = await cards();
+
   for (let i = 0; i < 400; i++) {
     const btn = page.getByRole("button", { name: /Show More Scholarships/i });
-    if ((await btn.count()) === 0) break;
+    if ((await btn.count()) === 0) {
+      await page.waitForTimeout(2000); // the app may simply not have re-rendered it yet
+      if ((await btn.count()) === 0) break;
+    }
     await btn.first().scrollIntoViewIfNeeded();
     await btn.first().click();
-    await page.waitForTimeout(500);
+
+    // Wait for the click to land rather than for a fixed interval.
+    const grewBy = await (async () => {
+      for (let waited = 0; waited < 10_000; waited += 250) {
+        await page.waitForTimeout(250);
+        const now = await cards();
+        if (now > seen) { const d = now - seen; seen = now; return d; }
+      }
+      return 0;
+    })();
+    if (!grewBy) break; // a click that adds nothing twice over is the real end of the list
   }
-  return page.locator('div[class*="StyledCardContainer"] a[href*="/scholarships/"]').count();
+  return seen;
+}
+
+/** What the page itself claims it has ("43,513 Results"), so a short harvest is visible. */
+async function statedResultCount(page: any): Promise<number | null> {
+  try {
+    const txt = await page.locator("text=/[\\d,]+\\s+Results/i").first().textContent({ timeout: 5_000 });
+    const m = String(txt ?? "").match(/([\d,]+)\s+Results/i);
+    return m ? Number(m[1].replace(/,/g, "")) : null;
+  } catch {
+    return null;
+  }
 }
 
 // BigFuture is a React app that sometimes self-navigates while `goto` is still in flight, which
@@ -205,6 +262,7 @@ async function main() {
   // the user had just done by hand — which is exactly what happened on the first run.
   const bySlug = new Map<string, BigFutureRaw>();
   let interrupted = false;
+  let shortfall = false; // a keyword came back with fewer cards than the page says it has
   try {
   for (const kw of KEYWORDS) {
     // Drive the keyword filter through the URL — BigFuture reads ?keyword= on load and
@@ -214,7 +272,10 @@ async function main() {
     await loadAllPages(page);
     const recs = (await page.evaluate(pageExtractor)) as BigFutureRaw[];
     for (const r of recs) if (r.slug && !bySlug.has(r.slug)) bySlug.set(r.slug, r);
-    console.log(`  "${kw}": ${recs.length} cards (running total ${bySlug.size})`);
+    const stated = await statedResultCount(page);
+    const short = stated != null && recs.length < stated * 0.9 ? ` — the page says ${stated}, SHORT` : "";
+    console.log(`  "${kw}": ${recs.length} cards (running total ${bySlug.size})${short}`);
+    if (short) shortfall = true;
   }
   } catch (err) {
     // A keyword that blows up should not cost us the keywords that already worked, nor the login.
@@ -237,18 +298,24 @@ async function main() {
     process.exit(1);
   }
 
+  const existing: BigFutureRaw[] = await Bun.file(OUT_PATH).json().catch(() => []);
+  // A pass that came back far smaller than what is already cached is not a catalogue that
+  // shrank by two thirds overnight — it is a pass that quietly stopped early. Measured: a run
+  // that reported success replaced 6,919 cards with 2,231 because one keyword's pager gave up
+  // after the first page.
+  const verdict = cacheVerdict({ interrupted, shortfall, existing: existing.length, fresh: fresh.length });
+
   let all = fresh;
-  if (interrupted) {
-    const existing: BigFutureRaw[] = await Bun.file(OUT_PATH).json().catch(() => []);
+  if (verdict.reason) {
     all = mergeHarvest(existing, fresh);
-    console.error(`  merged into the existing cache: ${existing.length} known + ${fresh.length} fresh = ${all.length}`);
+    console.error(`  ${verdict.reason} — merged instead of replaced: ${existing.length} known + ${fresh.length} fresh = ${all.length}`);
   }
 
   await Bun.write(OUT_PATH, JSON.stringify(all, null, 1));
   console.log(`\nWrote ${all.length} BigFuture scholarships → ${OUT_PATH}`);
   console.log(`Next: bun scout/scout.ts --emit-app --limit 400`);
-  // An interrupted harvest must not report success, or the daily chain ticks it off as done.
-  if (interrupted) process.exit(1);
+  // A harvest that could not be trusted must not report success, or the chain ticks it off.
+  if (verdict.reason) process.exit(1);
 }
 
 // Only when run as a script: the merge rule above is imported by the test, and importing this
