@@ -16,22 +16,28 @@
 //     HTTP fetch would work; they all stay on the needs_browser worklist.
 //
 // Usage: bun scout/scout.ts [--no-score] [--emit-app] [--top N] [--limit N]
-//                           [--from-cache] [--rescore-failed]
+//                           [--from-cache] [--rescore-failed] [--rescore-all]
+//
+// Scores are remembered between runs (scout/score-cache.ts), so only candidates the scout has
+// never scored before cost anything. --limit therefore caps NEW candidates, not the whole list.
 //   --no-score        skip Claude scoring (rank by amount only; no API key needed)
 //   --emit-app        also print top finds in the src/data/defaults.js scholarship shape
 //   --top N           how many ranked entries in the console summary (default 20)
-//   --limit N         cap candidates sent to scoring (default 120)
+//   --limit N         cap NEW (never-scored) candidates sent to scoring (default 120)
 //   --from-cache      rebuild scoutFound.js from the last run's JSON (no scrape/score)
 //   --rescore-failed  re-score only score_failed entries from the cache, re-rank
+//   --rescore-all     ignore remembered scores and score every candidate again
+//   --backfill-cache  seed the score cache from the last run's JSON, score nothing
 
 import { homedir } from "os";
-import { join } from "path";
+import { join, dirname } from "path";
 import { PRICING, costUsd } from "../src/lib/essayCost.js";
 import { scanForInjection, wrapUntrusted } from "../llm/untrusted";
 import { scrapePropublica990 } from "./propublica-990";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, mkdirSync } from "fs";
 import { PROJECTION_PATH } from "../state/rebuild";
 import { computeOutcomeBuckets, realizedWinRate, type OutcomeBucket } from "../state/outcomes";
+import { cacheKey, profileHash, usableScores, mergedCache, MAX_AGE_DAYS, type ScoreCacheFile } from "./score-cache";
 
 const HOME = homedir();
 const PROFILE_PATH = join(HOME, ".claude", "memory", "scholarship_profile.json");
@@ -40,6 +46,9 @@ const OUTPUT_PATH = join(HOME, "scholarships_found.json");
 // (logged-in browser capture — client-side app, no HTTP scrape). Local, gitignored,
 // optional: if the file is absent this source is simply skipped with an honest status.
 const BIGFUTURE_RAW_PATH = join(HOME, ".claude", "memory", "bigfuture_raw.json");
+// Scores already taken, so a daily run pays only for listings it has never seen.
+// See scout/score-cache.ts for what invalidates an entry.
+const SCORE_CACHE_PATH = join(HOME, ".claude", "memory", "scholarship-scout", "scores.json");
 const MODEL = "claude-haiku-4-5";
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
@@ -471,6 +480,27 @@ async function harvestBigFuture(statuses: SourceStatus[]): Promise<Candidate[]> 
 // Fallback: PAI Inference.ts CLI (subscription-billed, no API key needed).
 // ---------------------------------------------------------------------------
 
+/** The remembered scores, or null when there is no usable file yet. Never throws. */
+async function readScoreCache(): Promise<ScoreCacheFile | null> {
+  try {
+    const f = Bun.file(SCORE_CACHE_PATH);
+    if (!(await f.exists())) return null;
+    return (await f.json()) as ScoreCacheFile;
+  } catch {
+    return null; // a corrupt cache costs a re-score, not a failed run
+  }
+}
+
+async function writeScoreCache(next: ScoreCacheFile): Promise<void> {
+  try {
+    mkdirSync(dirname(SCORE_CACHE_PATH), { recursive: true });
+    await Bun.write(SCORE_CACHE_PATH, JSON.stringify(next));
+    console.log(`Remembered ${Object.keys(next.scores).length} scores → ${SCORE_CACHE_PATH}`);
+  } catch (err) {
+    console.error(`  could not write the score cache (${err instanceof Error ? err.message : err}) — next run re-scores`);
+  }
+}
+
 function compactProfile(profile: any): string {
   return JSON.stringify({
     personal: profile.personal,
@@ -698,6 +728,18 @@ async function main() {
 
   // --rescore-failed: re-score only entries whose batch timed out last run
   // (flagged score_failed with the default 50% match), then re-rank everything.
+  // --backfill-cache: remember the scores from the last run's JSON without re-scoring anything.
+  // Used once to seed the cache from a full run that predates it; harmless to repeat.
+  if (flag("--backfill-cache")) {
+    const cached = await Bun.file(OUTPUT_PATH).json();
+    const profile = await Bun.file(PROFILE_PATH).json();
+    const all: Candidate[] = [...cached.ranked, ...cached.low_match, ...cached.removed_scams];
+    const next = mergedCache(await readScoreCache(), profileHash(compactProfile(profile)), all);
+    await writeScoreCache(next);
+    console.log(`Backfilled from ${OUTPUT_PATH} (${all.length} entries, ${Object.keys(next.scores).length} remembered).`);
+    return;
+  }
+
   if (flag("--rescore-failed")) {
     const cached = await Bun.file(OUTPUT_PATH).json();
     const profile = await Bun.file(PROFILE_PATH).json();
@@ -710,6 +752,9 @@ async function main() {
     console.log(`Re-scoring ${failed.length} of ${all.length} entries that failed last run…`);
     for (const c of failed) c.match = undefined;
     const { cost, backend } = await scoreAll(profile, failed);
+    // A rescue that worked is worth remembering too, or tomorrow pays for it again.
+    const pHash = profileHash(compactProfile(profile));
+    await writeScoreCache(mergedCache(await readScoreCache(), pHash, failed));
     await finalizeAndReport(all, cached.sources, cost, backend);
     return;
   }
@@ -749,12 +794,35 @@ async function main() {
       `${unigo.length} Unigo, ${propublica990.length} ProPublica990, ${probed.length} probes)`,
   );
 
-  if (candidates.length > SCORE_LIMIT) {
+  // Scores already taken stay taken. Only what the scout has never seen is sent to the model,
+  // which is what makes a daily run minutes instead of hours.
+  const pHash = profileHash(compactProfile(profile));
+  const prevCache = flag("--no-score") ? null : await readScoreCache();
+  if (!flag("--rescore-all") && !flag("--no-score")) {
+    const remembered = usableScores(prevCache, pHash);
+    let hits = 0;
+    for (const c of candidates) {
+      const hit = remembered.get(cacheKey(c.name));
+      if (!hit) continue;
+      c.match = hit.match; c.effort = hit.effort; c.flags = hit.flags;
+      hits++;
+    }
+    if (remembered.size === 0 && prevCache) {
+      console.log(`Remembered scores ignored — the profile changed since they were taken (re-scoring all).`);
+    }
+    console.log(`${hits} of ${candidates.length} candidates already scored (cache, <${MAX_AGE_DAYS}d) — ${candidates.length - hits} to score`);
+  }
+
+  // Everything already scored stays in the run for free; the budget applies to the rest.
+  const scoredAlready = candidates.filter((c) => c.match !== undefined);
+  let candidatesToScore = candidates.filter((c) => c.match === undefined);
+
+  if (candidatesToScore.length > SCORE_LIMIT) {
     // Cap fairly: round-robin across sources, each source's list sorted by amount
     // ("Varies" competes at the fallback stand-in, not zero — otherwise a whole
     // source of no-listed-amount awards gets silently cut before scoring).
     const bySource = new Map<string, Candidate[]>();
-    for (const c of candidates) (bySource.get(c.source) ?? bySource.set(c.source, []).get(c.source)!).push(c);
+    for (const c of candidatesToScore) (bySource.get(c.source) ?? bySource.set(c.source, []).get(c.source)!).push(c);
     for (const list of bySource.values()) list.sort((a, b) => (b.amount ?? FALLBACK_AMOUNT) - (a.amount ?? FALLBACK_AMOUNT));
     const capped: Candidate[] = [];
     while (capped.length < SCORE_LIMIT) {
@@ -766,20 +834,29 @@ async function main() {
       }
       if (!took) break;
     }
-    candidates = capped;
-    console.log(`Capped to ${SCORE_LIMIT} for scoring, round-robin by source (--limit to change)`);
+    candidatesToScore = capped;
+    console.log(`Capped to ${SCORE_LIMIT} new candidates for scoring, round-robin by source (--limit to change)`);
   }
 
   let cost = 0;
   let backend = "none (--no-score)";
-  if (!flag("--no-score") && candidates.length) {
-    console.log(`\nScoring with ${process.env.ANTHROPIC_API_KEY ? "Anthropic API" : "PAI Inference.ts"}…`);
-    ({ cost, backend } = await scoreAll(profile, candidates));
-  } else {
-    for (const c of candidates) { c.match = 50; c.effort = "med"; c.flags = []; }
+  if (!flag("--no-score") && candidatesToScore.length) {
+    console.log(`\nScoring ${candidatesToScore.length} with ${process.env.ANTHROPIC_API_KEY ? "Anthropic API" : "PAI Inference.ts"}…`);
+    ({ cost, backend } = await scoreAll(profile, candidatesToScore));
+    await writeScoreCache(mergedCache(prevCache, pHash, candidatesToScore));
+  } else if (flag("--no-score")) {
+    for (const c of candidatesToScore) { c.match = 50; c.effort = "med"; c.flags = []; }
+  } else if (scoredAlready.length) {
+    backend = "cache (nothing new to score)";
   }
 
-  await finalizeAndReport(candidates, statuses, cost, backend);
+  // A candidate the budget could not reach this run is not an unscored entry in the output —
+  // it simply waits for tomorrow, rather than shipping as a fabricated 50% match.
+  const reached = new Set(candidatesToScore);
+  const unreached = candidates.filter((c) => c.match === undefined && !reached.has(c));
+  if (unreached.length) console.log(`${unreached.length} candidates left unscored for a later run (--limit ${SCORE_LIMIT})`);
+
+  await finalizeAndReport([...scoredAlready, ...candidatesToScore], statuses, cost, backend);
 }
 
 // Rank, filter, write JSON, print the summary, optionally regenerate scoutFound.js.
