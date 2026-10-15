@@ -6,7 +6,7 @@
 **How to use it:** write the 500-word version of each archetype below once, then cut it down per
 scholarship. Most prompts want 250–500 words, so the long draft is the parent of all the short ones.
 
-**Not in here:** 980 no-essay awards at 50%+ match from the same run — those need no words,
+**Not in here:** 1140 no-essay awards at 50%+ match from the same run — those need no words,
 so they stay in `APPLICATION_QUEUE.md` as straight applications.
 
 ---
@@ -76,8 +76,11 @@ _No open scholarship is waiting on this one right now._
 
 *Prompt to write against:* What have you built, and why does building a business matter to you?
 
-2 scholarships waiting on this topic:
+3 scholarships waiting on this topic:
 
+- [ ] **NASE Future Entrepreneur Award** — $24,000 · due verify at URL · word limit unknown · 60% match
+  - https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992884
+  - folder exists: `scholarship_essays/nase-future-entrepreneur-award/`
 - [ ] **$2,000 College Scholarship for the Business Leaders of Tomorrow** — $2,000 · due October · word limit unknown · 65% match
   - https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9997871
 - [ ] **People's Trust Innovation & Entrepreneurship Scholarship** — — · due 01/24/2027 · word limit unknown · 65% match
@@ -85,7 +88,7 @@ _No open scholarship is waiting on this one right now._
 
 ### Unsorted — open the URL to see the real prompt
 
-96 listings whose blurb doesn't say what the essay asks for.
+94 listings whose blurb doesn't say what the essay asks for.
 Each one asks for an essay; the listing just doesn't say which kind.
 Sorted by expected value, so work down from the top.
 
@@ -117,7 +120,7 @@ Sorted by expected value, so work down from the top.
 - [ ] **Mary Clifford Memorial Scholarship** — $5,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/mary-clifford-memorial-scholarship
 - [ ] **Roy and Mae Smith Scholarship** — $5,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/roy-and-mae-smith-scholarship
 - [ ] **Etta Gray Memorial Scholarship** — $5,000 · due 10/30/2026 · 50% match · https://bigfuture.collegeboard.org/scholarships/etta-gray-memorial-scholarship
-- [ ] **Renaissance Scholars Program - Winter** — $5,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/renaissance-scholars-program---winter
+- [ ] **Renaissance Scholars Program - Winter** — $5,000 · due 02/01/2027 · 50% match · https://bigfuture.collegeboard.org/scholarships/renaissance-scholars-program---winter
 - [ ] **Erma C. Johnson Hadley Scholarship** — $3,840 · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/erma-c-johnson-hadley-scholarship
 - [ ] **Beverly and D.R. Lutton Endowed Scholarship** — $4,000 · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/beverly-and-dr-lutton-endowed-scholarship
 - [ ] **Foundation 649 Scholarship** — $4,000 · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/foundation-649-scholarship
@@ -131,8 +134,8 @@ Sorted by expected value, so work down from the top.
 - [ ] **Robyn Gallup Memorial Scholarship** — $2,500 · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/robyn-gallup-memorial-scholarship
 - [ ] **Intertech Foundation STEM Scholarship** — $2,500 · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/intertech-foundation-stem-scholarship
 - [ ] **Sam Kiki College Access Scholarship** — $3,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/sam-kiki-college-access-scholarship
-- [ ] **Col. Delbert Townsend Scholarship** — $2,500 · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/col-delbert-townsend-scholarship
 - [ ] **Curtis H. Allen Scholarship** — $2,500 · due 01/06/2027 · 60% match · https://bigfuture.collegeboard.org/scholarships/curtis-h-allen-scholarship
+- [ ] **Col. Delbert Townsend Scholarship** — $2,500 · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/col-delbert-townsend-scholarship
 - [ ] **AIST Midwest Member Chapter - Western States Award** — $3,000 · due February · 50% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998334
 - [ ] **Sweet and Simple Scholarship** — $3,000 · due Mar 31, 2027 · 50% match · https://www.unigo.com/scholarships/our-scholarships/sweet-and-simple-scholarship
 - [ ] **All About Education Scholarship** — $3,000 · due Apr 30, 2027 · 50% match · https://www.unigo.com/scholarships/our-scholarships/all-about-education-scholarship
@@ -179,12 +182,10 @@ Sorted by expected value, so work down from the top.
 - [ ] **Massey Villarreal Endowed Scholarship** — — · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/massey-villarreal-endowed-scholarship
 - [ ] **Nancy Kalchbrenner Scholarship** — — · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/nancy-kalchbrenner-scholarship
 - [ ] **Follow Your Own Path Essay Scholarship** — — · due Aug 31, 2027 · 65% match · https://scholarships360.org/scholarships/search/follow-your-own-path-essay-scholarship/
+- [ ] **Ben Clough Endowed Scholarship** — — · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/ben-clough-endowed-scholarship
 - [ ] **Dr. Michael Saenz Scholarship** — $1,920 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/dr-michael-saenz-scholarship
 - [ ] **Chesapeake Fine Line Scholarship** — $1,920 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/chesapeake-fine-line-scholarship
 - [ ] **Don Bloxham Scholarship** — $1,920 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/don-bloxham-scholarship
-- [ ] **Mary LeGare Scholarship** — $1,700 · due 11/30/2026 · 55% match · https://bigfuture.collegeboard.org/scholarships/mary-legare-scholarship
-- [ ] **Eddy M Skolfield Scholarship** — $1,500 · due 04/15/2027 · 60% match · https://bigfuture.collegeboard.org/scholarships/eddy-m-skolfield-scholarship
-- [ ] **Dick Kraus Scholarship for Scientific Thinking** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/dick-kraus-scholarship-for-scientific-thinking
 
 ---
 
@@ -207,6 +208,7 @@ Sorted by expected value, so work down from the top.
 | Peierls Foundation Transfer Scholarship | $4,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | AFCEA Cyber Security Scholarship | $5,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | The Connor Group Kids & Community Partners Scholarship | $5,000 | January | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| Community Impact Scholarship | $5,000 | August | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Mary and Bob Sierra Family Foundation State/Community College Scholarship | $3,500 | 01/31/2027 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Stolba/Sukkary Family Scholarship | $3,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | LoopEd Scholarship | $3,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -229,6 +231,7 @@ Sorted by expected value, so work down from the top.
 | Shida Family Endowed Scholarship | $2,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | College Can Help Scholarship | $2,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Lieutenant General Douglas D. Buchholz Memorial Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
+| The Law Office of Shane R. Kadlec Public Service Scholarship | $2,000 | May | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Research Internships in Science and Engineering (RISE) | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Novus Biologicals Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | R&D Systems Scholarship | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -238,9 +241,8 @@ Sorted by expected value, so work down from the top.
 | Fund the Dream Scholarship | $1,500 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Billy Turney Foundation Community College Scholarship | — | 01/31/2027 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Bates Container Hardy Sanders Family Scholarship | $1,920 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| The James and Sharon Ricciardi Family Endowed Scholarship | $1,500 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 
-**Totals:** 150 scholarships at 50%+ match · 103 need new words · 47 reusable · 96 unsorted.
+**Totals:** 150 scholarships at 50%+ match · 102 need new words · 48 reusable · 94 unsorted.
 
 ---
 
