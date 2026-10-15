@@ -2,27 +2,37 @@
 //
 // WHY THIS IS SEPARATE FROM scout.ts:
 //   BigFuture's scholarship search (bigfuture.collegeboard.org/scholarship-search) is a
-//   login-walled, client-side React app. There is no server-rendered HTML to fetch and no
+//   client-side React app. There is no server-rendered HTML to fetch and no
 //   openly-replayable JSON API — the results are loaded once into browser memory (via an
 //   AWS-Lambda call that needs SigV4 auth) and then filtered/paginated entirely client-side
 //   behind a "Show More Scholarships" button. So it can't use scout.ts's plain fetch()+regex
-//   path. This script drives a REAL logged-in browser, applies profile-relevant keyword
+//   path. This script drives a REAL browser, applies profile-relevant keyword
 //   filters, exhausts the "Show More" pager, and scrapes the rendered cards.
 //
 // OUTPUT: ~/.claude/memory/bigfuture_raw.json — an array of BigFutureRaw records. scout.ts's
 //   harvestBigFuture() reads that file (no network) and maps it into scored Candidates.
 //   The file is local + gitignored; if absent, scout.ts just skips the source honestly.
 //
-// AUTH: reads the College Board login from the macOS Keychain via identity/secrets.ts
-//   (services ccp_cb_username / ccp_cb_password; falls back to the old .env vars with a
-//   warning). Only the username is ever displayed, as a sign-in hint. Login is bot-
-//   protected, so we use a PERSISTENT browser profile (USER_DATA_DIR): you log in once in
-//   the opened window, the session cookie persists, and every later run reuses it headlessly.
+// AUTH: NOT REQUIRED. Measured 2026-10-14: the scholarship search renders its cards for an
+//   anonymous visitor (43,513 results, "Show More" pager and all) — signing in only enables
+//   the "Saved Scholarships List". And the session does NOT survive a browser restart: after
+//   a successful hand sign-in, the persistent profile kept only consent, Adobe-analytics and
+//   Akamai bot cookies; no College Board auth cookie was written to disk, so every later
+//   headless run came back "not logged in". That combination used to abort the unattended
+//   6am run every morning, which is the whole point of the job.
+//
+//   So a sign-in is now opportunistic: if the profile happens to still be authenticated the
+//   run uses it, and otherwise it harvests anonymously and says so. A headed run still offers
+//   the sign-in window (worth doing for the saved list), but no longer blocks on it.
+//
+//   Credentials, when a headed run wants to prompt, come from the macOS Keychain via
+//   identity/secrets.ts (services ccp_cb_username / ccp_cb_password; falls back to the old
+//   .env vars with a warning). Only the username is ever displayed, as a sign-in hint.
 //
 // RUN:
 //   bunx playwright install chromium   # one time — downloads the browser
-//   bun scout/bigfuture-harvest.ts               # headed first run: log in if prompted
-//   bun scout/bigfuture-harvest.ts --headless    # once logged in, unattended re-runs
+//   bun scout/bigfuture-harvest.ts               # headed: offers a sign-in window, 60s
+//   bun scout/bigfuture-harvest.ts --headless    # unattended; harvests signed in or not
 //   bun scout/bigfuture-harvest.ts --keywords "biology,computer science,first generation"
 //
 // Then feed it into the pipeline:
@@ -162,26 +172,21 @@ async function main() {
   await gotoSearch(page, SEARCH_URL);
   await page.waitForTimeout(2500);
 
-  // Login check: the header greets "Hi, <name>" when authenticated.
-  const loggedIn = await page.locator("text=/Hi,\\s*\\w/").count();
-  if (!loggedIn) {
-    if (HEADLESS) {
-      console.error(
-        "Not logged in and running headless. Run once WITHOUT --headless, sign in with your\n" +
-          "College Board account in the opened window,\n" +
-          "then re-run. The persistent profile keeps the session for headless runs after that.",
-      );
-      await ctx.close();
-      process.exit(1);
-    }
+  // Sign-in is opportunistic, never required — see AUTH at the top of this file. The header
+  // greets "Hi, <name>" when the profile is still authenticated.
+  let loggedIn = (await page.locator("text=/Hi,\\s*\\w/").count()) > 0;
+  if (!loggedIn && !HEADLESS) {
     console.log(
-      `\nPlease sign in to College Board in the opened window` +
+      `\nNot signed in. You can sign in to College Board in the opened window` +
         (collegeBoardCredentials().username ? ` (${collegeBoardCredentials().username})` : "") +
-        `.\nWaiting up to 3 minutes for the "Hi, <name>" header…`,
+        `, or just wait — the search works either way.\nWaiting 60s for a "Hi, <name>" header…`,
     );
-    await page.waitForSelector("text=/Hi,\\s*\\w/", { timeout: 180_000 });
-    console.log("Signed in — continuing.");
+    loggedIn = await page
+      .waitForSelector("text=/Hi,\\s*\\w/", { timeout: 60_000 })
+      .then(() => true)
+      .catch(() => false);
   }
+  console.log(loggedIn ? "Signed in — continuing." : "Harvesting anonymously (the search is public; only the saved list needs an account).");
 
   // Everything past the login must run inside try/finally: the persistent profile only flushes
   // its cookies on ctx.close(), so an exception that skipped the close threw away the sign-in

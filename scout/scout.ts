@@ -583,12 +583,18 @@ async function scoreViaInferenceCli(system: string, user: string): Promise<{ row
   return { rows: extractJsonArray(out), cost: 0 }; // subscription-billed
 }
 
-async function scoreAll(profile: any, candidates: Candidate[]): Promise<{ scored: Candidate[]; cost: number; backend: string }> {
+async function scoreAll(
+  profile: any,
+  candidates: Candidate[],
+): Promise<{ scored: Candidate[]; cost: number; backend: string; batches: number; failedBatches: number }> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   const backend = apiKey ? `Anthropic API (${MODEL}, $${PRICING[MODEL].in}/M in)` : "PAI Inference.ts (subscription)";
   let cost = 0;
+  let batches = 0;
+  let failedBatches = 0;
   const BATCH = 15;
   for (let off = 0; off < candidates.length; off += BATCH) {
+    batches++;
     const batch = candidates.slice(off, off + BATCH);
     const { system, user } = scoringPrompt(profile, batch);
     // Inference.ts times out under load fairly often — one retry before defaulting.
@@ -612,11 +618,18 @@ async function scoreAll(profile: any, candidates: Candidate[]): Promise<{ scored
       }
     }
     if (lastErr) {
+      failedBatches++;
       console.error(`  batch at ${off} failed twice: ${lastErr instanceof Error ? lastErr.message : lastErr}`);
       for (const c2 of batch) if (c2.match === undefined) { c2.match = 50; c2.effort = "med"; c2.flags = ["score_failed"]; }
+      // A backend that is down fails every batch in the same way, and 80 identical retries just
+      // delay the honest answer. Bail after 3 consecutive total failures at the start of a run.
+      if (failedBatches === batches && failedBatches >= 3) {
+        console.error(`  scoring backend looks unreachable — stopping after ${failedBatches} failed batches`);
+        break;
+      }
     }
   }
-  return { scored: candidates, cost, backend };
+  return { scored: candidates, cost, backend, batches, failedBatches };
 }
 
 // ---------------------------------------------------------------------------
@@ -842,7 +855,18 @@ async function main() {
   let backend = "none (--no-score)";
   if (!flag("--no-score") && candidatesToScore.length) {
     console.log(`\nScoring ${candidatesToScore.length} with ${process.env.ANTHROPIC_API_KEY ? "Anthropic API" : "PAI Inference.ts"}…`);
-    ({ cost, backend } = await scoreAll(profile, candidatesToScore));
+    const run = await scoreAll(profile, candidatesToScore);
+    ({ cost, backend } = run);
+    // Every batch failing is a dead backend, not a result. Publishing it would hand the
+    // dashboard a few hundred fabricated 50% matches and overwrite a good ranked list with
+    // them — so the run fails instead, loudly, and the daily chain stops right here.
+    if (run.batches > 0 && run.failedBatches === run.batches) {
+      console.error(
+        `\nScoring failed on every batch (${run.failedBatches}/${run.batches}) — the scoring backend is unreachable.\n` +
+          `Nothing was written: the previous ranked list is still the current one.`,
+      );
+      process.exit(1);
+    }
     await writeScoreCache(mergedCache(prevCache, pHash, candidatesToScore));
   } else if (flag("--no-score")) {
     for (const c of candidatesToScore) { c.match = 50; c.effort = "med"; c.flags = []; }

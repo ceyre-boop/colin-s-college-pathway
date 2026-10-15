@@ -103,7 +103,12 @@ function foundSummary(): string {
   }
 }
 
-function finish(complete: boolean) {
+// The report has to be on disk BEFORE the commit, or `git add` is handed a path that does not
+// exist yet — which on the first scheduled run made the whole `git add` fail (a pathspec that
+// matches nothing fails the command and stages nothing), and the chain then reported the
+// perfectly honest-looking "nothing changed — no commit" while sitting on a full set of
+// regenerated files. The commit/push rows land in the log and the spoken result instead.
+function writeReport(complete: boolean) {
   const L: string[] = [];
   L.push("# Last automated run");
   L.push("");
@@ -122,8 +127,13 @@ function finish(complete: boolean) {
   L.push("Nothing here submits an application. The chain ends at a ranked list, a topic bank,");
   L.push("and a deadline digest — every submit is Colin's own click.");
   L.push("");
+  L.push("_This file is written before the run commits, so it is part of that commit; whether the");
+  L.push("commit and push succeeded is in the log above and in `git log`._");
+  L.push("");
   if (!DRY) writeFileSync(REPORT, L.join("\n"));
+}
 
+function announce(complete: boolean) {
   const failed = results.filter((r) => !r.ok).map((r) => r.name);
   log(failed.length ? `done with failures: ${failed.join(", ")}` : "done, all steps ok");
 
@@ -136,6 +146,11 @@ function finish(complete: boolean) {
   spawnSync("curl", ["-s", "-m", "5", "-X", "POST", "http://localhost:31337/notify",
     "-H", "Content-Type: application/json",
     "-d", JSON.stringify({ message: msg, voice_enabled: false })], { encoding: "utf8" });
+}
+
+function finish(complete: boolean) {
+  writeReport(complete);
+  announce(complete);
 }
 
 // Two runs at once would interleave writes to ~/scholarships_found.json and leave a
@@ -194,7 +209,14 @@ function main() {
     "scholarship_essays/LAST_RUN.md",
   ];
   if (!DRY) {
-    spawnSync("git", ["add", "--", ...TRACKED], { cwd: ROOT, encoding: "utf8" });
+    writeReport(true); // before staging — TRACKED includes this file
+    const add = spawnSync("git", ["add", "--", ...TRACKED], { cwd: ROOT, encoding: "utf8" });
+    if (add.status !== 0) {
+      // Never let a failed `git add` masquerade as "nothing to commit".
+      const why = `${add.stderr ?? ""}${add.error ? ` ${add.error.message}` : ""}`.trim() || `exit ${add.status}`;
+      log(`  ✗ git add failed — ${why}`);
+      results.push({ name: "commit", ok: false, detail: `git add failed: ${why}`.slice(0, 400) });
+    }
     const dirty = spawnSync("git", ["diff", "--cached", "--name-only"], { cwd: ROOT, encoding: "utf8" }).stdout.trim();
     if (!dirty) {
       log("nothing changed — no commit");
@@ -207,7 +229,8 @@ function main() {
     }
   }
 
-  finish(true);
+  if (DRY) writeReport(true);
+  announce(true);
   releaseLock();
 }
 

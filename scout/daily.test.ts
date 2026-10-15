@@ -37,11 +37,30 @@ describe("daily automation", () => {
     expect(xml).toContain("com.colin.scholarship-scout");
     // bun must be reachable from launchd's bare PATH, or every scheduled run dies instantly.
     expect(xml).toMatch(/<key>PATH<\/key>\s*<string>[^<]*\.bun\/bin/);
+    // ...and so must `claude`: scoring shells out to it via PAI's Inference.ts, and its absence
+    // failed every batch of the first real scheduled run while the chain still reported success.
+    const path = xml.match(/<key>PATH<\/key>\s*<string>([^<]*)<\/string>/)?.[1] ?? "";
+    expect(path.split(":")).toContain(`${homedir()}/.local/bin`);
   });
 
   test("the chain commits only generated files — never `git add -A`", () => {
     const src = readFileSync(join(ROOT, "scout", "daily.ts"), "utf8");
     expect(src).not.toContain('"add", "-A"');
     expect(src).toContain('"add", "--"');
+  });
+
+  test("the run report is written before it is staged", () => {
+    // `git add` fails outright on a pathspec that matches nothing, staging NOTHING. LAST_RUN.md
+    // is in TRACKED, so writing it after the add made the first real scheduled run report
+    // "nothing changed — no commit" while sitting on a full set of regenerated files.
+    const src = readFileSync(join(ROOT, "scout", "daily.ts"), "utf8");
+    expect(src.indexOf("writeReport(true); // before staging")).toBeGreaterThan(0);
+    expect(src.indexOf("writeReport(true); // before staging")).toBeLessThan(src.indexOf('"add", "--"'));
+  });
+
+  test("a failed `git add` is reported, not read as \"nothing to commit\"", () => {
+    const src = readFileSync(join(ROOT, "scout", "daily.ts"), "utf8");
+    expect(src).toContain("add.status !== 0");
+    expect(src).toContain("git add failed");
   });
 });

@@ -13,10 +13,18 @@
   <key>Label</key>
   <string>com.colin.scholarship-scout</string>
 
+  <!--
+    A morning budget, not the whole backlog. Scores are remembered between runs
+    (scout/score-cache.ts), so a day only pays for listings the scout has never seen:
+    1200 clears the first-time backlog within about a week and is far more than the
+    handful of new listings a normal day turns up.
+  -->
   <key>ProgramArguments</key>
   <array>
     <string>/Users/taboost/.bun/bin/bun</string>
     <string>scout/daily.ts</string>
+    <string>--limit</string>
+    <string>1200</string>
   </array>
 
   <key>WorkingDirectory</key>
@@ -24,9 +32,14 @@
 
   <key>EnvironmentVariables</key>
   <dict>
-    <!-- launchd gives a bare PATH; bun, git, curl and the Claude CLI must all be findable. -->
+    <!--
+      launchd gives a bare PATH; bun, git, curl and the Claude CLI must all be findable.
+      ~/.local/bin is where the `claude` CLI lives, and scoring shells out to it through PAI's
+      Inference.ts — without it every scoring batch of the 2026-10-15 run died with
+      `Executable not found in $PATH: "claude"`.
+    -->
     <key>PATH</key>
-    <string>/Users/taboost/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <string>/Users/taboost/.bun/bin:/Users/taboost/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     <key>HOME</key>
     <string>/Users/taboost</string>
   </dict>
