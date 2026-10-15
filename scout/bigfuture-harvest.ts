@@ -115,6 +115,18 @@ function pageExtractor(): Record<string, unknown>[] {
   return out;
 }
 
+/**
+ * A fragment of a harvest folded into what is already cached: every known listing is kept, and
+ * this run's record wins for anything it did reach. Exported for the test — the rule it encodes
+ * is that an interrupted run must never shrink the cache.
+ */
+export function mergeHarvest(existing: BigFutureRaw[], fresh: BigFutureRaw[]): BigFutureRaw[] {
+  const merged = new Map<string, BigFutureRaw>();
+  for (const r of existing ?? []) if (r?.slug) merged.set(r.slug, r);
+  for (const r of fresh ?? []) if (r?.slug) merged.set(r.slug, r);
+  return [...merged.values()];
+}
+
 // Clicks "Show More Scholarships" until it's gone (all client-side pages revealed).
 async function loadAllPages(page: any): Promise<number> {
   for (let i = 0; i < 400; i++) {
@@ -192,6 +204,7 @@ async function main() {
   // its cookies on ctx.close(), so an exception that skipped the close threw away the sign-in
   // the user had just done by hand — which is exactly what happened on the first run.
   const bySlug = new Map<string, BigFutureRaw>();
+  let interrupted = false;
   try {
   for (const kw of KEYWORDS) {
     // Drive the keyword filter through the URL — BigFuture reads ?keyword= on load and
@@ -205,24 +218,44 @@ async function main() {
   }
   } catch (err) {
     // A keyword that blows up should not cost us the keywords that already worked, nor the login.
+    interrupted = true;
     console.error(`  harvest interrupted: ${err instanceof Error ? err.message : err}`);
     console.error(`  keeping the ${bySlug.size} cards collected so far.`);
   } finally {
     await ctx.close();
   }
 
-  const all = [...bySlug.values()];
-  if (!all.length) {
+  // A complete pass is an authoritative snapshot and replaces the cache, so retired listings
+  // actually leave it. An interrupted pass is a fragment: it gets MERGED into what is already
+  // there, because a scholarship does not stop existing just because the run was cut short.
+  // (Measured: a run killed by the chain's 30-minute timeout had 1,811 of the 6,852 cards and
+  // wrote them straight over the full harvest, while still reporting success.)
+  const fresh = [...bySlug.values()];
+  if (!fresh.length) {
     console.error("No cards harvested — leaving the existing cache untouched rather than");
     console.error("overwriting a good harvest with an empty one.");
     process.exit(1);
   }
+
+  let all = fresh;
+  if (interrupted) {
+    const existing: BigFutureRaw[] = await Bun.file(OUT_PATH).json().catch(() => []);
+    all = mergeHarvest(existing, fresh);
+    console.error(`  merged into the existing cache: ${existing.length} known + ${fresh.length} fresh = ${all.length}`);
+  }
+
   await Bun.write(OUT_PATH, JSON.stringify(all, null, 1));
   console.log(`\nWrote ${all.length} BigFuture scholarships → ${OUT_PATH}`);
   console.log(`Next: bun scout/scout.ts --emit-app --limit 400`);
+  // An interrupted harvest must not report success, or the daily chain ticks it off as done.
+  if (interrupted) process.exit(1);
 }
 
-main().catch((err) => {
-  console.error(`bigfuture-harvest failed: ${err instanceof Error ? err.message : err}`);
-  process.exit(1);
-});
+// Only when run as a script: the merge rule above is imported by the test, and importing this
+// file must not open a browser.
+if (import.meta.main) {
+  main().catch((err) => {
+    console.error(`bigfuture-harvest failed: ${err instanceof Error ? err.message : err}`);
+    process.exit(1);
+  });
+}
