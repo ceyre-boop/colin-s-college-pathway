@@ -1,19 +1,19 @@
 # Last automated run
 
-> 2026-10-15T02:16:19.107Z · `bun scout/daily.ts` · completed
+> 2026-10-15T02:49:18.323Z · `bun scout/daily.ts` · completed
 > Log: `~/.claude/memory/scholarship-scout/daily-2026-10-15.log`
 
-**Harvest:** 3247 ranked · 3162 low-match · 2 scam-flagged · sources not ok → appily/cappex (probe):empty, raise.me (probe):empty, petersons (probe):empty, unigo (our-scholarships):empty, unigo (by-major/biology-scholarships):empty, unigo (by-major/chemistry-scholarships):error, unigo (by-major/engineering-scholarships):empty, unigo (by-major/pre-med-scholarships):error, unigo (by-type/need-based-scholarships):empty, unigo (by-type/entrepreneurship-scholarships):empty, unigo (by-type/full-ride-scholarships):empty, unigo (athletic/wrestling-scholarships):empty, unigo (athletic/martial-arts-scholarships):error
+**Harvest:** 2397 ranked · 3164 low-match · 5 scam-flagged · sources not ok → raise.me (probe):empty, petersons (probe):empty, appily/cappex (probe):empty, unigo (our-scholarships):empty, unigo (by-major/biology-scholarships):empty, unigo (by-major/chemistry-scholarships):error, unigo (by-major/engineering-scholarships):empty, unigo (by-major/pre-med-scholarships):error, unigo (by-type/need-based-scholarships):empty, unigo (by-type/entrepreneurship-scholarships):empty, unigo (by-type/full-ride-scholarships):empty, unigo (athletic/wrestling-scholarships):empty, unigo (athletic/martial-arts-scholarships):error
 
 | Step | Result | Detail |
 |------|--------|--------|
 | bigfuture harvest | ok | Next: bun scout/scout.ts --emit-app --limit 400 |
-| scout + score + emit app data | ok | Wrote 30 scout entries → src/data/scoutFound.js (generated 2026-10-15T02:47:28.368Z) |
-| rescore failed batches | ok | (no output) |
-| regenerate topic bank | ok | BANK.md |
-| emit essay kits | ok | (no output) |
-| rebuild state projection | ok | (no output) |
-| deadline digest | ok | (no output) |
+| scout + score + emit app data | ok | Wrote 30 scout entries → src/data/scoutFound.js (generated 2026-10-15T02:59:14.681Z) |
+| rescore failed batches | ok | No score_failed entries in the cache — nothing to do. |
+| regenerate topic bank | ok |   → scholarship_essays/TOPIC_BANK.md |
+| emit essay kits | ok | Wrote 20 apply kits → /Users/taboost/colin-s-college-pathway/src/data/essays.js (unchanged — kept timestamp) |
+| rebuild state projection | ok | Rebuilt 11 applications, 17 open checkpoint(s) (5 blocking), 0 resolved → /Users/taboost/colin-s-college-pathway/state/projection.json |
+| deadline digest | ok | No open applications with a parsed deadline in this window. |
 
 Nothing here submits an application. The chain ends at a ranked list, a topic bank,
 and a deadline digest — every submit is Colin's own click.

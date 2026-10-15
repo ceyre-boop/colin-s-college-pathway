@@ -6,7 +6,7 @@
 **How to use it:** write the 500-word version of each archetype below once, then cut it down per
 scholarship. Most prompts want 250–500 words, so the long draft is the parent of all the short ones.
 
-**Not in here:** 842 no-essay awards at 50%+ match from the same run — those need no words,
+**Not in here:** 643 no-essay awards at 50%+ match from the same run — those need no words,
 so they stay in `APPLICATION_QUEUE.md` as straight applications.
 
 ---
@@ -67,10 +67,7 @@ _No open scholarship is waiting on this one right now._
 
 *Prompt to write against:* How have you served your community, and what difference did it make?
 
-1 scholarship waiting on this topic:
-
-- [ ] **ABM Education Services Scholarship** — $1,920 · due verify at URL · word limit unknown · 50% match
-  - https://bigfuture.collegeboard.org/scholarships/abm-education-services-scholarship
+_No open scholarship is waiting on this one right now._
 
 ### Entrepreneurship / why business
 
@@ -88,7 +85,7 @@ _No open scholarship is waiting on this one right now._
 
 ### Unsorted — open the URL to see the real prompt
 
-94 listings whose blurb doesn't say what the essay asks for.
+95 listings whose blurb doesn't say what the essay asks for.
 Each one asks for an essay; the listing just doesn't say which kind.
 Sorted by expected value, so work down from the top.
 
@@ -146,9 +143,6 @@ Sorted by expected value, so work down from the top.
 - [ ] **Daniel R. Miller (Fretts) Memorial Scholarship** — $2,000 · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/daniel-r-miller-fretts-memorial-scholarship
 - [ ] **WellSky Scholarship** — $2,500 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/wellsky-scholarship
 - [ ] **Superpower Scholarship** — $2,500 · due Mar 31, 2027 · 50% match · https://www.unigo.com/scholarships/our-scholarships/superpower-scholarship
-- [ ] **Dr. Tahita Fulkerson Scholarship** — $1,920 · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/dr-tahita-fulkerson-scholarship
-- [ ] **Anna Miller Saint Endowed Scholarship** — $1,920 · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/anna-miller-saint-endowed-scholarship
-- [ ] **Boyd and Quimby Scholarship** — $1,920 · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/boyd-and-quimby-scholarship
 - [ ] **The Talegaonkar Medical Scholarship** — $2,000 · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/the-talegaonkar-medical-scholarship
 - [ ] **Skyline Technologies Scholarship** — $2,000 · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/skyline-technologies-scholarship
 - [ ] **AmericanMuscle's Student Scholarship Program** — $2,000 · due June · 60% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998796
@@ -156,36 +150,40 @@ Sorted by expected value, so work down from the top.
 - [ ] **Michigan State Grants and Scholarships** — — · due verify at URL · 80% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2014640
 - [ ] **Jack Kent Cooke Transfer Scholarship** — — · due Dec 9, 2026 · 80% match · https://scholarships360.org/scholarships/search/jack-kent-cooke-transfer-scholarship/
 - [ ] **Lawrence Strader Boy Scouts of America Scholarship** — — · due verify at URL · 80% match · https://scholarships360.org/scholarships/search/lawrence-strader-boy-scouts-of-america-scholarship/
-- [ ] **Alan and Karen Murray Endowed Scholarship** — $2,070 · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/alan-and-karen-murray-endowed-scholarship
 - [ ] **Jack Kent Cooke College Scholarship** — — · due Nov 11, 2026 · 75% match · https://scholarships360.org/scholarships/search/jack-kent-cooke-college-scholarship/
 - [ ] **Scholarships for Transfer Students** — — · due verify at URL · 75% match · https://www.unigo.com/scholarships/undergraduate-students/transfer-scholarships
 - [ ] **Jeanne Dubi Scholarship** — $2,000 · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/jeanne-dubi-scholarship
 - [ ] **Katherine M. Wakelee Scholarship** — $2,000 · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/katherine-m-wakelee-scholarship
-- [ ] **Coach Kevin Ferguson Scholarship** — $2,000 · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/coach-kevin-ferguson-scholarship
-- [ ] **Gayle Francis Dare to Dream Network Technology Scholarship** — $1,920 · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/gayle-francis-dare-to-dream-network-technology-scholarship
-- [ ] **Albert G. Mogor, PhD Memorial Scholarship** — $1,920 · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/albert-g-mogor-phd-memorial-scholarship
-- [ ] **Anne Tippett Memorial Endowed Scholarship** — $1,920 · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/anne-tippett-memorial-endowed-scholarship
 - [ ] **Robert Nabors Memorial Scholarship** — — · due verify at URL · 70% match · https://bigfuture.collegeboard.org/scholarships/robert-nabors-memorial-scholarship
 - [ ] **MDI Biological Laboratory Undergraduate Summer Research Fellowships** — — · due January · 70% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9993019
 - [ ] **Dell Scholars Program** — — · due verify at URL · 70% match · https://scholarships360.org/scholarships/search/dell-scholars-program/
 - [ ] **Niche 40000 no Essay Scholarship** — — · due verify at URL · 70% match · https://scholarships360.org/scholarships/search/niche-40000-no-essay-scholarship/
 - [ ] **Inclusive Futures in Biotech Scholarship** — — · due verify at URL · 70% match · https://scholarships360.org/scholarships/search/inclusive-futures-in-biotech-scholarship/
-- [ ] **The Max and Nadine Dimick Scholarship** — $2,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/the-max-and-nadine-dimick-scholarship
-- [ ] **The Assurance Caring Together Scholarship** — $2,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/the-assurance-caring-together-scholarship
-- [ ] **Dr. Judith J. Carrier Scholarship** — $2,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/dr-judith-j-carrier-scholarship
-- [ ] **Ann and Wirt Cogswell Scholarship** — $2,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/ann-and-wirt-cogswell-scholarship
-- [ ] **Worth Hill Scholarship** — $2,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/worth-hill-scholarship
-- [ ] **Bill Seifert Endowed Scholarship** — $2,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/bill-seifert-endowed-scholarship
-- [ ] **Walter M. Otey, III Scholarship** — $2,000 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/walter-m-otey-iii-scholarship
 - [ ] **Peek Law Group - Scholarship for Students** — $2,000 · due August · 50% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015681
 - [ ] **Rae Lee Siporin Scholarship** — — · due 01/11/2027 · 65% match · https://bigfuture.collegeboard.org/scholarships/rae-lee-siporin-scholarship
 - [ ] **Massey Villarreal Endowed Scholarship** — — · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/massey-villarreal-endowed-scholarship
 - [ ] **Nancy Kalchbrenner Scholarship** — — · due verify at URL · 65% match · https://bigfuture.collegeboard.org/scholarships/nancy-kalchbrenner-scholarship
 - [ ] **Follow Your Own Path Essay Scholarship** — — · due Aug 31, 2027 · 65% match · https://scholarships360.org/scholarships/search/follow-your-own-path-essay-scholarship/
-- [ ] **Dr. Michael Saenz Scholarship** — $1,920 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/dr-michael-saenz-scholarship
-- [ ] **Chesapeake Fine Line Scholarship** — $1,920 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/chesapeake-fine-line-scholarship
-- [ ] **Don Bloxham Scholarship** — $1,920 · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/don-bloxham-scholarship
-- [ ] **Mary LeGare Scholarship** — $1,700 · due 11/30/2026 · 55% match · https://bigfuture.collegeboard.org/scholarships/mary-legare-scholarship
+- [ ] **Eddy M Skolfield Scholarship** — $1,500 · due 04/15/2027 · 60% match · https://bigfuture.collegeboard.org/scholarships/eddy-m-skolfield-scholarship
+- [ ] **Dick Kraus Scholarship for Scientific Thinking** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/dick-kraus-scholarship-for-scientific-thinking
+- [ ] **Abraham and Shirley Fischler Scholarship - Undergraduate** — — · due 12/31/2026 · 60% match · https://bigfuture.collegeboard.org/scholarships/abraham-and-shirley-fischler-scholarship---undergraduate
+- [ ] **Aldo Valentini Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/aldo-valentini-scholarship
+- [ ] **Sally Ann Karnau Biology Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/sally-ann-karnau-biology-scholarship
+- [ ] **Arnold W. and and Janet L. Avery  Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/arnold-w-and-and-janet-l-avery--scholarship
+- [ ] **CIO Council Technology Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/cio-council-technology-scholarship
+- [ ] **Harold and Faye Teer Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/harold-and-faye-teer-scholarship
+- [ ] **Cecil Stricker Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/cecil-stricker-scholarship
+- [ ] **Circle City Classic Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/circle-city-classic-scholarship
+- [ ] **Vince Genovese Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/vince-genovese-scholarship
+- [ ] **Victory Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/victory-scholarship
+- [ ] **Drs. Byron and Kay McClenney Endowed Scholarship** — — · due verify at URL · 60% match · https://bigfuture.collegeboard.org/scholarships/drs-byron-and-kay-mcclenney-endowed-scholarship
+- [ ] **Tuition Solution Scholarship For Stem Students** — — · due verify at URL · 60% match · https://scholarships360.org/scholarships/search/tuition-solution-scholarship-for-stem-students/
+- [ ] **Destination Stem Scholarship** — — · due verify at URL · 60% match · https://scholarships360.org/scholarships/search/destination-stem-scholarship/
+- [ ] **2000 no Essay Scholarship by Sallie** — — · due verify at URL · 60% match · https://scholarships360.org/scholarships/search/2000-no-essay-scholarship-by-sallie/
+- [ ] **Michigan Competitive Scholarship** — — · due verify at URL · 60% match · https://scholarships360.org/scholarships/search/michigan-competitive-scholarship/
+- [ ] **Scholarships for College Students** — — · due verify at URL · 60% match · https://www.unigo.com/scholarships/undergraduate-students/scholarships-for-college-students
+- [ ] **Sean Duzant Scholarship** — — · due verify at URL · 55% match · https://bigfuture.collegeboard.org/scholarships/sean-duzant-scholarship
+- [ ] **Ashland Hercules Water Technologies Sciences Scholarship - Biology** — — · due 04/15/2027 · 55% match · https://bigfuture.collegeboard.org/scholarships/ashland-hercules-water-technologies-sciences-scholarship---biology
 
 ---
 
@@ -225,10 +223,7 @@ Sorted by expected value, so work down from the top.
 | Chester m Vernon Memorial Eagle Scout Scholarship | — | Mar 31, 2027 | `scholarship_essays/foot-locker-scholar-athletes/essay.md` (418w) | send as-is |
 | Harry Kramer Memorial Fund Endowed Scholarship | $2,112 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Terry Bryant College Scholarship | $2,500 | June | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
-| Mike Anderson Memorial Fund Scholarship | $2,000 | 08/01/2027 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Tocris Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
-| Shida Family Endowed Scholarship | $2,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| College Can Help Scholarship | $2,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Lieutenant General Douglas D. Buchholz Memorial Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | The Law Office of Shane R. Kadlec Public Service Scholarship | $2,000 | May | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Research Internships in Science and Engineering (RISE) | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -238,11 +233,14 @@ Sorted by expected value, so work down from the top.
 | Community College Scholarships | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | TCATA College Scholarship Fund | $2,000 | April | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Fund the Dream Scholarship | $1,500 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| Billy Turney Foundation Community College Scholarship | — | 01/31/2027 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| Bates Container Hardy Sanders Family Scholarship | $1,920 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | The James and Sharon Ricciardi Family Endowed Scholarship | $1,500 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| Jim Campbell College/University Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| Fred and Avery Test Scholarship | — | March | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| National Eagle Scout Association Scholarship | — | verify | `scholarship_essays/foot-locker-scholar-athletes/essay.md` (418w) | send as-is |
+| Edwin F. Wiegand Science & Technology Scholarship | $1,250 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
+| Sunburst Foundation Community Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 
-**Totals:** 150 scholarships at 50%+ match · 102 need new words · 48 reusable · 94 unsorted.
+**Totals:** 150 scholarships at 50%+ match · 102 need new words · 48 reusable · 95 unsorted.
 
 ---
 
