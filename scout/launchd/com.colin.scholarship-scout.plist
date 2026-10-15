@@ -59,10 +59,15 @@
   <key>StandardErrorPath</key>
   <string>/Users/taboost/.claude/memory/scholarship-scout/launchd.err.log</string>
 
-  <!-- Scoring the whole harvest is long and single-threaded; keep it off the foreground. -->
+  <!--
+    Polite, but not throttled into uselessness: Nice 5 keeps it out of the way, while
+    ProcessType Background caps I/O and CPU hard enough that the BigFuture harvest took over
+    30 minutes under launchd against 8 minutes in a terminal, and was killed by its own
+    timeout with a quarter of the catalogue.
+  -->
   <key>Nice</key>
   <integer>5</integer>
   <key>ProcessType</key>
-  <string>Background</string>
+  <string>Standard</string>
 </dict>
 </plist>

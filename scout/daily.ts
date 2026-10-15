@@ -100,9 +100,11 @@ function foundSummary(): string {
   if (!existsSync(p)) return "no scholarships_found.json";
   try {
     const d = JSON.parse(readFileSync(p, "utf8"));
+    // SourceStatus names the site in `source` — reading a `name`/`site` that was never there
+    // printed a row of "undefined:empty" into every report.
     const bad = (d.sources ?? [])
       .filter((s: any) => s.status && s.status !== "ok")
-      .map((s: any) => `${s.name ?? s.site}:${s.status}`);
+      .map((s: any) => `${s.source ?? s.name ?? s.site ?? "?"}:${s.status}`);
     return [
       `${(d.ranked ?? []).length} ranked`,
       `${(d.low_match ?? []).length} low-match`,
@@ -196,7 +198,7 @@ function main() {
   // 1. BigFuture needs a logged-in real browser. Headless works only once a profile exists,
   //    so an unattended run attempts it and accepts failure — scout.ts reads the cache it
   //    leaves behind and honestly reports the source as empty if there isn't one.
-  step("bigfuture harvest", "bun", ["scout/bigfuture-harvest.ts", "--headless"], { timeoutMin: 30 });
+  step("bigfuture harvest", "bun", ["scout/bigfuture-harvest.ts", "--headless"], { timeoutMin: 45 });
 
   // 2. The scout itself. Fatal: without a fresh ranked list the rest is stale republishing.
   step("scout + score + emit app data", "bun",
