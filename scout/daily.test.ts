@@ -1,18 +1,55 @@
 // The automation is only trustworthy if the chain is complete and the schedule is real.
 // These check both without running a 2-hour scoring pass.
-import { expect, test, describe } from "bun:test";
+import { expect, test, describe, afterEach } from "bun:test";
 import { spawnSync } from "child_process";
-import { existsSync, readFileSync, writeFileSync, rmSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, rmSync, appendFileSync, statSync } from "fs";
 import { join } from "path";
-import { homedir } from "os";
+import { homedir, tmpdir } from "os";
 
 const ROOT = join(import.meta.dir, "..");
 const PLIST = join(ROOT, "scout", "launchd", "com.colin.scholarship-scout.plist");
+
+// Importing daily.ts must not run the chain — the entrypoint is guarded by import.meta.main.
+const { appendedSince } = await import("./daily");
 
 // Spawning a second bun runtime costs ~3s on its own; bun test's 5s default made these two
 // tests fail purely because the rest of the suite was running alongside them.
 const SPAWN_TIMEOUT = 30_000;
 const LOCK = join(homedir(), ".claude", "memory", "scholarship-scout", "daily.lock");
+
+describe("reading a step's output back out of the log", () => {
+  // The log is full of multi-byte characters (→ ✓ —) and the offset is a byte count from
+  // statSync, so decoding first and slicing by that offset overshoots — which is how every
+  // short step in the 02:16 run reported "(no output)" while having printed a summary line.
+  const tmp = join(tmpdir(), `daily-log-test-${process.pid}.log`);
+
+  afterEach(() => rmSync(tmp, { force: true }));
+
+  test("multi-byte characters before the offset do not eat the output", () => {
+    const header = "[02:16:19] → bigfuture harvest ✓ — done\n";
+    writeFileSync(tmp, header);
+    const at = statSync(tmp).size;
+    expect(at).toBeGreaterThan(header.length); // the whole point: bytes ≠ characters
+    appendFileSync(tmp, "Rebuilt 11 applications\n");
+    expect(appendedSince(tmp, at)).toBe("Rebuilt 11 applications");
+  });
+
+  test("a step that printed nothing reads back as empty", () => {
+    writeFileSync(tmp, "→ ✓\n");
+    expect(appendedSince(tmp, statSync(tmp).size)).toBe("");
+  });
+
+  test("multi-byte output is decoded whole, not cut mid-character", () => {
+    writeFileSync(tmp, "→ ✓\n");
+    const at = statSync(tmp).size;
+    appendFileSync(tmp, "  ✓ 150 scholarships — 103 need new essays\n");
+    expect(appendedSince(tmp, at)).toBe("✓ 150 scholarships — 103 need new essays");
+  });
+
+  test("a log that vanished is no output rather than a crash", () => {
+    expect(appendedSince(join(tmpdir(), "definitely-not-here.log"), 0)).toBe("");
+  });
+});
 
 describe("daily automation", () => {
   test("the dry run names every step in the chain", () => {

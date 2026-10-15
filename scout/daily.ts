@@ -48,6 +48,20 @@ function log(line: string) {
   }
 }
 
+/**
+ * The text a step appended to the log, read back as BYTES. The offset comes from statSync, and
+ * this log is full of multi-byte characters (→ ✓ —), so slicing the decoded string by a byte
+ * offset skips past real output — which silently reduced every short step's report line to
+ * "(no output)".
+ */
+export function appendedSince(path: string, byteOffset: number): string {
+  try {
+    return readFileSync(path).subarray(byteOffset).toString("utf8").trim();
+  } catch {
+    return "";
+  }
+}
+
 interface StepResult { name: string; ok: boolean; detail: string; skipped?: boolean }
 const results: StepResult[] = [];
 
@@ -75,7 +89,7 @@ function step(name: string, cmd: string, args: string[], opts: { fatal?: boolean
     closeSync(fd);
   }
 
-  const out = readFileSync(logPath, "utf8").slice(before).trim();
+  const out = appendedSince(logPath, before);
 
   const ok = r.status === 0;
   // The last non-empty line is the summary these scripts print; that's what belongs in the report.
@@ -254,4 +268,4 @@ function main() {
   releaseLock();
 }
 
-main();
+if (import.meta.main) main();
