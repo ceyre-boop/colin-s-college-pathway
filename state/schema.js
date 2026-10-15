@@ -48,6 +48,10 @@ export const EMPTY_APPLICATION = {
     applicationFee: false,
     attestation: false,
     signature: false,
+    /** @type {"allowed"|"prohibited"|"unknown"} whether the sponsor permits AI-drafted essays */
+    aiPolicy: "unknown",
+    /** null = unstated. Third-party/automated submission is disqualifying at many sponsors. */
+    thirdPartyAllowed: null,
   },
 
   platform: null,
@@ -151,6 +155,8 @@ export function toApplication(raw, opts = {}) {
       applicationFee: Boolean(fm.applicationFee ?? raw.requirements?.applicationFee ?? false),
       attestation: Boolean(raw.requirements?.attestation ?? false),
       signature: Boolean(raw.requirements?.signature ?? false),
+      aiPolicy: raw.requirements?.aiPolicy ?? "unknown",
+      thirdPartyAllowed: raw.requirements?.thirdPartyAllowed ?? null,
     },
 
     platform: fm.platform ?? raw.platform ?? null,

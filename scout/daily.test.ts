@@ -9,6 +9,10 @@ import { homedir } from "os";
 const ROOT = join(import.meta.dir, "..");
 const PLIST = join(ROOT, "scout", "launchd", "com.colin.scholarship-scout.plist");
 
+// Spawning a second bun runtime costs ~3s on its own; bun test's 5s default made these two
+// tests fail purely because the rest of the suite was running alongside them.
+const SPAWN_TIMEOUT = 30_000;
+
 describe("daily automation", () => {
   test("the dry run names every step in the chain", () => {
     const r = spawnSync("bun", ["scout/daily.ts", "--dry"], { cwd: ROOT, encoding: "utf8" });
@@ -17,13 +21,13 @@ describe("daily automation", () => {
                      "regenerate topic bank", "emit essay kits", "deadline digest"]) {
       expect(r.stdout).toContain(s);
     }
-  });
+  }, SPAWN_TIMEOUT);
 
   test("a dry run never commits, pushes or writes a lock", () => {
     const r = spawnSync("bun", ["scout/daily.ts", "--dry"], { cwd: ROOT, encoding: "utf8" });
     expect(r.stdout).not.toContain("git push");
     expect(existsSync(join(homedir(), ".claude", "memory", "scholarship-scout", "daily.lock"))).toBe(false);
-  });
+  }, SPAWN_TIMEOUT);
 
   test("the launchd plist is well-formed and scheduled daily", () => {
     expect(existsSync(PLIST)).toBe(true);

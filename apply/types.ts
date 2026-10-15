@@ -76,6 +76,9 @@ export interface FormMeta {
   applicationFee: boolean; // a fee was detected — hard stop, never auto-fill
   essayRequired: boolean;
   essayPrompts: EssayPrompt[];
+  aiPolicy: "allowed" | "prohibited" | "unknown"; // page-text evidence only; absence ≠ "allowed"
+  thirdPartyAllowed: boolean | null; // null = unstated; false = explicitly prohibited
+  pdfUrl: string | null; // a linked PDF application document, if the page has no web form
   detectedFields: string[]; // input names/labels we saw (for the field-mapper)
   autoSubmitEligible: boolean;
   route: "playwright" | "chrome"; // recommended engine for fill.ts

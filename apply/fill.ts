@@ -30,8 +30,9 @@ import { mapField, pathForLabel, type MapResult } from "./field-map";
 import { loadEssayLibrary, matchEssay } from "../scout/essay-match";
 import { append as logEvent } from "../state/log";
 import { scholarshipId } from "../src/lib/ids.js";
-import { loadVault } from "../identity/vault";
+import { loadVault, type Vault } from "../identity/vault";
 import { grantForLabels, open } from "../identity/broker";
+import { fillPdf, pdfFieldNames, pdfHasFillableFields } from "./pdf-fill";
 import { raise } from "../state/queue";
 import { begin, complete, fail } from "../state/operations";
 
@@ -63,7 +64,16 @@ const AUTOSUBMIT_ALLOWLIST = new Set(["googleform", "direct-formidable"]);
 const AUTOFILL_THRESHOLD = 0.98;
 const ASK_THRESHOLD = 0.8;
 
-interface Target { slug: string; name: string; amount?: number | null; applyUrl: string; platform?: string; }
+interface Target {
+  slug: string;
+  name: string;
+  amount?: number | null;
+  applyUrl: string;
+  platform?: string;
+  aiPolicy?: "allowed" | "prohibited" | "unknown";
+  thirdPartyAllowed?: boolean | null;
+  pdfUrl?: string | null;
+}
 
 type Outcome = "auto_submitted" | "filled_ready" | "needs_human" | "needs_essay" | "skipped_dedupe" | "error";
 interface Result {
@@ -140,6 +150,50 @@ function liveFormExtractor() {
 
 function loadJson<T>(p: string, d: T): T { try { return JSON.parse(readFileSync(p, "utf8")); } catch { return d; } }
 
+/**
+ * Download a linked PDF application (probe-form.ts's t.pdfUrl), fill what mapField() maps, and
+ * raise PDF_DRAFT_REVIEW. Returns null (never throws) when the PDF isn't fetchable or has no
+ * AcroForm fields — the caller falls through to the existing PORTAL_MALFUNCTION path, same as if
+ * this PDF branch didn't exist.
+ */
+async function tryFillPdf(t: Target, appId: string, vault: Vault): Promise<Result | null> {
+  const r: Result = { slug: t.slug, name: t.name, amount: t.amount ?? null, applyUrl: t.applyUrl, outcome: "needs_human", reasons: [], filled: [], declined: [], unmapped: [], blocked: [] };
+  try {
+    const res = await fetch(t.pdfUrl!, { signal: AbortSignal.timeout(30_000) });
+    if (!res.ok) return null;
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    if (!(await pdfHasFillableFields(bytes))) return null;
+
+    // Same grant-before-vault-open order as the web-form path: the PDF's own field names decide
+    // what's readable, not a blanket grant.
+    const fieldNames = await pdfFieldNames(bytes);
+    const grant = grantForLabels(fieldNames, pathForLabel, `pdf-fill:${t.slug}`, appId);
+    const broker = open(grant, vault);
+    const applicant: Applicant = broker.restrictedApplicant();
+
+    const draftDir = join(RESULTS_DIR, t.slug); mkdirSync(draftDir, { recursive: true });
+    const draftPath = join(draftDir, "draft.pdf");
+    const pdfResult = await fillPdf(bytes, applicant, draftPath);
+
+    r.filled = pdfResult.filled.map((f) => ({ label: f.field, path: f.path }));
+    r.declined = pdfResult.declined.map((f) => `${f.field}: ${f.reason}`);
+    r.unmapped = pdfResult.unmapped;
+    r.blocked = pdfResult.blocked.map((f) => `${f.field}: ${f.reason}`);
+    r.reasons.push(`PDF draft filled (${pdfResult.filled.length} field(s)) — sign/attach/submit by hand`);
+
+    raise({
+      type: "PDF_DRAFT_REVIEW",
+      applicationId: appId,
+      context: { slug: t.slug, pdfUrl: t.pdfUrl, filledCount: pdfResult.filled.length, blockedCount: pdfResult.blocked.length },
+      evidenceRefs: { draft_pdf_path: draftPath },
+    });
+    return r;
+  } catch (err) {
+    r.reasons.push(`PDF fill attempt failed: ${err instanceof Error ? err.message : err}`);
+    return null; // fall through to the generic no-form checkpoint rather than losing the target
+  }
+}
+
 async function run() {
   // Identity now comes from the vault, not the flat profile file. The vault carries per-field
   // verification metadata, which is what makes the freshness factor in the confidence score real
@@ -209,6 +263,14 @@ async function run() {
 
       const fields = await page.evaluate(liveFormExtractor);
       if (!fields.length) {
+        // No live web form — probe-form.ts may have already found a linked PDF application. Try
+        // that before giving up to a bare "needs human" checkpoint; a filled draft is strictly
+        // more useful to review than an empty one.
+        if (t.pdfUrl) {
+          // vault is definitely assigned by this point — run() exits above if loadVault() threw.
+          const pdfResult = await tryFillPdf(t, appId, vault!);
+          if (pdfResult) { results.push(pdfResult); console.log(`  📄 ${t.slug}: PDF draft filled → checkpoint`); continue; }
+        }
         raise({ type: "PORTAL_MALFUNCTION", applicationId: appId, context: { slug: t.slug }, evidenceRefs: { error_detail: "no fillable form detected (JS-rendered / PDF / email apply)" } });
         r.outcome = "needs_human"; r.reasons.push("no fillable form detected (JS-rendered / PDF / email apply)"); results.push(r); console.log(`  📄 ${t.slug}: no form → checkpoint`); continue;
       }
@@ -268,7 +330,7 @@ async function run() {
         }
         if (f.isEssay) {
           hasEssayField = true;
-          const em = matchEssay(label, null, essayLib);
+          const em = matchEssay(label, null, essayLib, t.aiPolicy);
           r.essay = { bucket: em.bucket, angle: em.angle };
           // Short-answer/essay prompts are human-gated; we don't jam a reused essay in and we
           // never auto-submit. Leave for review (or fill if a same-length reuse existed).
