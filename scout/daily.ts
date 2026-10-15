@@ -16,7 +16,7 @@
 //   bun scout/daily.ts --dry           # print the plan, run nothing
 
 import { spawnSync } from "child_process";
-import { appendFileSync, mkdirSync, writeFileSync, existsSync, readFileSync, rmSync } from "fs";
+import { appendFileSync, mkdirSync, writeFileSync, existsSync, readFileSync, rmSync, openSync, closeSync, statSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 
@@ -56,15 +56,26 @@ function step(name: string, cmd: string, args: string[], opts: { fatal?: boolean
   log(`→ ${name}: ${cmd} ${args.join(" ")}`);
   if (DRY) { results.push({ name, ok: true, detail: "dry run", skipped: true }); return true; }
 
-  const r = spawnSync(cmd, args, {
-    cwd: ROOT,
-    encoding: "utf8",
-    timeout: (opts.timeoutMin ?? 120) * 60_000,
-    maxBuffer: 64 * 1024 * 1024,
-  });
+  // The child writes straight into the log file, so a long step (the harvest runs for ten
+  // minutes or more) can be watched while it happens instead of appearing only once it is
+  // over — which is the difference between seeing a 6am run stall and finding out at noon.
+  // Reading back the slice it appended gives the same captured text spawnSync used to buffer,
+  // with no maxBuffer ceiling.
+  mkdirSync(LOG_DIR, { recursive: true });
+  const before = existsSync(logPath) ? statSync(logPath).size : 0;
+  const fd = openSync(logPath, "a");
+  let r: ReturnType<typeof spawnSync>;
+  try {
+    r = spawnSync(cmd, args, {
+      cwd: ROOT,
+      stdio: ["ignore", fd, fd],
+      timeout: (opts.timeoutMin ?? 120) * 60_000,
+    });
+  } finally {
+    closeSync(fd);
+  }
 
-  const out = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim();
-  if (out) appendFileSync(logPath, out + "\n");
+  const out = readFileSync(logPath, "utf8").slice(before).trim();
 
   const ok = r.status === 0;
   // The last non-empty line is the summary these scripts print; that's what belongs in the report.
