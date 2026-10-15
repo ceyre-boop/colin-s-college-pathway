@@ -171,6 +171,10 @@ function acquireLock(): boolean {
 }
 
 function releaseLock() {
+  // A dry run never took the lock, so it must never give one back: `bun test` spawns two dry
+  // runs, and while a real scheduled run was in flight they deleted its lock out from under it,
+  // leaving the next run free to start concurrently and interleave writes to the ranked list.
+  if (DRY) return;
   try { if (existsSync(LOCK)) rmSync(LOCK); } catch { /* nothing useful to do */ }
 }
 
@@ -197,7 +201,10 @@ function main() {
   // 5. Bundle essays + form triage for the dashboard.
   step("emit essay kits", "bun", ["scout/emit-essays.ts"], { timeoutMin: 5 });
 
-  // 6. What's due soon, out of the state projection.
+  // 6. The deadline digest reads state/projection.json, which is a fold over the event log and
+  //    is gitignored — so on any machine that has not replayed the log it simply does not exist,
+  //    and the digest printed "run `bun state/rebuild.ts` first" every morning. Replay it here.
+  step("rebuild state projection", "bun", ["state/rebuild.ts"], { timeoutMin: 5 });
   step("deadline digest", "bun", ["state/deadlines.ts", "--days", "45"], { timeoutMin: 5 });
 
   // 7. Commit only the files this chain regenerates — never `git add -A`, which would sweep

@@ -2,7 +2,7 @@
 // These check both without running a 2-hour scoring pass.
 import { expect, test, describe } from "bun:test";
 import { spawnSync } from "child_process";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, rmSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 
@@ -12,13 +12,16 @@ const PLIST = join(ROOT, "scout", "launchd", "com.colin.scholarship-scout.plist"
 // Spawning a second bun runtime costs ~3s on its own; bun test's 5s default made these two
 // tests fail purely because the rest of the suite was running alongside them.
 const SPAWN_TIMEOUT = 30_000;
+const LOCK = join(homedir(), ".claude", "memory", "scholarship-scout", "daily.lock");
 
 describe("daily automation", () => {
   test("the dry run names every step in the chain", () => {
     const r = spawnSync("bun", ["scout/daily.ts", "--dry"], { cwd: ROOT, encoding: "utf8" });
     expect(r.status).toBe(0);
     for (const s of ["bigfuture harvest", "scout + score", "rescore failed",
-                     "regenerate topic bank", "emit essay kits", "deadline digest"]) {
+                     "regenerate topic bank", "emit essay kits",
+                     // the digest reads a gitignored projection, so the replay has to precede it
+                     "rebuild state projection", "deadline digest"]) {
       expect(r.stdout).toContain(s);
     }
   }, SPAWN_TIMEOUT);
@@ -26,7 +29,24 @@ describe("daily automation", () => {
   test("a dry run never commits, pushes or writes a lock", () => {
     const r = spawnSync("bun", ["scout/daily.ts", "--dry"], { cwd: ROOT, encoding: "utf8" });
     expect(r.stdout).not.toContain("git push");
-    expect(existsSync(join(homedir(), ".claude", "memory", "scholarship-scout", "daily.lock"))).toBe(false);
+    expect(existsSync(LOCK)).toBe(false);
+  }, SPAWN_TIMEOUT);
+
+  test("a dry run does not release a real run's lock", () => {
+    // It used to: this suite spawns dry runs, and running it while the 6am job was mid-harvest
+    // deleted that job's lock, which is the one thing stopping two runs interleaving their
+    // writes to the ranked list.
+    const owner = String(process.pid);
+    const existing = existsSync(LOCK) ? readFileSync(LOCK, "utf8") : null;
+    try {
+      writeFileSync(LOCK, owner);
+      spawnSync("bun", ["scout/daily.ts", "--dry"], { cwd: ROOT, encoding: "utf8" });
+      expect(existsSync(LOCK)).toBe(true);
+      expect(readFileSync(LOCK, "utf8")).toBe(owner);
+    } finally {
+      if (existing === null) rmSync(LOCK, { force: true });
+      else writeFileSync(LOCK, existing);
+    }
   }, SPAWN_TIMEOUT);
 
   test("the launchd plist is well-formed and scheduled daily", () => {
