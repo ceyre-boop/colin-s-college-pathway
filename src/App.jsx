@@ -13,7 +13,7 @@ import { fullProfile, fieldsBlock } from "./data/profile";
 import { buildLegacyPrompt } from "./lib/legacyPrompt";
 import { brainDump, dumpAsText } from "./lib/brainDump";
 import { estimateBatchCost, fmtUsd } from "./lib/essayCost";
-import { WORKFLOW_STATES, WORKFLOW_LABELS, EVIDENCE_STATUS, normalizeScholarship, expectedBenefit, advance, prioritize } from "./lib/scholarshipWorkflow";
+import { WORKFLOW_STATES, WORKFLOW_LABELS, EVIDENCE_STATUS, normalizeScholarship, expectedBenefit, advance, prioritize, isTouched } from "./lib/scholarshipWorkflow";
 import "./index.css";
 
 const usd = (n) => (n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}K` : `$${n.toLocaleString()}`);
@@ -101,11 +101,24 @@ export default function CollegePathway() {
   // Merge scout finds (src/data/scoutFound.js) into the localStorage-backed list.
   // Scout ids are stable slugs, so re-runs only add genuinely new scholarships and
   // the user's status/amount edits on existing ones persist.
+  //
+  // The merge also PRUNES. It used to only add, so a scout entry that landed once stayed in the
+  // browser forever — including one the scout has since disqualified. That is how the NSHSS
+  // Foundation STEM Scholarship ("High school students of all grade levels") kept appearing in
+  // the brain dump with a countdown after the pipeline had already dropped it.
+  //
+  // Only untouched scout imports are dropped: anything carrying work — a changed status, a
+  // workflow state, notes, a won amount — is the user's, not the scout's, and stays.
   useEffect(() => {
     setScholarships((prev) => {
       const normalized = prev.map(normalizeScholarship);
-      const fresh = SCOUT_SCHOLARSHIPS.filter((s) => !normalized.some((p) => p.id === s.id)).map(normalizeScholarship);
-      return [...normalized, ...fresh];
+      const current = new Set(SCOUT_SCHOLARSHIPS.map((s) => s.id));
+      const kept = normalized.filter((s) => {
+        if (!String(s.id).startsWith("sc_scout_") || current.has(s.id)) return true;
+        return isTouched(s);
+      });
+      const fresh = SCOUT_SCHOLARSHIPS.filter((s) => !kept.some((p) => p.id === s.id)).map(normalizeScholarship);
+      return [...kept, ...fresh];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

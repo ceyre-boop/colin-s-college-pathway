@@ -28,6 +28,9 @@
 //   --rescore-failed  re-score only score_failed entries from the cache, re-rank
 //   --rescore-all     ignore remembered scores and score every candidate again
 //   --backfill-cache  seed the score cache from the last run's JSON, score nothing
+//   --enrich N        top-ranked BigFuture candidates to fetch requirements for (default 250)
+//   --no-enrich       skip the detail fetch entirely
+//   --rescreen        re-run the eligibility screen over the last run's list (no scrape/score)
 
 import { homedir } from "os";
 import { join, dirname } from "path";
@@ -38,6 +41,9 @@ import { readFileSync, existsSync, mkdirSync } from "fs";
 import { PROJECTION_PATH } from "../state/rebuild";
 import { computeOutcomeBuckets, realizedWinRate, type OutcomeBucket } from "../state/outcomes";
 import { cacheKey, profileHash, usableScores, mergedCache, MAX_AGE_DAYS, type ScoreCacheFile } from "./score-cache";
+import { buildEligibilityProfile, screenEligibility } from "./eligibility";
+import { loadVault, resolveApplicant } from "../identity/vault";
+import { readDetailCache, writeDetailCache, fetchDetails, detailText, slugOf } from "./bigfuture-detail";
 
 const HOME = homedir();
 const PROFILE_PATH = join(HOME, ".claude", "memory", "scholarship_profile.json");
@@ -72,6 +78,9 @@ export interface Candidate {
   flags?: string[];
   expectedValue?: number;
   amountEstimated?: boolean;
+  // set by the pre-scoring eligibility screen; the candidate is kept in the output file under
+  // `ineligible` rather than deleted, so a wrong rule is auditable instead of invisible.
+  ineligibleReason?: string;
 }
 
 export interface SourceStatus {
@@ -89,6 +98,9 @@ const opt = (f: string, dflt: number) => {
 };
 const TOP_N = opt("--top", 20);
 const SCORE_LIMIT = opt("--limit", 120);
+// How many top-ranked BigFuture candidates get their requirements fetched per run. Details are
+// cached permanently, so this is a backlog rate, not a cap on how many are ever screened.
+const ENRICH_LIMIT = opt("--enrich", 250);
 
 // ---------------------------------------------------------------------------
 // Fetching
@@ -246,6 +258,22 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
+/**
+ * The one-line requirements text a Scholarships360 card can support. screenEligibility() needs
+ * prose, and "Grade level: High School Senior." is enough for it to disqualify deterministically.
+ * Returns null when the card carried nothing — an empty string would read as "screened and clean".
+ */
+export function describeCard(
+  gradeLevel: string | null,
+  amountKey: string | null,
+  amountText: string | null,
+): string | null {
+  const parts: string[] = [];
+  if (gradeLevel) parts.push(`Grade level: ${gradeLevel}.`);
+  if (amountKey && amountText) parts.push(`${amountKey.replace(/\b\w/, (c) => c.toUpperCase())} ${amountText}.`);
+  return parts.length ? parts.join(" ") : null;
+}
+
 async function scrapeScholarships360(statuses: SourceStatus[]): Promise<Candidate[]> {
   const bySlug = new Map<string, Candidate>();
   for (const pageUrl of S360_PAGES) {
@@ -268,15 +296,26 @@ async function scrapeScholarships360(statuses: SourceStatus[]): Promise<Candidat
       const pairRe = /card-info(?:_mob)?-name"[^>]*>([^<]+)<[\s\S]{0,200}?card-info(?:_mob)?-value"[^>]*>([^<]+)</g;
       let p: RegExpExecArray | null;
       while ((p = pairRe.exec(win))) pairs[stripTags(p[1]).toLowerCase()] = stripTags(p[2]);
-      const amountText = pairs["amount"] ?? null;
+      // The amount key carries the award count, so it is never literally "amount":
+      // "1 award worth", "2 awards worth", "4 awards worth up to", "multiple awards worth".
+      // Reading only pairs["amount"] left every Scholarships360 find with a null amount, which
+      // zeroes its expected value and buries it in the ranking.
+      const amountKey = Object.keys(pairs).find((k) => /awards?\s+worth/.test(k));
+      const amountText = amountKey ? pairs[amountKey] : null;
+      // "Grade level" is a structured field on ~2/3 of cards ("High School Senior",
+      // "High School Seniors & College Students", "All Grade Levels"). It is the single most
+      // valuable eligibility fact on the page and used to be discarded, which left the free
+      // deterministic screen with no text to screen and sent high-school-only awards all the way
+      // through to the dashboard.
+      const gradeLevel = pairs["grade level"] ?? null;
       bySlug.set(slug, {
         name: slugToName(slug),
         org: null,
         amount: parseAmount(amountText),
         amountText,
-        deadline: pairs["deadline"] ?? null,
+        deadline: pairs["deadline"] ?? pairs["next deadline"] ?? null,
         url,
-        description: null,
+        description: describeCard(gradeLevel, amountKey ?? null, amountText),
         source: "scholarships360",
       });
       count++;
@@ -753,6 +792,23 @@ async function main() {
     return;
   }
 
+  // --rescreen: no scraping and no scoring — re-run the free eligibility screen over the last
+  // run's list, fetching BigFuture requirements for the top of it. Use it after a screening rule
+  // changes, so the dashboard stops showing awards the student cannot win without waiting for a
+  // full harvest.
+  if (flag("--rescreen")) {
+    const cached = await Bun.file(OUTPUT_PATH).json();
+    const all: Candidate[] = [...cached.ranked, ...cached.low_match, ...cached.removed_scams, ...(cached.ineligible ?? [])];
+    // Re-screening is the whole point, so a previous verdict must not stick.
+    for (const c of all) {
+      c.flags = (c.flags ?? []).filter((f) => f !== "ineligible");
+      delete c.ineligibleReason;
+    }
+    console.log(`Re-screening ${all.length} entries from ${OUTPUT_PATH} (generated ${cached.generated_at}).`);
+    await finalizeAndReport(all, cached.sources, 0, cached.scoring_backend ?? "cache");
+    return;
+  }
+
   if (flag("--rescore-failed")) {
     const cached = await Bun.file(OUTPUT_PATH).json();
     const profile = await Bun.file(PROFILE_PATH).json();
@@ -806,6 +862,37 @@ async function main() {
     `${candidates.length} unique candidates (${bigfuture.length} BigFuture, ${cos.length} CareerOneStop, ${s360.length} Scholarships360, ` +
       `${unigo.length} Unigo, ${propublica990.length} ProPublica990, ${probed.length} probes)`,
   );
+
+  // Eligibility screen — deterministic, free, and it runs BEFORE scoring so a disqualified
+  // candidate never costs a model call and never reaches the dashboard.
+  //
+  // This module existed and was fully tested, but nothing in this pipeline ever called it: the
+  // only caller was adjudicate.ts, which screens applications that have already been created by
+  // hand. That is how the NSHSS Foundation STEM Scholarship — "High school students of all grade
+  // levels" — arrived in the dashboard's brain dump as an actionable lead with a deadline.
+  const eligibility = buildEligibilityProfile(resolveApplicant(loadVault()) as any);
+  const requirementsTextOf = (c: Candidate) =>
+    [c.name, c.org, c.description].filter(Boolean).join(". ");
+  const ineligible: Candidate[] = [];
+  candidates = candidates.filter((c) => {
+    const v = screenEligibility(requirementsTextOf(c), eligibility);
+    if (v.decision !== "disqualified") return true;
+    c.flags = [...(c.flags ?? []), "ineligible"];
+    c.ineligibleReason = v.reasons[0];
+    ineligible.push(c);
+    return false;
+  });
+  if (ineligible.length) {
+    const byRule = new Map<string, number>();
+    for (const c of ineligible) {
+      const r = c.ineligibleReason ?? "unknown";
+      byRule.set(r, (byRule.get(r) ?? 0) + 1);
+    }
+    console.log(`${ineligible.length} candidates disqualified on eligibility before scoring:`);
+    for (const [reason, n] of [...byRule.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6)) {
+      console.log(`  ${String(n).padStart(5)}  ${reason}`);
+    }
+  }
 
   // Scores already taken stay taken. Only what the scout has never seen is sent to the model,
   // which is what makes a daily run minutes instead of hours.
@@ -880,11 +967,43 @@ async function main() {
   const unreached = candidates.filter((c) => c.match === undefined && !reached.has(c));
   if (unreached.length) console.log(`${unreached.length} candidates left unscored for a later run (--limit ${SCORE_LIMIT})`);
 
-  await finalizeAndReport([...scoredAlready, ...candidatesToScore], statuses, cost, backend);
+  await finalizeAndReport([...scoredAlready, ...candidatesToScore], statuses, cost, backend, ineligible);
+}
+
+/**
+ * Should this run's results replace the ones already on disk?
+ *
+ * A blocked source is not an empty source. CareerOneStop rate-limits, and when all 28 of its
+ * keyword queries come back BLOCKED the run harvests ~2,900 fewer candidates through no fault of
+ * the catalog — then publishes the shortfall over a good list and regenerates the dashboard from
+ * it. This is the same failure the BigFuture cache already guards against (see cacheVerdict in
+ * bigfuture-harvest.ts): a partial pass must never overwrite a complete one.
+ *
+ * A clean run always publishes, including one that is legitimately smaller because listings
+ * closed. The refusal is narrow: something was blocked AND the result collapsed.
+ */
+export function publishVerdict(opts: { blocked: string[]; fresh: number; existing: number }): { publish: boolean; reason: string } {
+  const { blocked, fresh, existing } = opts;
+  if (!blocked.length) return { publish: true, reason: "every source reported in" };
+  if (existing <= 100) return { publish: true, reason: "no meaningful previous list to protect" };
+  // 90%, not the 70% the BigFuture cache uses. That guard compares two harvests of the same
+  // source, where churn is normal; here a blocked source means a whole slice is simply absent,
+  // so any real shortfall is loss rather than listings closing.
+  const floor = Math.round(existing * 0.9);
+  if (fresh < floor) {
+    return {
+      publish: false,
+      reason:
+        `${blocked.length} source${blocked.length === 1 ? "" : "s"} blocked and the harvest fell to ${fresh} ` +
+        `from ${existing} (floor ${floor}) — keeping the previous list`,
+    };
+  }
+  return { publish: true, reason: `${blocked.length} source(s) blocked but ${fresh} of ${existing} survived` };
 }
 
 // Rank, filter, write JSON, print the summary, optionally regenerate scoutFound.js.
-async function finalizeAndReport(candidates: Candidate[], statuses: SourceStatus[], cost: number, backend: string) {
+async function finalizeAndReport(candidates: Candidate[], statuses: SourceStatus[], cost: number, backend: string, ineligible: Candidate[] = []) {
+  // eslint-disable-next-line prefer-const -- reassigned when the detail pass adds to it
   for (const c of candidates) rank(c);
   // Hard scam signals remove an entry; soft flags (suspicious, missing_org) only warn —
   // the scorer over-flags legitimate awards on data-quality gaps.
@@ -892,9 +1011,58 @@ async function finalizeAndReport(candidates: Candidate[], statuses: SourceStatus
   const scams = candidates.filter((c) => (c.flags ?? []).some((f) => HARD_FLAGS.includes(f)));
   // match < 20 = "doesn't qualify" — a $500K faculty award at 5% match is not a $25K EV.
   const lowMatch = candidates.filter((c) => !scams.includes(c) && (c.match ?? 50) < 20);
-  const ranked = candidates
+  let ranked = candidates
     .filter((c) => !scams.includes(c) && !lowMatch.includes(c))
     .sort((a, b) => (b.expectedValue ?? 0) - (a.expectedValue ?? 0));
+
+  // Second eligibility pass, on the only candidates whose requirements are worth fetching: the
+  // ones at the top of the list the dashboard actually shows. BigFuture's card list carries no
+  // requirements at all, so these reached the scorer as a bare title; its detail page states them
+  // plainly. Details are cached forever, so the backlog drains a slice per run.
+  const eligibility = buildEligibilityProfile(resolveApplicant(loadVault()) as any);
+  const detailCache = await readDetailCache();
+  const wanted = ranked
+    .filter((c) => c.source === "bigfuture")
+    .map((c) => slugOf(c.url))
+    .filter((x): x is string => !!x)
+    .filter((slug) => !detailCache[slug])
+    .slice(0, ENRICH_LIMIT);
+  if (wanted.length && !flag("--no-enrich")) {
+    console.log(`\nFetching BigFuture requirements for ${wanted.length} top-ranked candidates…`);
+    const { fetched, failed } = await fetchDetails(wanted, detailCache, {
+      onProgress: (done, total) => { if (done % 60 === 0 || done === total) console.log(`  ${done}/${total}`); },
+    });
+    await writeDetailCache(detailCache);
+    console.log(`  ${fetched} fetched, ${failed} unreadable — ${Object.keys(detailCache).length} cached in all`);
+  }
+
+  const lateDq: Candidate[] = [];
+  ranked = ranked.filter((c) => {
+    const slug = c.source === "bigfuture" ? slugOf(c.url) : null;
+    const d = slug ? detailCache[slug] : null;
+    if (!d) return true;
+    // The detail page is authoritative on the award amount too; the card list produced $20,002
+    // for a $2,000 award because React's SSR splits "$" from the digits with a comment node.
+    if (d.amountText && d.amountText !== c.amountText) {
+      c.amountText = d.amountText;
+      c.amount = parseAmount(d.amountText);
+      c.amountEstimated = false;
+      rank(c);
+    }
+    c.description = [c.description, detailText(d)].filter(Boolean).join(" ");
+    const v = screenEligibility(detailText(d), eligibility);
+    if (v.decision !== "disqualified") return true;
+    c.flags = [...(c.flags ?? []), "ineligible"];
+    c.ineligibleReason = v.reasons[0];
+    lateDq.push(c);
+    return false;
+  });
+  if (lateDq.length) {
+    console.log(`${lateDq.length} top-ranked candidates disqualified once their requirements were read:`);
+    for (const c of lateDq.slice(0, 8)) console.log(`  ${c.name} — ${c.ineligibleReason}`);
+    ineligible = [...ineligible, ...lateDq];
+  }
+  ranked.sort((a, b) => (b.expectedValue ?? 0) - (a.expectedValue ?? 0));
 
   const output = {
     generated_at: new Date().toISOString(),
@@ -905,10 +1073,30 @@ async function finalizeAndReport(candidates: Candidate[], statuses: SourceStatus
     ranked,
     low_match: lowMatch,
     removed_scams: scams,
+    ineligible,
     needs_browser: NEEDS_BROWSER,
   };
+  // Refuse to publish a collapsed harvest over a good one (see publishVerdict).
+  const blocked = statuses.filter((st) => st.status === "blocked" || st.status === "error").map((st) => st.source);
+  let existingTotal = 0;
+  try {
+    const prev = await Bun.file(OUTPUT_PATH).json();
+    existingTotal = (prev.ranked?.length ?? 0) + (prev.low_match?.length ?? 0) + (prev.removed_scams?.length ?? 0) + (prev.ineligible?.length ?? 0);
+  } catch { /* no previous run — nothing to protect */ }
+  const freshTotal = ranked.length + lowMatch.length + scams.length + ineligible.length;
+  const verdict = publishVerdict({ blocked, fresh: freshTotal, existing: existingTotal });
+  if (!verdict.publish) {
+    console.error(`\nNOT WRITTEN: ${verdict.reason}.`);
+    console.error(`Blocked: ${[...new Set(blocked.map((b) => b.split(" (")[0]))].join(", ")}. Re-run when the source recovers.`);
+    process.exitCode = 1;
+    return;
+  }
+  if (blocked.length) console.log(`\n${verdict.reason}.`);
   await Bun.write(OUTPUT_PATH, JSON.stringify(output, null, 2));
-  console.log(`\nWrote ${ranked.length} ranked (${lowMatch.length} low-match + ${scams.length} scam-flagged set aside) → ${OUTPUT_PATH}`);
+  console.log(
+    `\nWrote ${ranked.length} ranked (${lowMatch.length} low-match + ${scams.length} scam-flagged + ` +
+      `${ineligible.length} ineligible set aside) → ${OUTPUT_PATH}`,
+  );
 
   // Console summary: top N by EV, split by deadline bucket.
   const top = ranked.slice(0, TOP_N);
@@ -929,7 +1117,8 @@ async function finalizeAndReport(candidates: Candidate[], statuses: SourceStatus
   if (flag("--emit-app")) await emitAppFile(ranked, output.generated_at);
 }
 
-main().catch((err) => {
+// Guarded: importing a helper from this file must not kick off a full harvest.
+if (import.meta.main) main().catch((err) => {
   console.error(`scout failed: ${err instanceof Error ? err.message : err}`);
   process.exit(1);
 });

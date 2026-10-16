@@ -34,6 +34,16 @@ describe("wrong-state", () => {
   test("Michigan residency → pass", () => {
     expect(dq("Must be a resident of Michigan pursuing a degree in biology.")).toBe("pass");
   });
+  test("a county list carries the state scope", () => {
+    // The McConnell Foundation Scholarship. No residency verb sits next to "California", so the
+    // scope has to be read from "counties in California" or the award looks open.
+    const t = "Reside or attend high school or community college in Modoc, Shasta, Siskiyou, Tehama, or Trinity counties in California. Demonstrate financial need.";
+    expect(dq(t)).toBe("disqualified");
+    expect(rule(t)).toBe("wrong-state");
+  });
+  test("a Michigan county list is still in scope", () => {
+    expect(dq("Resident of Genesee or Oakland counties in Michigan pursuing a degree in biology.")).toBe("pass");
+  });
   test("preference (not requirement) for a state → not disqualified", () => {
     const t = "Resident of the U.S. Studying biology. Preference is given to students enrolled in academic institutions in South Carolina and the Southeastern United States.";
     expect(dq(t)).not.toBe("disqualified");
@@ -106,6 +116,77 @@ describe("grade level", () => {
   });
   test("teacher/faculty required → disqualified", () => {
     expect(dq("Open to faculty applicants and educators in science.")).toBe("disqualified");
+  });
+});
+
+// Regression: the NSHSS Foundation STEM Scholarship reached the dashboard as an actionable lead.
+// Its own page reads "High school students of all grade levels with a minimum GPA of 3.0" — no
+// "only", no "must be" — so the old grade-level rule never fired and the listing screened "pass".
+// A college sophomore cannot win any of these, so every one is a wasted application.
+describe("high-school scope (no 'only')", () => {
+  const hsOnly = [
+    ["the provider's own eligibility line", "High school students of all grade levels with a minimum GPA of 3.0"],
+    ["the aggregator's listing", "Grade level: High School Students. Academic interest: Computer Science, Engineering. Minimum GPA 3.5. Open to college-bound high school students who have a demonstrated desire to major in STEM."],
+    ["open to, without 'only'", "This scholarship is open to graduating high school seniors."],
+    ["a high schooler's college PLANS are not a grade level", "Open to high school juniors planning to attend an accredited college."],
+  ] as const;
+  for (const [label, text] of hsOnly) {
+    test(`${label} → disqualified`, () => {
+      expect(dq(text)).toBe("disqualified");
+      expect(rule(text)).toBe("wrong-grade-level");
+    });
+  }
+
+  // The doctrine is bias-to-ambiguous: a false DQ silently throws away real money, so each of
+  // these must survive the rule.
+  const mustNotDq = [
+    ["high school AND college in scope", "Open to high school seniors and current undergraduate college students."],
+    ["college only", "Open to undergraduate students enrolled at an accredited college."],
+    ["an essay prompt that mentions high school", "Open to all undergraduate students. Essay: describe a challenge you faced in high school."],
+    ["'High School' inside the provider's name", "Offered by the National Society of High School Scholars. Open to undergraduates majoring in biology."],
+    ["community college transfer", "For community college students transferring to a four-year university."],
+  ] as const;
+  for (const [label, text] of mustNotDq) {
+    test(`${label} → not disqualified`, () => {
+      expect(dq(text)).not.toBe("disqualified");
+    });
+  }
+});
+
+describe("wrong-institution must not fire on a category of school", () => {
+  test("'attend high school or community college in <counties>' is not a named institution", () => {
+    // Real text from The McConnell Foundation Scholarship. It IS disqualifying — on California —
+    // but reading "high school or community college" as an institution attached a false reason to
+    // a true verdict, and would misfire on text describing where the student actually studies.
+    const t = "Reside or attend high school or community college in Modoc, Shasta, Siskiyou, Tehama, or Trinity counties in California.";
+    expect(rule(t)).not.toBe("wrong-institution");
+  });
+  test("a genuinely named school still disqualifies", () => {
+    const t = "Resident of the U.S. Planning to attend Presbyterian College. Seeking a bachelor's degree.";
+    expect(dq(t)).toBe("disqualified");
+    expect(rule(t)).toBe("wrong-institution");
+  });
+  test("the student's own community college is never a foreign scope", () => {
+    expect(dq("Transfer student from a community college seeking a bachelor's degree in biology.")).not.toBe("disqualified");
+  });
+});
+
+describe("citizenship must not fire on inclusive text", () => {
+  // All four strings are real, from BigFuture requirement lists.
+  test("'Undocumented students are encouraged to apply' is an invitation, not a bar", () => {
+    expect(dq("Reside in Shasta County, California. Undocumented students are encouraged to apply.")).not.toBe("disqualified");
+  });
+  test("a list that includes U.S. citizens does not exclude one", () => {
+    expect(dq("U.S. citizen, current DACA status, FAFSA-eligible non-citizen, permanent resident, or U.S. national. Demonstrate financial need.")).not.toBe("disqualified");
+  });
+  test("'first-generation college students, undocumented students, as well as students who have DACA status'", () => {
+    const t = "First-generation college students, undocumented students, as well as students who have DACA status and are planning to pursue a bachelor's degree.";
+    expect(rule(t)).not.toBe("citizenship");
+  });
+  test("a genuine requirement still disqualifies", () => {
+    const t = "Open to undocumented students only, pursuing a degree in biology.";
+    expect(dq(t)).toBe("disqualified");
+    expect(rule(t)).toBe("citizenship");
   });
 });
 

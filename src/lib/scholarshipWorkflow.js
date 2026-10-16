@@ -123,3 +123,24 @@ export function advance(s, next) {
   if (!check.ok) return { scholarship: s, error: check.reason };
   return { scholarship: { ...s, workflowState: next, expectedBenefit: expectedBenefit(s) } };
 }
+
+/**
+ * Has the user done anything to this scholarship, beyond it having been imported?
+ *
+ * Used when re-merging scout finds: an untouched import that the scout no longer ranks can be
+ * dropped, because the pipeline has since judged it not worth his time (usually: he isn't
+ * eligible). Anything he has actually worked on stays, whatever the scout now thinks — losing
+ * his work to a filter change would be far worse than showing one stale card.
+ */
+export function isTouched(s) {
+  if (!s) return false;
+  // "discovered"/"DISCOVERED" is where every import starts — see LEGACY_TO_WORKFLOW and
+  // toCanonical. Anything past it is a step he took.
+  if (s.status && !["apply", "research", "future"].includes(s.status)) return true;
+  if (s.workflowState && s.workflowState !== "discovered") return true;
+  if (s.canonicalState && toCanonical(s.canonicalState) !== "DISCOVERED") return true;
+  if (Number(s.awardedAmount) > 0) return true;
+  if (typeof s.notes === "string" && s.notes.trim() && !s.notes.startsWith("Scout find (")) return true;
+  if (s.essayDraft || s.submittedAt || s.pinned) return true;
+  return false;
+}

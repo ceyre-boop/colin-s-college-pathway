@@ -174,7 +174,10 @@ const STATE_SCOPE = new RegExp(
   "(?:reside(?:nt|nts|s|ncy)?|residing|living|live|domiciled|located|based)\\s+(?:in|of|within)\\s+" +
     "|(?:attend(?:ing)?|enrolled(?:\\s+in)?|studying)\\s+(?:a\\s+)?(?:school|college|university|institution|high\\s+school)s?\\s+in\\s+" +
     "|(?:graduat\\w+\\s+from\\s+a\\s+)?high\\s+school\\s+in\\s+" +
-    "|(?:from|of)\\s+the\\s+(?:state\\s+of\\s+)?",
+    "|(?:from|of)\\s+the\\s+(?:state\\s+of\\s+)?" +
+    // "...in Modoc, Shasta, Siskiyou, Tehama, or Trinity counties in California" — a county list
+    // leaves the state far from any residency verb, so the scope has to be read off the counties.
+    "|(?:count(?:y|ies)|parish(?:es)?|boroughs?)\\s+(?:in|of)\\s+",
   "i",
 );
 
@@ -198,6 +201,61 @@ function scopedStates(text: string): string[] {
     if (abbr !== "in" && abbr !== "or" && abbr !== "me" && abbr !== "ok" && abbrCtx.test(text)) found.add(name);
   }
   return [...found];
+}
+
+// ---------------------------------------------------------------------------
+// Grade-level scope — "is this award addressed to high-school students?"
+//
+// Listings almost never write "high school students only". They write "Open to high school
+// seniors", "Grade level: High School Students", or "High school students of all grade levels".
+// The rule below used to require the word "only" (or "must be ..."), so every one of those common
+// phrasings sailed straight through and a college student was handed awards he cannot win —
+// measured on the NSHSS Foundation STEM Scholarship, whose own page reads "High school students of
+// all grade levels with a minimum GPA of 3.0" and which screened as "pass".
+//
+// Only a SCOPE counts. Prose that merely mentions high school ("a challenge you faced in high
+// school", or the provider's own name, "National Society of High School Scholars") is not a scope
+// and must never DQ — hence the explicit cue list, which deliberately excludes "of".
+// ---------------------------------------------------------------------------
+
+const HS_LEVEL =
+  "(?:current\\s+|currently\\s+|graduating\\s+|rising\\s+|incoming\\s+|college-?\\s?bound\\s+)*" +
+  "high\\s+school\\s+(?:students?|seniors?|juniors?|sophomores?|freshm(?:a|e)n|scholars?)";
+
+// Phrases that INTRODUCE who the award is for. "of" is absent on purpose: "Society of High School
+// Scholars" is a name, not an eligibility scope.
+const HS_SCOPE_CUE =
+  "(?:open\\s+to|available\\s+to|awarded\\s+to|offered\\s+to|designed\\s+for|intended\\s+for|" +
+  "eligibility|eligible|grade\\s+levels?|applicants?\\s+must\\s+be|must\\s+be|recognizes|for|to)";
+
+const HS_SCOPED = new RegExp(
+  // "Open to ... high school seniors", "Grade level: High School Students"
+  "\\b" + HS_SCOPE_CUE + "\\s*:?\\s+(?:\\w+[\\s,]+){0,6}?" + HS_LEVEL + "\\b" +
+    // "High school students of all grade levels ...", "High school seniors who ... are eligible"
+    // screenEligibility() prepends a space, so the "start of text" anchor must tolerate it.
+    "|(?:^\\s*|[.;:]\\s*)" + HS_LEVEL +
+    "\\b(?=[^.;]*\\b(?:of\\s+all\\s+grade\\s+levels|only|who\\s+|in\\s+grades|are\\s+eligible|may\\s+apply|with\\s+(?:a|at\\s+least)\\b))",
+  "i",
+);
+
+// A high schooler's FUTURE college plans are not a grade level — "college-bound", "planning to
+// attend college". Stripped before looking for a post-secondary level, or every HS award that
+// mentions college would look open to college students.
+const FUTURE_COLLEGE =
+  /\bcollege-?\s?bound\b|\b(?:plan(?:ning|s)?\s+to\s+|intend(?:ing|s)?\s+to\s+|hoping\s+to\s+|will\s+|who\s+will\s+|to\s+)?(?:attend|enter|entering|enroll\s+in|begin|start|pursue)\s+(?:an?\s+)?(?:accredited\s+)?(?:college|university|post-?secondary)\w*/gi;
+
+// A post-secondary level the student could actually hold.
+const COLLEGE_LEVEL =
+  /\b(?:undergraduates?|undergrads?|post-?secondary\s+students?|college\s+students?|university\s+students?|community\s+college\s+students?|college\s+(?:freshm(?:a|e)n|sophomores?|juniors?|seniors?)|currently\s+enrolled\s+(?:in|at)\s+(?:an?\s+)?(?:accredited\s+)?(?:college|university|two-?year|four-?year|community)|transfer\s+students?|graduate\s+students?|adult\s+learners?|associates?(?:'|')?\s+degree|bachelor'?s?\s+degree\s+(?:candidates?|students?)|current\s+college|returning\s+students?)\b/i;
+
+/** Does the text scope eligibility to high-school students? */
+export function scopesToHighSchool(text: string): boolean {
+  return HS_SCOPED.test(text);
+}
+
+/** Does the text name a post-secondary level, ignoring a high schooler's future college plans? */
+export function namesCollegeLevel(text: string): boolean {
+  return COLLEGE_LEVEL.test(text.replace(FUTURE_COLLEGE, " "));
 }
 
 // ---------------------------------------------------------------------------
@@ -242,6 +300,11 @@ export function screenEligibility(
       const school = norm(m[1]);
       // ignore generic ("a university", "any college", "an accredited college")
       if (/^(a|an|any|accredited|four-?year|two-?year|participating|eligible|your|their|local|community)\b/.test(school)) continue;
+      // A category of school is not a named school. "Reside or attend high school or community
+      // college in Modoc, Shasta, ... counties" was reading as a restriction to an institution
+      // called "high school or community college" — a disqualification with a false reason
+      // attached, on a phrase that describes exactly where the student does study.
+      if (/\b(high\s+school|community\s+college|junior\s+college|technical\s+college|vocational\s+(school|college)|trade\s+school)\b/.test(school)) continue;
       namedSchools.push(school);
     }
     if (namedSchools.length) {
@@ -280,16 +343,33 @@ export function screenEligibility(
   // 4) Wrong grade level — graduate/faculty/HS-senior-only scopes.
   const levelDq: [RegExp, string][] = [
     [/\bgraduate\s+students?\s+only\b|\b(ph\.?d|doctoral|master'?s?)\s+(students?|candidates?)\s+only\b|\bmust\s+be\s+(a\s+)?(graduate|doctoral|ph\.?d)\s+student\b/i, "graduate/doctoral only"],
-    [/\b(current\s+)?high\s+school\s+(senior|junior|student)s?\s+only\b|\bmust\s+be\s+(a\s+)?(current\s+|graduating\s+)*high\s+school\s+(senior|student)\b/i, "high-school-only (student is in college)"],
     [/\b(teacher|faculty|professor|educator|administrator)\s+(applicants?|only)\b|\bmust\s+be\s+(a\s+|an\s+)?(teacher|faculty|educator)\b/i, "requires being a teacher/faculty member"],
     [/\bentering\s+freshm(a|e)n\s+only\b|\bincoming\s+freshm(a|e)n\s+only\b|\bfirst[- ]time\s+freshm(a|e)n\s+only\b/i, "entering-freshman only (student is a returning transfer)"],
   ];
   for (const [re, why] of levelDq) {
     if (re.test(text)) return { decision: "disqualified", reasons: [why], hardDqRule: "wrong-grade-level" };
   }
+  // High-school scope, with no post-secondary level named alongside it. Checked as a pair so that
+  // "open to high school seniors and current undergraduates" still passes.
+  if (scopesToHighSchool(text) && !namesCollegeLevel(text)) {
+    return {
+      decision: "disqualified",
+      reasons: ["scoped to high-school students; student is a college sophomore"],
+      hardDqRule: "wrong-grade-level",
+    };
+  }
 
-  // 5) Citizenship — DACA/undocumented-required, or a specific non-US citizenship required.
-  if (/\b(daca|undocumented|dreamer)\s+(students?|applicants?|only)\b|\bmust\s+be\s+(a\s+)?(daca|undocumented)\b/i.test(text)) {
+  // 5) Citizenship — only when DACA/undocumented status is genuinely REQUIRED.
+  //
+  // This rule used to fire on any mention of the words, which cost real awards: "Undocumented
+  // students are encouraged to apply" is an invitation, and "U.S. citizen, current DACA status,
+  // FAFSA-eligible non-citizen, permanent resident" is a list that EXPLICITLY includes the
+  // student. Both read as a disqualification. 11 of the first 500 listings whose requirements
+  // were fetched matched the old pattern; none of them actually excluded a US citizen.
+  const CITIZEN_ACCEPTED = /\bu\.?s\.?\s*(?:citizens?|nationals?)\b|\bunited\s+states\s+citizens?\b|\bpermanent\s+residents?\b|\bcitizens?\s+or\b/i;
+  const DACA_REQUIRED =
+    /\b(?:daca|undocumented|dreamer)\s+(?:students?|applicants?)\s+only\b|\bonly\s+(?:daca|undocumented|dreamer)s?\b|\bmust\s+(?:be|have)\s+(?:an?\s+)?(?:daca|undocumented|dreamer)\b|\bmust\s+have\s+daca\s+status\b/i;
+  if (DACA_REQUIRED.test(text) && !CITIZEN_ACCEPTED.test(text)) {
     return { decision: "disqualified", reasons: ["requires DACA/undocumented status; student is a US citizen"], hardDqRule: "citizenship" };
   }
 
