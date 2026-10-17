@@ -1,14 +1,14 @@
 # Last automated run
 
-> 2026-10-16T10:00:05.317Z · `bun scout/daily.ts` · completed
-> Log: `~/.claude/memory/scholarship-scout/daily-2026-10-16.log`
+> 2026-10-17T15:54:10.530Z · `bun scout/daily.ts` · completed
+> Log: `~/.claude/memory/scholarship-scout/daily-2026-10-17.log`
 
-**Harvest:** 4541 ranked · 4330 low-match · 5 scam-flagged · sources not ok → raise.me (probe):empty, appily/cappex (probe):empty, petersons (probe):empty, unigo (our-scholarships):empty, unigo (by-major/biology-scholarships):empty, unigo (by-major/chemistry-scholarships):error, unigo (by-major/engineering-scholarships):empty, unigo (by-major/pre-med-scholarships):error, unigo (by-type/need-based-scholarships):empty, unigo (by-type/entrepreneurship-scholarships):empty, unigo (by-type/full-ride-scholarships):empty, unigo (athletic/wrestling-scholarships):empty, unigo (athletic/martial-arts-scholarships):error
+**Harvest:** 4415 ranked · 4324 low-match · 5 scam-flagged · sources not ok → raise.me (probe):empty, appily/cappex (probe):empty, petersons (probe):empty, unigo (our-scholarships):empty, unigo (by-major/biology-scholarships):empty, unigo (by-major/chemistry-scholarships):error, unigo (by-major/engineering-scholarships):empty, careeronestop (athlete):blocked, unigo (by-major/pre-med-scholarships):error, unigo (by-type/need-based-scholarships):empty, unigo (by-type/entrepreneurship-scholarships):empty, unigo (by-type/full-ride-scholarships):empty, unigo (athletic/wrestling-scholarships):empty, unigo (athletic/martial-arts-scholarships):error
 
 | Step | Result | Detail |
 |------|--------|--------|
-| bigfuture harvest | ok | Next: bun scout/scout.ts --emit-app --limit 400 |
-| scout + score + emit app data | ok | Wrote 30 scout entries → src/data/scoutFound.js (generated 2026-10-16T10:16:09.318Z) |
+| bigfuture harvest | **FAILED** | Next: bun scout/scout.ts --emit-app --limit 400 |
+| scout + score + emit app data | ok | Wrote 30 scout entries → src/data/scoutFound.js (generated 2026-10-17T16:09:57.397Z) |
 | rescore failed batches | ok | No score_failed entries in the cache — nothing to do. |
 | regenerate topic bank | ok |   → scholarship_essays/TOPIC_BANK.md |
 | emit essay kits | ok | Wrote 20 apply kits → /Users/taboost/colin-s-college-pathway/src/data/essays.js (unchanged — kept timestamp) |
