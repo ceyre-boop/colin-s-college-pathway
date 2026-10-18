@@ -1,12 +1,12 @@
 # Essay Topic Bank
 
-> Generated 2026-10-17 by `bun scout/topic-bank.ts` from the scout run of 2026-10-17.
+> Generated 2026-10-18 by `bun scout/topic-bank.ts` from the scout run of 2026-10-18.
 > Regenerate after every scout run. Nothing here is written for you — this is the list of what to write.
 
 **How to use it:** write the 500-word version of each archetype below once, then cut it down per
 scholarship. Most prompts want 250–500 words, so the long draft is the parent of all the short ones.
 
-**Not in here:** 662 no-essay awards at 50%+ match from the same run — those need no words,
+**Not in here:** 628 no-essay awards at 50%+ match from the same run — those need no words,
 so they stay in `APPLICATION_QUEUE.md` as straight applications.
 
 ---
@@ -79,7 +79,7 @@ _No open scholarship is waiting on this one right now._
 
 ### Unsorted — open the URL to see the real prompt
 
-34 listings whose blurb doesn't say what the essay asks for.
+32 listings whose blurb doesn't say what the essay asks for.
 Each one asks for an essay; the listing just doesn't say which kind.
 Sorted by expected value, so work down from the top.
 
@@ -115,8 +115,6 @@ Sorted by expected value, so work down from the top.
 - [ ] **Guy m Wilson Scholarships** — — · due verify at URL · 55% match · https://scholarships360.org/scholarships/search/guy-m-wilson-scholarships/
 - [ ] **Bluepay Stem Scholarship** — $1,000 · due August · 80% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998037
 - [ ] **Dr. Arthur A. Kezian DDS Science Scholarship** — $1,200 · due March · 65% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9996038
-- [ ] **Jimmy Rane Foundation Scholarship** — — · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/jimmy-rane-foundation-scholarship
-- [ ] **Kathryn R. Thomas Scholarship** — — · due verify at URL · 50% match · https://bigfuture.collegeboard.org/scholarships/kathryn-r-thomas-scholarship
 
 ---
 
@@ -236,8 +234,10 @@ Sorted by expected value, so work down from the top.
 | Bettie Joy Bledsoe Thurmond Endowed Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Pradeau Endowed Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Karen Lee Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| Jimmy Rane Foundation Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| Greg Bourgeois Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 
-**Totals:** 150 scholarships at 50%+ match · 38 need new words · 112 reusable · 34 unsorted.
+**Totals:** 150 scholarships at 50%+ match · 36 need new words · 114 reusable · 32 unsorted.
 
 ---
 
