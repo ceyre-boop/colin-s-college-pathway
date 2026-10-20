@@ -1,12 +1,12 @@
 # Essay Topic Bank
 
-> Generated 2026-10-19 by `bun scout/topic-bank.ts` from the scout run of 2026-10-19.
+> Generated 2026-10-20 by `bun scout/topic-bank.ts` from the scout run of 2026-10-20.
 > Regenerate after every scout run. Nothing here is written for you — this is the list of what to write.
 
 **How to use it:** write the 500-word version of each archetype below once, then cut it down per
 scholarship. Most prompts want 250–500 words, so the long draft is the parent of all the short ones.
 
-**Not in here:** 614 no-essay awards at 50%+ match from the same run — those need no words,
+**Not in here:** 606 no-essay awards at 50%+ match from the same run — those need no words,
 so they stay in `APPLICATION_QUEUE.md` as straight applications.
 
 ---
@@ -54,10 +54,12 @@ _No open scholarship is waiting on this one right now._
 
 *Prompt to write against:* Describe a time you led. What did you build or change, and who did it serve?
 
-1 scholarship waiting on this topic:
+2 scholarships waiting on this topic:
 
 - [ ] **Richard J. Weyhrich Leadership Award** — $4,000 · due verify at URL · word limit unknown · 65% match
   - https://bigfuture.collegeboard.org/scholarships/richard-j-weyhrich-leadership-award
+- [ ] **NACA Scholarships for for Student Leaders** — — · due November · word limit unknown · 55% match
+  - https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992923
 
 ### Community service and impact
 
@@ -69,11 +71,15 @@ _No open scholarship is waiting on this one right now._
 
 *Prompt to write against:* What have you built, and why does building a business matter to you?
 
-_No open scholarship is waiting on this one right now._
+1 scholarship waiting on this topic:
+
+- [ ] **NASE Future Entrepreneur Award** — $24,000 · due verify at URL · word limit unknown · 60% match
+  - https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992884
+  - folder exists: `scholarship_essays/nase-future-entrepreneur-award/`
 
 ### Unsorted — open the URL to see the real prompt
 
-34 listings whose blurb doesn't say what the essay asks for.
+31 listings whose blurb doesn't say what the essay asks for.
 Each one asks for an essay; the listing just doesn't say which kind.
 Sorted by expected value, so work down from the top.
 
@@ -94,7 +100,6 @@ Sorted by expected value, so work down from the top.
 - [ ] **TRIUMF Summer Research Award** — $2,000 · due January · 60% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989656
 - [ ] **Michigan State Grants and Scholarships** — — · due verify at URL · 80% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2014640
 - [ ] **Scholarships for Transfer Students** — — · due verify at URL · 75% match · https://www.unigo.com/scholarships/undergraduate-students/transfer-scholarships
-- [ ] **Orafs Student Scholarship** — $2,000 · due Dec 31, 2026 · 55% match · https://scholarships360.org/scholarships/search/orafs-student-scholarship/
 - [ ] **MDI Biological Laboratory Undergraduate Summer Research Fellowships** — — · due January · 70% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9993019
 - [ ] **Dell Scholars Program** — — · due verify at URL · 70% match · https://scholarships360.org/scholarships/search/dell-scholars-program/
 - [ ] **Peek Law Group - Scholarship for Students** — $2,000 · due August · 50% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015681
@@ -104,13 +109,11 @@ Sorted by expected value, so work down from the top.
 - [ ] **Michigan Competitive Scholarship** — $1,500 · due verify at URL · 60% match · https://scholarships360.org/scholarships/search/michigan-competitive-scholarship/
 - [ ] **Scholarships for College Students** — — · due verify at URL · 60% match · https://www.unigo.com/scholarships/undergraduate-students/scholarships-for-college-students
 - [ ] **USGA/Chevron STEM Scholarship Program** — — · due verify at URL · 55% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989442
-- [ ] **John L. and Eleanore I. Mckinley Scholarships** — — · due February · 55% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9996095
 - [ ] **Collegexpress Monthly Scholarship** — — · due verify at URL · 55% match · https://scholarships360.org/scholarships/search/collegexpress-monthly-scholarship/
 - [ ] **Sofi 2500 Scholarship Giveaway** — — · due verify at URL · 55% match · https://scholarships360.org/scholarships/search/sofi-2500-scholarship-giveaway/
 - [ ] **Guy m Wilson Scholarships** — — · due verify at URL · 55% match · https://scholarships360.org/scholarships/search/guy-m-wilson-scholarships/
 - [ ] **Bluepay Stem Scholarship** — $1,000 · due August · 80% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998037
 - [ ] **Dr. Arthur A. Kezian DDS Science Scholarship** — $1,200 · due March · 65% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9996038
-- [ ] **WSSA Student Paper Competition** — — · due December · 50% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9988858
 
 ---
 
@@ -163,6 +166,7 @@ Sorted by expected value, so work down from the top.
 | Skyline Technologies Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Tocris Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Lieutenant General Douglas D. Buchholz Memorial Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
+| The Law Office of Shane R. Kadlec Public Service Scholarship | $2,000 | May | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Research Internships in Science and Engineering (RISE) | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Novus Biologicals Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | R&D Systems Scholarship | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -218,6 +222,7 @@ Sorted by expected value, so work down from the top.
 | SpawGlass Endowed Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | ACC Alumni Network Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Delco Endowed Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| iCoast CIO Council Technology Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Oportun Scholarship | $1,500 | March | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | CitizenshipTests.org Engineering and Science Scholarship | $1,000 | April | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Oberndorf Lifeline to Completion Scholarship | $1,500 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
@@ -231,9 +236,8 @@ Sorted by expected value, so work down from the top.
 | Greg Bourgeois Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Roger E. Shea, Jr. Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Lowe Family First Summer Student Scholarship | — | March | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| Dr. Elzada Clover and Dr. Lois Jotter Cutter Student Scholarship | — | March | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 
-**Totals:** 150 scholarships at 50%+ match · 36 need new words · 114 reusable · 34 unsorted.
+**Totals:** 150 scholarships at 50%+ match · 35 need new words · 115 reusable · 31 unsorted.
 
 ---
 
