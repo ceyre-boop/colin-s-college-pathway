@@ -1,12 +1,12 @@
 # Essay Topic Bank
 
-> Generated 2026-10-22 by `bun scout/topic-bank.ts` from the scout run of 2026-10-22.
+> Generated 2026-10-23 by `bun scout/topic-bank.ts` from the scout run of 2026-10-23.
 > Regenerate after every scout run. Nothing here is written for you — this is the list of what to write.
 
 **How to use it:** write the 500-word version of each archetype below once, then cut it down per
 scholarship. Most prompts want 250–500 words, so the long draft is the parent of all the short ones.
 
-**Not in here:** 594 no-essay awards at 50%+ match from the same run — those need no words,
+**Not in here:** 587 no-essay awards at 50%+ match from the same run — those need no words,
 so they stay in `APPLICATION_QUEUE.md` as straight applications.
 
 ---
@@ -71,7 +71,11 @@ _No open scholarship is waiting on this one right now._
 
 *Prompt to write against:* What have you built, and why does building a business matter to you?
 
-_No open scholarship is waiting on this one right now._
+1 scholarship waiting on this topic:
+
+- [ ] **NASE Future Entrepreneur Award** — $24,000 · due verify at URL · word limit unknown · 60% match
+  - https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992884
+  - folder exists: `scholarship_essays/nase-future-entrepreneur-award/`
 
 ### Unsorted — open the URL to see the real prompt
 
@@ -164,9 +168,9 @@ Sorted by expected value, so work down from the top.
 | Skyline Technologies Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Tocris Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Lieutenant General Douglas D. Buchholz Memorial Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
+| The Law Office of Shane R. Kadlec Public Service Scholarship | $2,000 | May | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Research Internships in Science and Engineering (RISE) | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | R&D Systems Scholarship | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
-| Novus Biologicals Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Eagle Scout Scholarships | — | verify | `scholarship_essays/foot-locker-scholar-athletes/essay.md` (418w) | send as-is |
 | Community College Scholarships | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | The Max and Nadine Dimick Scholarship | $2,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
@@ -174,7 +178,6 @@ Sorted by expected value, so work down from the top.
 | Worth Hill Scholarship | $2,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | TCATA College Scholarship Fund | $2,000 | April | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | 1st Financial Bank Usa Financial Goals Scholarship | $2,000 | Dec 31, 2026 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| Billy Turney Foundation Community College Scholarship | — | 01/31/2027 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Ben Clough Endowed Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Dick Kraus Scholarship for Scientific Thinking | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Aldo Valentini Scholarship | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -234,7 +237,7 @@ Sorted by expected value, so work down from the top.
 | Greg Bourgeois Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Roger E. Shea, Jr. Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 
-**Totals:** 150 scholarships at 50%+ match · 36 need new words · 114 reusable · 33 unsorted.
+**Totals:** 150 scholarships at 50%+ match · 37 need new words · 113 reusable · 33 unsorted.
 
 ---
 
