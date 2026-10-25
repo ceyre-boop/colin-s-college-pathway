@@ -31,3 +31,24 @@ The mitochondria repo is step 1 of this path.
 ## Sources (as given)
 
 Pfizer QSP role; Pfizer QSP postdoc; Sanofi QSP Scientist; Sanofi entry-level QSP Modeler; Regeneron Director; CMU–Pitt CPCB; Tri-Institutional CBSP; U-M Molecular & Integrative Physiology. Links were not included in the paste; re-pull before quoting salaries in any application.
+
+## Year-one goal (Nov 2026 – Oct 2027)
+
+**Target:** by October 2027, at least one existing drug that the pipeline predicted would help is confirmed in a disease's patient cells by a real lab. That turns "I cured it in a simulation" into something investors, foundations and journals take seriously.
+
+| Window | Work |
+|--------|------|
+| Nov–Jan | Get the model right: finish the current fix, port the 2007 model, build the Complex I disease population, rediscover the succinate bypass (positive control). |
+| Feb–Apr | Drug screen. Treatment library from already-approved drugs only, each tied to the model part it acts on (ChEMBL lists protein targets). Post preprint #1: method, positive control, ranked predictions. |
+| May–Jul | A lab tests the top 1–3 picks in patient cells. |
+| Aug–Oct | Publish the result either way. If a prediction holds, that is the moment to start the company. |
+
+**Critical path is the lab, not the code.** Colin can't test drugs in cells himself, so outreach starts in month 2, not month 9. The Beard email is the first one.
+
+### Posting rules
+
+- Post the process now. Real findings (e.g. "the textbook model puts 87% of control on one transporter") build an audience before it's needed.
+- Never say "cure" publicly before a lab confirms it. Families of affected kids will find the posts and get their hopes up.
+- Nothing that reads as medical advice, ever.
+
+Keep TABOOST running all year. It funds the attempt.
