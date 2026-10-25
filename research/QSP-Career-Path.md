@@ -1,10 +1,12 @@
-# Career Target: Quantitative Systems Pharmacology (QSP) Scientist
+# Possible Trajectory: QSP / Computational Oncology (Founder Route)
+
+**Status:** one possible trajectory, not the plan. Colin does NOT want to work for a salary. The goal is to own the company; ownership pays far more than any salary, but the "if" (it works) carries most of the weight. Treat the salaried QSP-scientist ladder below as the fallback and the skills-building route, not the destination.
 
 Best-fit title for the mitochondria-modeling work. Pfizer describes QSP as mechanistic mathematical models of disease used to improve drug decisions from early research through clinical trials. Academic name: computational systems biology. With cancer as the disease area, this is what "computational oncologist" means in practice.
 
 Related: [AI-Computational-Oncology-MasterPlan.md](AI-Computational-Oncology-MasterPlan.md)
 
-## Pay (current postings, unverified by us)
+## Salary benchmarks (fallback floor only, unverified)
 
 | Role | Range |
 |------|-------|
@@ -22,7 +24,7 @@ Related: [AI-Computational-Oncology-MasterPlan.md](AI-Computational-Oncology-Mas
    - Tri-Institutional PhD in Computational Biology & Medicine (Sloan Kettering, Weill Cornell, Rockefeller)
    - U-M Molecular & Integrative Physiology (Beard's department)
 3. **Postdoc, ~2 years**, often in industry. Pfizer and GSK both run QSP postdocs.
-4. **QSP scientist** at a drug company, or a company built on the pipeline.
+4. **Own it:** a company built on the pipeline (target). A QSP scientist job at a drug company is the fallback, and also a way to learn how pharma buys modeling work.
 
 The mitochondria repo is step 1 of this path.
 
