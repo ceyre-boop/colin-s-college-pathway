@@ -27,7 +27,8 @@
     "sat": "",
     "act": "",
     "expectedGraduation": "Spring 20XX",
-    "highSchool": ""
+    "highSchool": "",
+    "priorFourYear": ""
   },
   "financial": {
     "fafsaSAI": "",

@@ -211,3 +211,29 @@ describe("bias to ambiguous", () => {
     expect(dq("Applicants must demonstrate leadership and community involvement.")).toBe("ambiguous");
   });
 });
+
+describe("prior four-year attendance", () => {
+  const withPrior = buildEligibilityProfile({
+    identity: { citizenship: "US citizen", gender: "" },
+    contact: { address: { state: "MI" } },
+    academic: { currentSchool: "Mott Community College", highSchool: "", classLevel: "Sophomore", priorFourYear: "University of Michigan-Flint" },
+    financial: { residency: "MI" },
+  } as any);
+  const jkc = "Students who have previously attended a four-year institution (in the U.S. or internationally) are not eligible for this scholarship. Current community college students with a 3.5 GPA.";
+
+  test("Jack Kent Cooke exclusion → disqualified when a four-year term is on record", () => {
+    const v = screenEligibility(jkc, withPrior);
+    expect(v.decision).toBe("disqualified");
+    expect(v.hardDqRule).toBe("prior-four-year");
+  });
+  test("other exclusion phrasings", () => {
+    expect(screenEligibility("Applicants must not have previously attended a four-year college.", withPrior).hardDqRule).toBe("prior-four-year");
+    expect(screenEligibility("Community college students with no prior enrollment at a four-year university.", withPrior).hardDqRule).toBe("prior-four-year");
+  });
+  test("blank priorFourYear → rule stays inert", () => {
+    expect(rule(jkc)).not.toBe("prior-four-year");
+  });
+  test("requiring a four-year school is not an exclusion", () => {
+    expect(screenEligibility("Must attend an accredited four-year college in the United States studying biology.", withPrior).decision).toBe("pass");
+  });
+});

@@ -37,6 +37,7 @@ export interface Applicant {
     act: string;
     expectedGraduation: string;
     highSchool: string;
+    priorFourYear?: string; // four-year school with a completed term; "" if none
   };
   financial: { fafsaSAI: string; pellEligible: boolean; financialNeed: string; residency: string };
   honors: string[];
