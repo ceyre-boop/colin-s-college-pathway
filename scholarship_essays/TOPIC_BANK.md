@@ -1,12 +1,12 @@
 # Essay Topic Bank
 
-> Generated 2026-10-28 by `bun scout/topic-bank.ts` from the scout run of 2026-10-28.
+> Generated 2026-10-30 by `bun scout/topic-bank.ts` from the scout run of 2026-10-30.
 > Regenerate after every scout run. Nothing here is written for you — this is the list of what to write.
 
 **How to use it:** write the 500-word version of each archetype below once, then cut it down per
 scholarship. Most prompts want 250–500 words, so the long draft is the parent of all the short ones.
 
-**Not in here:** 564 no-essay awards at 50%+ match from the same run — those need no words,
+**Not in here:** 527 no-essay awards at 50%+ match from the same run — those need no words,
 so they stay in `APPLICATION_QUEUE.md` as straight applications.
 
 ---
@@ -75,7 +75,7 @@ _No open scholarship is waiting on this one right now._
 
 ### Unsorted — open the URL to see the real prompt
 
-31 listings whose blurb doesn't say what the essay asks for.
+32 listings whose blurb doesn't say what the essay asks for.
 Each one asks for an essay; the listing just doesn't say which kind.
 Sorted by expected value, so work down from the top.
 
@@ -95,6 +95,7 @@ Sorted by expected value, so work down from the top.
 - [ ] **TRIUMF Summer Research Award** — $2,000 · due January · 60% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989656
 - [ ] **Michigan State Grants and Scholarships** — — · due verify at URL · 80% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2014640
 - [ ] **Scholarships for Transfer Students** — — · due verify at URL · 75% match · https://www.unigo.com/scholarships/undergraduate-students/transfer-scholarships
+- [ ] **Orafs Student Scholarship** — $2,000 · due Dec 31, 2026 · 55% match · https://scholarships360.org/scholarships/search/orafs-student-scholarship/
 - [ ] **MDI Biological Laboratory Undergraduate Summer Research Fellowships** — — · due January · 70% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9993019
 - [ ] **Dell Scholars Program** — — · due verify at URL · 70% match · https://scholarships360.org/scholarships/search/dell-scholars-program/
 - [ ] **Peek Law Group - Scholarship for Students** — $2,000 · due August · 50% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015681
@@ -162,7 +163,6 @@ Sorted by expected value, so work down from the top.
 | Skyline Technologies Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Tocris Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Lieutenant General Douglas D. Buchholz Memorial Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
-| The Law Office of Shane R. Kadlec Public Service Scholarship | $2,000 | May | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Research Internships in Science and Engineering (RISE) | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | R&D Systems Scholarship | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Novus Biologicals Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -234,7 +234,7 @@ Sorted by expected value, so work down from the top.
 | Dr. Elzada Clover and Dr. Lois Jotter Cutter Student Scholarship | — | March | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Community Service Scholarship | $1,000 | November | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 
-**Totals:** 150 scholarships at 50%+ match · 34 need new words · 116 reusable · 31 unsorted.
+**Totals:** 150 scholarships at 50%+ match · 35 need new words · 115 reusable · 32 unsorted.
 
 ---
 
