@@ -50,6 +50,48 @@ describe("wrong-state", () => {
   });
 });
 
+describe("prior four-year enrollment", () => {
+  const JKC = "Applicants are not eligible if they have attended a four-year institution in the past. Must be a current community college student with a cumulative GPA of 3.5 or higher.";
+  const base = {
+    identity: { citizenship: "US citizen", gender: "" },
+    contact: { address: { state: "MI" } },
+    financial: { residency: "MI" },
+    doNotClaim: ["first-generation college student"],
+  };
+  const returning = buildEligibilityProfile({
+    ...base,
+    academic: { currentSchool: "Mott Community College", enrollmentNote: "returns to UM-Flint Fall 2027", highSchool: "", classLevel: "Sophomore" },
+  } as any);
+  const ccOnly = buildEligibilityProfile({
+    ...base,
+    academic: { currentSchool: "Mott Community College", enrollmentNote: "", highSchool: "", classLevel: "Sophomore" },
+  } as any);
+
+  test("a returning four-year student is excluded from a CC-only transfer award", () => {
+    const v = screenEligibility(JKC, returning);
+    expect(v.decision).toBe("disqualified");
+    expect(v.hardDqRule).toBe("prior-four-year");
+  });
+  test("a CC-only student is not", () => {
+    expect(screenEligibility(JKC, ccOnly).hardDqRule).toBeUndefined();
+  });
+  test("an explicit vault value overrides the enrollment note", () => {
+    const explicitNo = buildEligibilityProfile({
+      ...base,
+      academic: { currentSchool: "Mott Community College", enrollmentNote: "returning Fall 2027", priorFourYear: "no", highSchool: "", classLevel: "Sophomore" },
+    } as any);
+    expect(screenEligibility(JKC, explicitNo).hardDqRule).toBeUndefined();
+  });
+  test("other phrasings", () => {
+    expect(screenEligibility("Students must not have previously enrolled at a four-year college.", returning).hardDqRule).toBe("prior-four-year");
+    expect(screenEligibility("Applicant has never attended a 4-year university.", returning).hardDqRule).toBe("prior-four-year");
+  });
+  test("merely mentioning four-year schools does not fire", () => {
+    const t = "Community college students planning to transfer to a four-year institution to study biology.";
+    expect(screenEligibility(t, returning).hardDqRule).not.toBe("prior-four-year");
+  });
+});
+
 describe("wrong-institution", () => {
   test("scoped to a named non-home university → disqualified", () => {
     expect(dq("Students of Clemson University pursuing a science degree.")).toBe("disqualified");

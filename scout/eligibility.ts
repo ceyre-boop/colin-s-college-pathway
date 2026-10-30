@@ -32,6 +32,8 @@ export interface EligibilityProfile {
   isUsCitizen: boolean;
   /** undefined = declined to state; gender-restricted awards then screen ambiguous, never DQ. */
   gender?: "male" | "female";
+  /** Has already completed a full-time term at a four-year school (Colin: UM-Flint, Fall 2025). */
+  attendedFourYear: boolean;
 }
 
 // SCREENING POLICY — which academic fields and levels the student can honestly claim. This is
@@ -114,7 +116,7 @@ export function extractInstitutions(text: string): string[] {
 export function buildEligibilityProfile(a: {
   identity: { citizenship: string; gender: string };
   contact: { address: { state: string } };
-  academic: { currentSchool: string; highSchool: string; classLevel: string };
+  academic: { currentSchool: string; highSchool: string; classLevel: string; enrollmentNote?: string; priorFourYear?: string };
   financial: { residency: string };
   doNotClaim?: string[];
 }): EligibilityProfile {
@@ -145,6 +147,11 @@ export function buildEligibilityProfile(a: {
     // "" in the profile means decline-to-state. Gender-restricted awards must then screen as
     // ambiguous rather than being answered on the student's behalf.
     gender: (a.identity?.gender || "").toLowerCase() === "female" ? "female" : (a.identity?.gender || "").toLowerCase() === "male" ? "male" : undefined,
+    // Explicit vault value wins; otherwise an enrollment note that says the student is RETURNING
+    // to a school means they already attended it. That is how Colin's record reads today.
+    attendedFourYear: a.academic?.priorFourYear
+      ? /^(y|yes|true)\b/i.test(a.academic.priorFourYear)
+      : /\breturn(?:s|ing|ed)?\b/i.test(a.academic?.enrollmentNote || ""),
   };
 }
 
@@ -258,6 +265,11 @@ export function namesCollegeLevel(text: string): boolean {
   return COLLEGE_LEVEL.test(text.replace(FUTURE_COLLEGE, " "));
 }
 
+// "Applicants are not eligible if they have attended a four-year institution", "must not have
+// previously enrolled at a four-year college", "have never attended a 4-year university".
+const NO_PRIOR_FOUR_YEAR =
+  /\b(?:not\s+(?:be\s+)?eligible\s+if\s+(?:they|you|the\s+applicant)\s+(?:have|has)\s+(?:previously\s+|ever\s+)?|(?:have|has|must)\s+not\s+(?:have\s+)?(?:previously\s+|ever\s+)?|(?:have|has)\s+never\s+(?:previously\s+)?|no\s+prior\s+)(?:attended|enrolled\s+(?:in|at)|attendance\s+at|enrollment\s+at)\s+(?:a\s+|an\s+|any\s+)?(?:four|4)[- ]?year\b/i;
+
 // ---------------------------------------------------------------------------
 // The screen.
 // ---------------------------------------------------------------------------
@@ -348,6 +360,17 @@ export function screenEligibility(
   ];
   for (const [re, why] of levelDq) {
     if (re.test(text)) return { decision: "disqualified", reasons: [why], hardDqRule: "wrong-grade-level" };
+  }
+  // Community-college-transfer awards that exclude anyone who already attended a four-year school.
+  // The Jack Kent Cooke Undergraduate Transfer Scholarship is the expensive example: it sat at the
+  // top of the June queue ($55k, 88% match) while Colin's full-time Fall 2025 semester at UM-Flint
+  // rules him out. Only an explicit "have not attended a four-year" clause fires this.
+  if (profile.attendedFourYear && NO_PRIOR_FOUR_YEAR.test(text)) {
+    return {
+      decision: "disqualified",
+      reasons: ["excludes students who previously attended a four-year school; student completed a full-time term at UM-Flint"],
+      hardDqRule: "prior-four-year",
+    };
   }
   // High-school scope, with no post-secondary level named alongside it. Checked as a pair so that
   // "open to high school seniors and current undergraduates" still passes.

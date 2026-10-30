@@ -14,7 +14,8 @@ Workflow: open the URL → run the **Apply to Scholarship** Chrome shortcut (Sch
 
 ## Apply now
 
-- [ ] **Jack Kent Cooke Foundation Undergraduate Transfer Scholarship** | Jack Kent Cooke Foundation | $55,000 | January | 88% match
+- [x] ~~**Jack Kent Cooke Foundation Undergraduate Transfer Scholarship** | Jack Kent Cooke Foundation | $55,000 | January | 88% match~~
+  - **INELIGIBLE (checked 2026-10-30).** JKCF excludes anyone who has already attended a four-year school, unless they did less than one full-time semester there. Colin did a full-time 15-credit term at UM-Flint in Fall 2025. The 2027 cycle also closes **Dec 9, 2026**, not January. If you want to rule it out completely, email scholarships@jkcf.org. See `research/Transfer-Strategy-2027.md`.
   - Apply: https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9994025
   - Angle: MRI moment → computational oncology → Alta/TABOOST as proof he builds
   - Essay: `~/scholarship_essays/jack-kent-cooke-foundation-undergraduate-transfe/essay.md`
