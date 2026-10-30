@@ -37,6 +37,8 @@ export interface Applicant {
     act: string;
     expectedGraduation: string;
     highSchool: string;
+    /** "yes" once a full-time term at a four-year school is on the transcript. */
+    priorFourYear?: string;
   };
   financial: { fafsaSAI: string; pellEligible: boolean; financialNeed: string; residency: string };
   honors: string[];

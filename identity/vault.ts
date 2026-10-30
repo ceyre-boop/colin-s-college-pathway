@@ -132,6 +132,7 @@ export function resolveApplicant(v: Vault): Applicant {
       act: get("academic.act"),
       expectedGraduation: get("academic.expectedGraduation"),
       highSchool: get("academic.highSchool"),
+      priorFourYear: get("academic.priorFourYear"),
     },
     financial: {
       fafsaSAI: get("financial.fafsaSAI"),

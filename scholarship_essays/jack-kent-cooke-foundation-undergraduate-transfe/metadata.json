@@ -23,6 +23,11 @@
       "date": "2026-08-07",
       "by": "draft",
       "note": "Batch rewrite under the narrative doctrine + storytelling engine: distinct spine per essay, fact count cut to <=5, TABOOST described at true scale (largest US social media agency, $5M profit), no ask, ends on an image."
+    },
+    {
+      "date": "2026-10-30",
+      "by": "draft",
+      "note": "Marked ineligible: prior full-time semester at UM-Flint. Essay kept as raw material for other transfer essays."
     }
   ],
   "formMeta": {
@@ -46,5 +51,7 @@
     ],
     "autoSubmitEligible": false,
     "route": "chrome"
-  }
+  },
+  "ineligible": true,
+  "ineligibleReason": "JKCF excludes applicants who already attended a four-year institution (except under one full-time semester); Colin completed Fall 2025 full-time at UM-Flint. 2027 cycle deadline is Dec 9, 2026."
 }
