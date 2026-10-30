@@ -67,6 +67,7 @@ const POLICY: Record<string, { source: FieldSource; sensitivity: Sensitivity; au
   "academic.act": { source: "document", sensitivity: "public", autofill: true },
   "academic.expectedGraduation": { source: "official", sensitivity: "public", autofill: true },
   "academic.highSchool": { source: "official", sensitivity: "internal", autofill: true },
+  "academic.priorFourYear": { source: "official", sensitivity: "public", autofill: false, note: "four-year school with a completed term (screens out CC-only transfer awards); blank if none" },
 
   "financial.fafsaSAI": { source: "document", sensitivity: "restricted", autofill: false, note: "from the FAFSA SAR; never auto-typed — financial questions are a human checkpoint" },
   "financial.pellEligible": { source: "document", sensitivity: "restricted", autofill: false },

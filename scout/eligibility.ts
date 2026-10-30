@@ -32,6 +32,8 @@ export interface EligibilityProfile {
   isUsCitizen: boolean;
   /** undefined = declined to state; gender-restricted awards then screen ambiguous, never DQ. */
   gender?: "male" | "female";
+  /** Has completed a term at a four-year school. Transfer awards (Jack Kent Cooke) exclude this. */
+  attendedFourYear: boolean;
 }
 
 // SCREENING POLICY — which academic fields and levels the student can honestly claim. This is
@@ -114,7 +116,7 @@ export function extractInstitutions(text: string): string[] {
 export function buildEligibilityProfile(a: {
   identity: { citizenship: string; gender: string };
   contact: { address: { state: string } };
-  academic: { currentSchool: string; highSchool: string; classLevel: string };
+  academic: { currentSchool: string; highSchool: string; classLevel: string; priorFourYear?: string };
   financial: { residency: string };
   doNotClaim?: string[];
 }): EligibilityProfile {
@@ -145,6 +147,8 @@ export function buildEligibilityProfile(a: {
     // "" in the profile means decline-to-state. Gender-restricted awards must then screen as
     // ambiguous rather than being answered on the student's behalf.
     gender: (a.identity?.gender || "").toLowerCase() === "female" ? "female" : (a.identity?.gender || "").toLowerCase() === "male" ? "male" : undefined,
+    // A school name or "yes" means a completed term at a four-year school; blank/"no" means none.
+    attendedFourYear: !!(a.academic?.priorFourYear || "").trim() && !/^(no|n|false|none)$/i.test(a.academic.priorFourYear!.trim()),
   };
 }
 
@@ -348,6 +352,25 @@ export function screenEligibility(
   ];
   for (const [re, why] of levelDq) {
     if (re.test(text)) return { decision: "disqualified", reasons: [why], hardDqRule: "wrong-grade-level" };
+  }
+  // "Pure" community-college transfer awards. Jack Kent Cooke's FAQ: "Students who have previously
+  // attended a four-year institution ... are not eligible." Its $55K/yr topped the queue at an 88%
+  // match for a student who finished a full semester at UM-Flint. Requires the exclusion to be
+  // spelled out — "must attend a four-year college" is the opposite and must still pass.
+  const FOUR_YEAR = "(?:a\\s+|any\\s+)?four[-\\s]?year\\s+(?:institution|college|university|school)s?";
+  const NO_PRIOR_FOUR_YEAR = new RegExp(
+    "\\b(?:previously|already|ever)\\s+(?:attended|enrolled\\s+(?:in|at))\\s+" + FOUR_YEAR + "\\b[^;]{0,80}?\\b(?:not|in)\\s?eligible\\b" +
+      "|\\b(?:no|without)\\s+(?:previous|prior)\\s+(?:enrollment|attendance)\\s+(?:(?:in|at)\\s+|or\\s+attendance\\s+(?:in|at)\\s+)" + FOUR_YEAR +
+      "|\\bmust\\s+not\\s+have\\s+(?:previously\\s+)?(?:attended|enrolled\\s+(?:in|at))\\s+" + FOUR_YEAR +
+      "|\\b(?:have|has)\\s+never\\s+(?:attended|enrolled\\s+(?:in|at))\\s+" + FOUR_YEAR,
+    "i",
+  );
+  if (profile.attendedFourYear && NO_PRIOR_FOUR_YEAR.test(text)) {
+    return {
+      decision: "disqualified",
+      reasons: ["excludes students who previously attended a four-year school; student completed a term at one"],
+      hardDqRule: "prior-four-year",
+    };
   }
   // High-school scope, with no post-secondary level named alongside it. Checked as a pair so that
   // "open to high school seniors and current undergraduates" still passes.
