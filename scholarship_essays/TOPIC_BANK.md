@@ -1,6 +1,6 @@
 # Essay Topic Bank
 
-> Generated 2026-11-01 by `bun scout/topic-bank.ts` from the scout run of 2026-11-01.
+> Generated 2026-11-02 by `bun scout/topic-bank.ts` from the scout run of 2026-11-02.
 > Regenerate after every scout run. Nothing here is written for you — this is the list of what to write.
 
 **How to use it:** write the 500-word version of each archetype below once, then cut it down per
@@ -71,11 +71,15 @@ _No open scholarship is waiting on this one right now._
 
 *Prompt to write against:* What have you built, and why does building a business matter to you?
 
-_No open scholarship is waiting on this one right now._
+1 scholarship waiting on this topic:
+
+- [ ] **NASE Future Entrepreneur Award** — $24,000 · due verify at URL · word limit unknown · 60% match
+  - https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9992884
+  - folder exists: `scholarship_essays/nase-future-entrepreneur-award/`
 
 ### Unsorted — open the URL to see the real prompt
 
-32 listings whose blurb doesn't say what the essay asks for.
+33 listings whose blurb doesn't say what the essay asks for.
 Each one asks for an essay; the listing just doesn't say which kind.
 Sorted by expected value, so work down from the top.
 
@@ -88,6 +92,7 @@ Sorted by expected value, so work down from the top.
 - [ ] **D.O.O.R.S. Development Of Our Research Scientists Scholarship** — $5,000 · due September · 55% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015617
 - [ ] **$2,500 College Raptor Scholarship** — $2,500 · due September · 75% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9997224
 - [ ] **AIST Midwest Member Chapter - Western States Award** — $3,000 · due February · 50% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998334
+- [ ] **Interstellar Research Group Undergraduate College Scholarship Program** — $2,500 · due Dec 31, 2026 · 60% match · https://scholarships360.org/scholarships/search/interstellar-research-group-undergraduate-college-scholarship-program/
 - [ ] **Superpower Scholarship** — $3,000 · due Mar 31, 2027 · 50% match · https://www.unigo.com/scholarships/our-scholarships/superpower-scholarship
 - [ ] **All About Education Scholarship** — $3,000 · due Apr 30, 2027 · 50% match · https://www.unigo.com/scholarships/our-scholarships/all-about-education-scholarship
 - [ ] **Buzzell, Welsh & Hill College Scholarship Program** — $2,500 · due May · 55% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9997865
@@ -95,6 +100,7 @@ Sorted by expected value, so work down from the top.
 - [ ] **TRIUMF Summer Research Award** — $2,000 · due January · 60% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989656
 - [ ] **Michigan State Grants and Scholarships** — — · due verify at URL · 80% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2014640
 - [ ] **Scholarships for Transfer Students** — — · due verify at URL · 75% match · https://www.unigo.com/scholarships/undergraduate-students/transfer-scholarships
+- [ ] **Orafs Student Scholarship** — $2,000 · due Dec 31, 2026 · 55% match · https://scholarships360.org/scholarships/search/orafs-student-scholarship/
 - [ ] **MDI Biological Laboratory Undergraduate Summer Research Fellowships** — — · due January · 70% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9993019
 - [ ] **Dell Scholars Program** — — · due verify at URL · 70% match · https://scholarships360.org/scholarships/search/dell-scholars-program/
 - [ ] **Peek Law Group - Scholarship for Students** — $2,000 · due August · 50% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=2015681
@@ -106,7 +112,6 @@ Sorted by expected value, so work down from the top.
 - [ ] **USGA/Chevron STEM Scholarship Program** — — · due verify at URL · 55% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9989442
 - [ ] **John L. and Eleanore I. Mckinley Scholarships** — — · due February · 55% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9996095
 - [ ] **Collegexpress Monthly Scholarship** — — · due verify at URL · 55% match · https://scholarships360.org/scholarships/search/collegexpress-monthly-scholarship/
-- [ ] **Sofi 2500 Scholarship Giveaway** — — · due verify at URL · 55% match · https://scholarships360.org/scholarships/search/sofi-2500-scholarship-giveaway/
 - [ ] **Guy m Wilson Scholarships** — — · due verify at URL · 55% match · https://scholarships360.org/scholarships/search/guy-m-wilson-scholarships/
 - [ ] **Bluepay Stem Scholarship** — $1,000 · due August · 80% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9998037
 - [ ] **Dr. Arthur A. Kezian DDS Science Scholarship** — $1,200 · due March · 65% match · https://www.careeronestop.org/Toolkit/Training/find-scholarships-detail.aspx?scholarshipId=9996038
@@ -138,6 +143,7 @@ Sorted by expected value, so work down from the top.
 | Foundation Gala Scholarship for New Students | $5,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Mary Clifford Memorial Scholarship | $5,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Etta Gray Memorial Scholarship | $5,000 | 10/30/2026 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
+| Community Impact Scholarship | $5,000 | August | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Mary and Bob Sierra Family Foundation State/Community College Scholarship | $3,500 | 01/31/2027 | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Foundation 649 Scholarship | $4,000 | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | LoopEd Scholarship | $3,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -160,7 +166,6 @@ Sorted by expected value, so work down from the top.
 | $1500 College Monk No Essay Scholarship | $1,500 | October | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Terry Bryant College Scholarship | $2,500 | June | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Skyline Technologies Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
-| Tocris Scholarship Program | $1,500 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | Lieutenant General Douglas D. Buchholz Memorial Scholarship | $2,000 | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
 | The Law Office of Shane R. Kadlec Public Service Scholarship | $2,000 | May | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 | Research Internships in Science and Engineering (RISE) | — | verify | `scholarship_essays/cybercorps-reg-scholarship-for-service/essay.md` (424w) | send as-is |
@@ -231,10 +236,8 @@ Sorted by expected value, so work down from the top.
 | Greg Bourgeois Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Roger E. Shea, Jr. Memorial Scholarship | — | verify | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
 | Lowe Family First Summer Student Scholarship | — | March | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| Dr. Elzada Clover and Dr. Lois Jotter Cutter Student Scholarship | — | March | `scholarship_essays/the-bailey-family-foundation-college-scholarship/essay.md` (441w) | send as-is |
-| Community Service Scholarship | $1,000 | November | `scholarship_essays/james-e-foy-john-w-sagabiel-undergraduate-leader/essay.md` (420w) | send as-is |
 
-**Totals:** 150 scholarships at 50%+ match · 35 need new words · 115 reusable · 32 unsorted.
+**Totals:** 150 scholarships at 50%+ match · 37 need new words · 113 reusable · 33 unsorted.
 
 ---
 
